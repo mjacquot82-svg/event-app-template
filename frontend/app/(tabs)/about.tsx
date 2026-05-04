@@ -1,4 +1,4 @@
-// © 2026 1001538341 ONTARIO INC. All Rights Reserved.
+// © 2026 1001538341 ONTARIO INC.
 
 import React from 'react';
 import {
@@ -14,14 +14,14 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 import colors from '../../src/theme/colors';
-import { eventInfo, locations, sessions } from '../../src/data/mockData';
+import eventConfig from '../../src/data/eventConfig';
 
 export default function AboutScreen() {
   const openMaps = () => {
-    const { lat, lng } = eventInfo.coordinates;
+    const { lat, lng } = eventConfig.event.coordinates;
     const url = Platform.select({
       ios: `maps://app?daddr=${lat},${lng}`,
-      android: `geo:${lat},${lng}?q=${lat},${lng}(IPM 2026)`,
+      android: `geo:${lat},${lng}?q=${lat},${lng}`,
       default: `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`,
     });
     Linking.openURL(url as string);
@@ -30,316 +30,84 @@ export default function AboutScreen() {
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-        {/* Logo Header */}
+
+        {/* Logo + Title */}
         <View style={styles.logoSection}>
-          <Image 
-            source={{ uri: 'https://customer-assets.emergentagent.com/job_95522952-d1fd-436e-88ee-22dc044a6280/artifacts/cwk6huub_image.png' }}
-            style={styles.logoImage}
-            resizeMode="contain"
-          />
-          <Text style={styles.eventTitle}>International Plowing Match</Text>
-          <Text style={styles.eventSubtitle}>& Rural Expo</Text>
+          <Image source={{ uri: eventConfig.assets.logoUri }} style={styles.logoImage} resizeMode="contain" />
+          <Text style={styles.eventTitle}>{eventConfig.event.shortName}</Text>
+          <Text style={styles.eventSubtitle}>{eventConfig.event.subtitle}</Text>
         </View>
 
-        {/* 50 Years Strong Heritage Banner */}
+        {/* Highlight Banner */}
         <View style={styles.heritageBanner}>
-          <View style={styles.heritageDecor}>
-            <View style={styles.heritageLine} />
-            <Feather name="award" size={24} color={colors.accent} />
-            <View style={styles.heritageLine} />
-          </View>
-          <Text style={styles.heritageTagline}>50 Years Strong</Text>
-          <Text style={styles.heritageYear}>Celebrating Half a Century of Agricultural Excellence</Text>
+          <Feather name="award" size={24} color={colors.accent} />
+          <Text style={styles.heritageTagline}>{eventConfig.about.highlightTitle}</Text>
+          <Text style={styles.heritageYear}>{eventConfig.about.highlightSubtitle}</Text>
         </View>
 
         {/* Event Details */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Event Details</Text>
-          
+
           <View style={styles.detailCard}>
             <View style={styles.detailRow}>
-              <View style={[styles.detailIcon, { backgroundColor: colors.primary }]}>
-                <Feather name="calendar" size={20} color="#FFFFFF" />
-              </View>
-              <View style={styles.detailText}>
-                <Text style={styles.detailLabel}>Dates</Text>
-                <Text style={styles.detailValue}>{eventInfo.dates}</Text>
-              </View>
+              <Feather name="calendar" size={20} color={colors.primary} />
+              <Text style={styles.detailValue}>{eventConfig.event.dates}</Text>
             </View>
 
             <View style={styles.detailRow}>
-              <View style={[styles.detailIcon, { backgroundColor: colors.accent }]}>
-                <Feather name="map-pin" size={20} color="#FFFFFF" />
-              </View>
-              <View style={styles.detailText}>
-                <Text style={styles.detailLabel}>Location</Text>
-                <Text style={styles.detailValue}>{eventInfo.location}</Text>
-              </View>
-            </View>
-
-            <View style={styles.detailRow}>
-              <View style={[styles.detailIcon, { backgroundColor: colors.field }]}>
-                <Feather name="navigation" size={20} color="#FFFFFF" />
-              </View>
-              <View style={styles.detailText}>
-                <Text style={styles.detailLabel}>Coordinates</Text>
-                <Text style={styles.detailCoords}>
-                  {eventInfo.coordinates.lat}, {eventInfo.coordinates.lng}
-                </Text>
-              </View>
+              <Feather name="map-pin" size={20} color={colors.accent} />
+              <Text style={styles.detailValue}>{eventConfig.event.location}</Text>
             </View>
           </View>
 
-          <TouchableOpacity 
-            style={styles.directionsButton}
-            onPress={openMaps}
-            activeOpacity={0.8}
-          >
-            <Feather name="navigation" size={20} color="#FFFFFF" />
+          <TouchableOpacity style={styles.directionsButton} onPress={openMaps}>
             <Text style={styles.directionsButtonText}>Get Directions</Text>
           </TouchableOpacity>
         </View>
 
-        {/* About the Event */}
+        {/* About */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>About the Event</Text>
-          <View style={styles.descriptionCard}>
-            <Text style={styles.description}>{eventInfo.description}</Text>
-          </View>
+          <Text style={styles.sectionTitle}>About</Text>
+          <Text style={styles.description}>{eventConfig.event.description}</Text>
         </View>
 
-        {/* Heritage Section */}
+        {/* Secondary Section */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Our Heritage</Text>
-          <View style={styles.heritageCard}>
-            <Feather name="book-open" size={32} color={colors.accent} />
-            <Text style={styles.heritageTitle}>A Proud Tradition</Text>
-            <Text style={styles.heritageText}>
-              For 50 years, the International Plowing Match has brought together farmers, 
-              families, and communities to celebrate Ontario's rich agricultural heritage. 
-              From horse-drawn plows to modern machinery, we honor the past while 
-              embracing the future of farming.
-            </Text>
-          </View>
+          <Text style={styles.sectionTitle}>{eventConfig.about.secondarySectionTitle}</Text>
+          <Text style={styles.description}>{eventConfig.about.secondaryText}</Text>
         </View>
 
-        {/* Copyright Footer */}
-        <View style={styles.copyrightSection}>
-          <Text style={styles.copyrightText}>© 2026 1001538341 ONTARIO INC.</Text>
-          <Text style={styles.copyrightText}>All Rights Reserved.</Text>
+        {/* Footer */}
+        <View style={styles.footer}>
+          {eventConfig.footer.copyrightLines.map((line, i) => (
+            <Text key={i} style={styles.footerText}>{line}</Text>
+          ))}
         </View>
 
-        <View style={styles.bottomPadding} />
       </ScrollView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  logoSection: {
-    alignItems: 'center',
-    paddingTop: 20,
-    paddingBottom: 24,
-  },
-  logoImage: {
-    width: 160,
-    height: 160,
-  },
-  eventTitle: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: colors.textPrimary,
-    marginTop: 16,
-    textAlign: 'center',
-  },
-  eventSubtitle: {
-    fontSize: 16,
-    color: colors.accent,
-    fontWeight: '500',
-    marginTop: 2,
-  },
-  heritageBanner: {
-    backgroundColor: colors.surface,
-    marginHorizontal: 20,
-    padding: 20,
-    borderRadius: 16,
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: colors.accent,
-  },
-  heritageDecor: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  heritageLine: {
-    width: 40,
-    height: 2,
-    backgroundColor: colors.accent,
-    marginHorizontal: 12,
-  },
-  heritageTagline: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: colors.accent,
-    fontFamily: Platform.OS === 'ios' ? 'Georgia' : 'serif',
-    fontStyle: 'italic',
-  },
-  heritageYear: {
-    fontSize: 13,
-    color: colors.textSecondary,
-    marginTop: 4,
-    textAlign: 'center',
-  },
-  section: {
-    paddingHorizontal: 20,
-    marginTop: 24,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: colors.textPrimary,
-    marginBottom: 16,
-  },
-  detailCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 16,
-    padding: 16,
-    gap: 16,
-  },
-  detailRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  detailIcon: {
-    width: 44,
-    height: 44,
-    borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  detailText: {
-    marginLeft: 14,
-    flex: 1,
-  },
-  detailLabel: {
-    fontSize: 13,
-    color: colors.textMuted,
-  },
-  detailValue: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.textPrimary,
-    marginTop: 2,
-  },
-  detailCoords: {
-    fontSize: 14,
-    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
-    color: colors.textSecondary,
-    marginTop: 2,
-  },
-  directionsButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 10,
-    backgroundColor: colors.primary,
-    paddingVertical: 16,
-    borderRadius: 50,
-    marginTop: 16,
-  },
-  directionsButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#FFFFFF',
-  },
-  descriptionCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 16,
-    padding: 16,
-  },
-  description: {
-    fontSize: 15,
-    color: colors.textSecondary,
-    lineHeight: 24,
-  },
-  statsGrid: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  statCard: {
-    flex: 1,
-    backgroundColor: colors.surface,
-    padding: 16,
-    borderRadius: 16,
-    alignItems: 'center',
-  },
-  statNumber: {
-    fontSize: 32,
-    fontWeight: '700',
-    color: colors.accent,
-  },
-  statLabel: {
-    fontSize: 13,
-    color: colors.textMuted,
-    marginTop: 4,
-  },
-  heritageCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 16,
-    padding: 20,
-    alignItems: 'center',
-  },
-  heritageTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: colors.textPrimary,
-    marginTop: 12,
-    marginBottom: 8,
-  },
-  heritageText: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    lineHeight: 22,
-    textAlign: 'center',
-  },
-  footerBadge: {
-    backgroundColor: colors.surface,
-    borderRadius: 16,
-    padding: 20,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  footerText: {
-    fontSize: 14,
-    color: colors.textMuted,
-  },
-  footerTagline: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.accent,
-    marginTop: 4,
-    fontStyle: 'italic',
-  },
-  copyrightSection: {
-    marginTop: 24,
-    paddingHorizontal: 20,
-    alignItems: 'center',
-  },
-  copyrightText: {
-    fontSize: 11,
-    color: colors.textMuted,
-    textAlign: 'center',
-  },
-  bottomPadding: {
-    height: 200, // THE SPACER - Critical for scrolling content above floating ad
-  },
+  container: { flex: 1, backgroundColor: colors.background },
+  scrollView: { flex: 1 },
+  logoSection: { alignItems: 'center', padding: 20 },
+  logoImage: { width: 120, height: 120 },
+  eventTitle: { fontSize: 20, fontWeight: '700', color: colors.textPrimary },
+  eventSubtitle: { fontSize: 14, color: colors.accent },
+  heritageBanner: { alignItems: 'center', padding: 16 },
+  heritageTagline: { fontSize: 20, fontWeight: '700', color: colors.accent },
+  heritageYear: { fontSize: 12, color: colors.textSecondary },
+  section: { padding: 20 },
+  sectionTitle: { fontSize: 16, fontWeight: '600', marginBottom: 10 },
+  detailCard: { gap: 10 },
+  detailRow: { flexDirection: 'row', gap: 10, alignItems: 'center' },
+  detailValue: { fontSize: 14 },
+  directionsButton: { marginTop: 10 },
+  directionsButtonText: { color: colors.primary },
+  description: { fontSize: 14, lineHeight: 20 },
+  footer: { alignItems: 'center', padding: 20 },
+  footerText: { fontSize: 10, color: colors.textMuted },
 });
