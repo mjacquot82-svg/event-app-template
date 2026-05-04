@@ -1,161 +1,82 @@
 // © 2026 1001538341 ONTARIO INC. All Rights Reserved.
 
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-} from 'react-native';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
-import colors from '../../src/theme/colors';
+
+const YELLOW = '#FFD23F';
+const PINK = '#F6008F';
+const CYAN = '#16BFD6';
+const LIME = '#74D65E';
 
 export default function LeaderboardScreen() {
   return (
-    <View style={styles.container}>
-      <SafeAreaView edges={['top']} style={styles.safeArea}>
-        {/* Header */}
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>Leaderboard</Text>
+    <SafeAreaView style={styles.container} edges={['top']}>
+      <View style={styles.header}>
+        <Text style={styles.eyebrow}>Weekend Highlights</Text>
+        <Text style={styles.headerTitle}>Featured Moments</Text>
+        <Text style={styles.subtitle}>What people should not miss during Homecoming weekend.</Text>
+      </View>
+
+      <ScrollView style={styles.content} contentContainerStyle={styles.contentContainer} showsVerticalScrollIndicator={false}>
+        <View style={styles.heroCard}>
+          <View style={styles.iconContainer}>
+            <Feather name="star" size={42} color="#000" />
+          </View>
+          <Text style={styles.placeholderTitle}>Highlights Hub</Text>
+          <Text style={styles.placeholderText}>
+            Featured concerts, sponsor spotlights, photo moments, contests, and top weekend announcements can live here.
+          </Text>
         </View>
 
-        <ScrollView
-          style={styles.content}
-          contentContainerStyle={styles.contentContainer}
-          showsVerticalScrollIndicator={false}
-        >
-          {/* Placeholder Content */}
-          <View style={styles.placeholderContainer}>
-            <View style={styles.iconContainer}>
-              <Feather name="bar-chart-2" size={64} color={colors.accent} />
-            </View>
-            <Text style={styles.placeholderTitle}>Coming Soon</Text>
-            <Text style={styles.placeholderText}>
-              The leaderboard feature is being developed. Check back during the event to see competition standings and results!
-            </Text>
-          </View>
-
-          {/* Example structure for future leaderboard */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>What to Expect</Text>
-            <View style={styles.featureCard}>
-              <Feather name="trophy" size={24} color={colors.accent} />
-              <View style={styles.featureContent}>
-                <Text style={styles.featureTitle}>Competition Rankings</Text>
-                <Text style={styles.featureText}>Live standings for plowing competitions</Text>
-              </View>
-            </View>
-            <View style={styles.featureCard}>
-              <Feather name="users" size={24} color={colors.field} />
-              <View style={styles.featureContent}>
-                <Text style={styles.featureTitle}>Competitor Profiles</Text>
-                <Text style={styles.featureText}>Learn about the competitors</Text>
-              </View>
-            </View>
-            <View style={styles.featureCard}>
-              <Feather name="award" size={24} color={colors.primary} />
-              <View style={styles.featureContent}>
-                <Text style={styles.featureTitle}>Awards & Results</Text>
-                <Text style={styles.featureText}>Final results and award winners</Text>
-              </View>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Featured This Weekend</Text>
+          <View style={[styles.featureCard, { borderColor: PINK }]}>
+            <Feather name="music" size={24} color={PINK} />
+            <View style={styles.featureContent}>
+              <Text style={styles.featureTitle}>Main Stage Nights</Text>
+              <Text style={styles.featureText}>Concerts, reunion energy, and Saturday night Remix vibes.</Text>
             </View>
           </View>
-
-          <View style={styles.bottomPadding} />
-        </ScrollView>
-      </SafeAreaView>
-    </View>
+          <View style={[styles.featureCard, { borderColor: LIME }]}>
+            <Feather name="users" size={24} color={LIME} />
+            <View style={styles.featureContent}>
+              <Text style={styles.featureTitle}>Community Moments</Text>
+              <Text style={styles.featureText}>Parade, market, brunch, and hometown gathering points.</Text>
+            </View>
+          </View>
+          <View style={[styles.featureCard, { borderColor: CYAN }]}>
+            <Feather name="camera" size={24} color={CYAN} />
+            <View style={styles.featureContent}>
+              <Text style={styles.featureTitle}>Photo & Sponsor Spots</Text>
+              <Text style={styles.featureText}>Future home for sponsor-backed photo walls and highlight galleries.</Text>
+            </View>
+          </View>
+        </View>
+        <View style={styles.bottomPadding} />
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  safeArea: {
-    flex: 1,
-  },
-  header: {
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-    backgroundColor: colors.surface,
-  },
-  headerTitle: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: colors.textPrimary,
-  },
-  content: {
-    flex: 1,
-  },
-  contentContainer: {
-    padding: 20,
-  },
-  placeholderContainer: {
-    alignItems: 'center',
-    paddingVertical: 40,
-    backgroundColor: colors.surface,
-    borderRadius: 20,
-    marginBottom: 24,
-  },
-  iconContainer: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    backgroundColor: colors.surfaceHighlight,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  placeholderTitle: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: colors.textPrimary,
-    marginBottom: 12,
-  },
-  placeholderText: {
-    fontSize: 15,
-    color: colors.textSecondary,
-    textAlign: 'center',
-    paddingHorizontal: 30,
-    lineHeight: 22,
-  },
-  section: {
-    marginBottom: 20,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: colors.textPrimary,
-    marginBottom: 16,
-  },
-  featureCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.surface,
-    padding: 16,
-    borderRadius: 16,
-    marginBottom: 12,
-    gap: 16,
-  },
-  featureContent: {
-    flex: 1,
-  },
-  featureTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.textPrimary,
-    marginBottom: 4,
-  },
-  featureText: {
-    fontSize: 14,
-    color: colors.textSecondary,
-  },
-  bottomPadding: {
-    height: 200, // THE SPACER - Critical for scrolling content above floating ad
-  },
+  container: { flex: 1, backgroundColor: '#000' },
+  header: { paddingHorizontal: 20, paddingTop: 12, paddingBottom: 16, backgroundColor: '#151100', borderBottomWidth: 2, borderBottomColor: YELLOW },
+  eyebrow: { color: YELLOW, fontSize: 12, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1 },
+  headerTitle: { fontSize: 28, fontWeight: '900', color: '#fff', marginTop: 4 },
+  subtitle: { color: '#D1D5DB', fontSize: 13, marginTop: 4 },
+  content: { flex: 1, backgroundColor: '#000' },
+  contentContainer: { padding: 20 },
+  heroCard: { alignItems: 'center', paddingVertical: 34, paddingHorizontal: 20, backgroundColor: '#111', borderRadius: 22, marginBottom: 24, borderWidth: 2, borderColor: YELLOW },
+  iconContainer: { width: 92, height: 92, borderRadius: 46, backgroundColor: YELLOW, justifyContent: 'center', alignItems: 'center', marginBottom: 18 },
+  placeholderTitle: { fontSize: 24, fontWeight: '900', color: '#fff', marginBottom: 10 },
+  placeholderText: { fontSize: 14, color: '#D1D5DB', textAlign: 'center', lineHeight: 21 },
+  section: { marginBottom: 20 },
+  sectionTitle: { fontSize: 18, fontWeight: '900', color: '#fff', marginBottom: 14 },
+  featureCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#111', padding: 16, borderRadius: 16, marginBottom: 12, gap: 16, borderWidth: 1 },
+  featureContent: { flex: 1 },
+  featureTitle: { fontSize: 16, fontWeight: '900', color: '#fff', marginBottom: 4 },
+  featureText: { fontSize: 13, color: '#B7BDC7', lineHeight: 18 },
+  bottomPadding: { height: 200 },
 });
