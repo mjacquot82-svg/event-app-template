@@ -13,15 +13,23 @@ import {
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import eventConfig from '../../src/data/eventConfig';
+import { featuredSponsors } from '../../src/data/sponsors';
 
-type GridItemProps = {
-  label: string;
-  icon: keyof typeof Feather.glyphMap;
-  color: string;
-  onPress: () => void;
-};
+function SponsorCard({ sponsor }: any) {
+  return (
+    <Pressable
+      onPress={() => sponsor.url && Linking.openURL(sponsor.url)}
+      style={[styles.sponsorCard, { borderColor: sponsor.color }]}
+    >
+      <Text style={[styles.sponsorName, { color: sponsor.color }]}>
+        {sponsor.name}
+      </Text>
+      <Text style={styles.sponsorTagline}>{sponsor.tagline}</Text>
+    </Pressable>
+  );
+}
 
-function GridItem({ label, icon, color, onPress }: GridItemProps) {
+function GridItem({ label, icon, color, onPress }: any) {
   const scaleAnim = useRef(new Animated.Value(1)).current;
 
   return (
@@ -42,11 +50,7 @@ export default function HomeScreen() {
   return (
     <ScrollView style={[styles.container, { backgroundColor: eventConfig.brand.homeBackground }]}> 
       <View style={styles.bannerContainer}>
-        <Image
-          source={eventConfig.assets.bannerImage}
-          style={styles.bannerImage}
-          resizeMode="cover"
-        />
+        <Image source={eventConfig.assets.bannerImage} style={styles.bannerImage} resizeMode="cover" />
         <View style={styles.bannerOverlay} />
       </View>
 
@@ -56,16 +60,25 @@ export default function HomeScreen() {
             <GridItem
               key={item.id}
               label={item.label}
-              icon={item.icon as any}
+              icon={item.icon}
               color={item.color}
               onPress={() => {
-                if (item.route) router.push(item.route as any);
+                if (item.route) router.push(item.route);
                 if (item.url) Linking.openURL(item.url);
               }}
             />
           ))}
         </View>
       </View>
+
+      {/* Sponsors Section */}
+      <View style={styles.sponsorSection}>
+        <Text style={styles.sponsorTitle}>Featured Sponsors</Text>
+        {featuredSponsors.map((sponsor) => (
+          <SponsorCard key={sponsor.id} sponsor={sponsor} />
+        ))}
+      </View>
+
     </ScrollView>
   );
 }
@@ -113,5 +126,29 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '700',
     color: '#1F2937',
+  },
+  sponsorSection: {
+    paddingHorizontal: 16,
+    paddingBottom: 30,
+  },
+  sponsorTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    marginBottom: 10,
+  },
+  sponsorCard: {
+    borderWidth: 2,
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 10,
+    backgroundColor: '#fff',
+  },
+  sponsorName: {
+    fontWeight: '700',
+    fontSize: 14,
+  },
+  sponsorTagline: {
+    fontSize: 12,
+    color: '#6B7280',
   },
 });
