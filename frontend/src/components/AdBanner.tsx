@@ -1,5 +1,4 @@
 // © 2026 1001538341 ONTARIO INC. All Rights Reserved.
-// AD BANNER COMPONENT - FINAL VERSION WITH REAL ASSETS
 
 import React from 'react';
 import {
@@ -23,60 +22,35 @@ const AdBanner: React.FC<AdBannerProps> = ({ adUnit, position, pointerEvents = '
   if (!adUnit.enabled) return null;
 
   const handlePress = async () => {
+    if (!adUnit.targetUrl) return;
     try {
       const canOpen = await Linking.canOpenURL(adUnit.targetUrl);
-      if (canOpen) {
-        await Linking.openURL(adUnit.targetUrl);
-      }
+      if (canOpen) await Linking.openURL(adUnit.targetUrl);
     } catch (error) {
-      console.error('Error opening ad URL:', error);
+      console.error('Error opening sponsor URL:', error);
     }
   };
 
   const isTop = position === 'top';
 
-  if (isTop) {
-    // TOP AD - 92% width, borderRadius: 12, shadow
-    return (
-      <View style={styles.topContainer} pointerEvents={pointerEvents}>
-        <TouchableOpacity
-          style={styles.topBanner}
-          onPress={handlePress}
-          activeOpacity={0.9}
-        >
-          {adUnit.imageUrl ? (
-            <Image
-              source={{ uri: adUnit.imageUrl }}
-              style={styles.topBannerImage}
-              resizeMode="cover"
-            />
-          ) : (
-            <View style={styles.topPlaceholder}>
-              <Text style={styles.placeholderText}>{adUnit.placeholderText}</Text>
-            </View>
-          )}
-        </TouchableOpacity>
-      </View>
-    );
-  }
-
-  // BOTTOM AD - 92% width, borderRadius: 12, shadow
   return (
-    <View style={styles.bottomContainer} pointerEvents={pointerEvents}>
+    <View style={isTop ? styles.topContainer : styles.bottomContainer} pointerEvents={pointerEvents}>
       <TouchableOpacity
-        style={styles.bottomBanner}
+        style={isTop ? styles.topBanner : styles.bottomBanner}
         onPress={handlePress}
         activeOpacity={0.9}
       >
         {adUnit.imageUrl ? (
           <Image
             source={{ uri: adUnit.imageUrl }}
-            style={styles.bottomBannerImage}
+            style={isTop ? styles.topBannerImage : styles.bottomBannerImage}
             resizeMode="cover"
           />
         ) : (
-          <View style={styles.bottomPlaceholder}>
-            <Text style={styles.placeholderText}>{adUnit.placeholderText}</Text>
+          <View style={styles.placeholder}>
+            <Text style={styles.sponsorEyebrow}>{isTop ? 'Presented By' : 'Sponsor Spotlight'}</Text>
+            <Text style={styles.sponsorName}>{adUnit.name}</Text>
+            <Text style={styles.sponsorText}>{adUnit.placeholderText}</Text>
           </View>
         )}
       </TouchableOpacity>
@@ -85,85 +59,65 @@ const AdBanner: React.FC<AdBannerProps> = ({ adUnit, position, pointerEvents = '
 };
 
 const styles = StyleSheet.create({
-  // TOP AD CONTAINER - marginTop: 10
   topContainer: {
     width: '100%',
     alignItems: 'center',
-    paddingHorizontal: '4%', // Creates 92% width effect
+    paddingHorizontal: '4%',
     marginTop: 10,
   },
-  
-  // TOP BANNER - borderRadius: 12, shadow matching Quick Actions
   topBanner: {
     width: '100%',
-    height: 80,
-    borderRadius: 12,
+    height: 82,
+    borderRadius: 14,
     overflow: 'hidden',
     alignSelf: 'center',
-    backgroundColor: '#8B1538',
-    // Shadow matching Quick Actions buttons
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    backgroundColor: '#111827',
+    borderWidth: 2,
+    borderColor: colors.accent,
   },
-  
-  topBannerImage: {
-    width: '100%',
-    height: 80,
-  },
-  
-  topPlaceholder: {
-    width: '100%',
-    height: 80,
-    backgroundColor: '#8B1538',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  
-  // BOTTOM AD CONTAINER
   bottomContainer: {
     width: '100%',
     alignItems: 'center',
-    paddingHorizontal: '4%', // Creates 92% width effect
+    paddingHorizontal: '4%',
   },
-  
-  // BOTTOM BANNER - borderRadius: 12, shadow matching Quick Actions
   bottomBanner: {
     width: '100%',
     height: 50,
     alignSelf: 'center',
     borderRadius: 12,
     overflow: 'hidden',
-    backgroundColor: '#8B1538',
-    // Shadow matching Quick Actions buttons
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    backgroundColor: '#111827',
+    borderWidth: 1,
+    borderColor: colors.primary,
   },
-  
-  bottomBannerImage: {
-    width: '100%',
-    height: 50,
-  },
-  
-  bottomPlaceholder: {
-    width: '100%',
-    height: 50,
-    backgroundColor: '#8B1538',
+  placeholder: {
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    paddingHorizontal: 12,
   },
-  
-  placeholderText: {
+  sponsorEyebrow: {
+    color: colors.field,
+    fontSize: 10,
+    fontWeight: '900',
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+  },
+  sponsorName: {
     color: '#FFFFFF',
-    fontSize: 12,
-    fontWeight: '700',
+    fontSize: 13,
+    fontWeight: '900',
     textAlign: 'center',
+    marginTop: 2,
   },
+  sponsorText: {
+    color: '#D1D5DB',
+    fontSize: 10,
+    textAlign: 'center',
+    marginTop: 2,
+  },
+  topBannerImage: { width: '100%', height: 82 },
+  bottomBannerImage: { width: '100%', height: 50 },
 });
 
 export default AdBanner;
