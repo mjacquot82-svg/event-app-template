@@ -1,15 +1,6 @@
 // © 2026 1001538341 ONTARIO INC.
 import React, { useMemo, useRef } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  Linking,
-  Image,
-  Pressable,
-  Animated,
-} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Linking, Image, Pressable, Animated } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import eventConfig from '../../src/data/eventConfig';
@@ -54,19 +45,25 @@ function getCurrentOrNextEvents() {
   const today = new Date();
   const todayKey = today.toISOString().slice(0, 10);
   const todayEvents = homeEvents.filter((event) => event.date === todayKey);
-
-  if (todayEvents.length > 0) {
-    return { title: 'Happening Today', events: todayEvents.slice(0, 3) };
-  }
+  if (todayEvents.length > 0) return { title: 'Happening Today', events: todayEvents.slice(0, 3) };
 
   const next = homeEvents.find((event) => new Date(`${event.date}T23:59:59`) >= today);
-  if (!next) {
-    return { title: 'Weekend Highlights', events: homeEvents.slice(-3) };
-  }
+  if (!next) return { title: 'Weekend Highlights', events: homeEvents.slice(-3) };
 
   const nextEvents = homeEvents.filter((event) => event.date === next.date).slice(0, 3);
   const label = new Date(`${next.date}T12:00:00`).toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
   return { title: `Coming Up: ${label}`, events: nextEvents };
+}
+
+function TextLogo() {
+  return (
+    <View style={styles.textLogoPanel}>
+      <Text style={styles.logoMingle}>Mingle</Text>
+      <Text style={styles.logoAmp}>&</Text>
+      <Text style={styles.logoRemix}>REMIX</Text>
+      <Text style={styles.logoYear}>2026</Text>
+    </View>
+  );
 }
 
 function SponsorCard({ sponsor }: any) {
@@ -121,9 +118,7 @@ export default function HomeScreen() {
       <View style={styles.heroCard}>
         <View style={styles.heroGlowPink} />
         <View style={styles.heroGlowBlue} />
-        <View style={styles.logoPanel}>
-          <Image source={{ uri: eventConfig.assets.logoUri }} style={styles.heroLogo} resizeMode="contain" />
-        </View>
+        <TextLogo />
         <Text style={styles.heroSubtitle}>{eventConfig.event.subtitle}</Text>
         <Text style={styles.heroDates}>{eventConfig.event.dates}</Text>
         <Text style={styles.heroLocation}>{eventConfig.event.location}</Text>
@@ -144,7 +139,9 @@ export default function HomeScreen() {
       <View style={styles.todayCard}>
         <View style={styles.todayHeader}>
           <Text style={styles.todayTitle}>{dynamicEvents.title}</Text>
-          <Pressable onPress={() => router.push('/schedule')}><Text style={styles.viewAll}>View schedule</Text></Pressable>
+          <Pressable onPress={() => router.push('/schedule')}>
+            <Text style={styles.viewAll}>View schedule</Text>
+          </Pressable>
         </View>
         {dynamicEvents.events.map((event) => (
           <View key={event.id} style={styles.todayItemRow}>
@@ -205,24 +202,14 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#000' },
   countdownWrap: { alignItems: 'center', marginTop: 10, marginBottom: 2 },
   countdownText: { color: '#74D65E', fontWeight: '900', fontSize: 13 },
-  heroCard: {
-    marginHorizontal: 16,
-    marginTop: 12,
-    marginBottom: 14,
-    borderRadius: 26,
-    minHeight: 286,
-    overflow: 'hidden',
-    backgroundColor: '#090909',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 18,
-    borderWidth: 1,
-    borderColor: 'rgba(22, 191, 214, 0.55)',
-  },
+  heroCard: { marginHorizontal: 16, marginTop: 12, marginBottom: 14, borderRadius: 26, minHeight: 300, overflow: 'hidden', backgroundColor: '#090909', alignItems: 'center', justifyContent: 'center', padding: 18, borderWidth: 1, borderColor: 'rgba(22,191,214,0.55)' },
   heroGlowPink: { position: 'absolute', width: 260, height: 260, borderRadius: 130, backgroundColor: 'rgba(246,0,143,0.30)', top: -95, right: -75 },
   heroGlowBlue: { position: 'absolute', width: 260, height: 260, borderRadius: 130, backgroundColor: 'rgba(22,191,214,0.32)', bottom: -95, left: -75 },
-  logoPanel: { width: '96%', borderRadius: 20, backgroundColor: '#FFFFFF', paddingHorizontal: 12, paddingVertical: 12, marginBottom: 12 },
-  heroLogo: { width: '100%', height: 112 },
+  textLogoPanel: { width: '96%', borderRadius: 20, backgroundColor: '#fff', paddingVertical: 12, alignItems: 'center', marginBottom: 12 },
+  logoMingle: { fontSize: 38, fontWeight: '900', color: '#F6008F', lineHeight: 40, letterSpacing: 0.5 },
+  logoAmp: { fontSize: 26, fontWeight: '900', color: '#16BFD6', lineHeight: 28 },
+  logoRemix: { fontSize: 34, fontWeight: '900', color: '#111', lineHeight: 36, letterSpacing: 2 },
+  logoYear: { fontSize: 18, fontWeight: '900', color: '#74D65E', marginTop: 2 },
   heroSubtitle: { color: '#74D65E', fontSize: 13, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1.1 },
   heroDates: { color: '#FFFFFF', fontSize: 20, fontWeight: '900', marginTop: 8 },
   heroLocation: { color: '#D1D5DB', fontSize: 14, marginTop: 4 },
