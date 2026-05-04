@@ -21,7 +21,11 @@ export default function AboutScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
 
         <View style={styles.header}>
           <Text style={styles.title}>About the Event</Text>
@@ -72,6 +76,7 @@ export default function AboutScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#000' },
   scrollView: { flex: 1, backgroundColor: '#000' },
+  scrollContent: { paddingBottom: 220 },
   header: { padding: 20, borderBottomWidth: 2, borderBottomColor: BLUE, backgroundColor: '#06141A' },
   title: { fontSize: 26, fontWeight: '900', color: '#fff' },
   subtitle: { fontSize: 14, color: '#B7BDC7', marginTop: 4 },
