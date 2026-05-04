@@ -1,11 +1,11 @@
 // © 2026 1001538341 ONTARIO INC. All Rights Reserved.
-// Central Ad Campaigns Configuration
-// Edit this file to control all ad content and destinations
+// Sponsor placement configuration
+// These are monetizable ad/sponsor slots, not random third-party ads.
 
 export interface AdUnit {
   id: string;
   name: string;
-  imageUrl: string | null;  // null = use placeholder
+  imageUrl: string | null;
   targetUrl: string;
   placeholderText: string;
   width: number;
@@ -19,48 +19,43 @@ export interface AdCampaignsConfig {
   interstitial: AdUnit;
 }
 
-// ============================================
-// EDIT YOUR AD CAMPAIGNS BELOW
-// ============================================
-
 const adCampaignsConfig: AdCampaignsConfig = {
-  // Top Masthead Banner (1800x400)
-  // Appears at the top of every screen below the status bar
+  // Premium top sponsor placement.
+  // Sell this as the highest-value sponsor spot across the app.
   topBanner: {
-    id: 'top-banner',
-    name: 'Sponsor Spotlight',
-    imageUrl: '',
-    targetUrl: '',
-    placeholderText: 'TOP BANNER AD (1800x400)',
+    id: 'top-presenting-sponsor',
+    name: 'Presented by Main Stage Sponsor',
+    imageUrl: null,
+    targetUrl: 'https://www.walkertonhomecoming2026.ca/sponsors',
+    placeholderText: 'Premium app-wide sponsor placement',
     width: 1800,
     height: 400,
     enabled: true,
   },
 
-  // Bottom Banner (1800x250)
-  // Appears above the tab navigation on every screen
+  // Secondary sponsor placement above the bottom navigation.
   bottomBanner: {
-    id: 'bottom-banner',
-    name: 'Official Souvenirs',
-    imageUrl: '',
-    targetUrl: '',
-    placeholderText: 'BOTTOM BANNER AD (1800x250)',
+    id: 'bottom-community-sponsor',
+    name: 'Community Sponsor Spotlight',
+    imageUrl: null,
+    targetUrl: 'https://www.walkertonhomecoming2026.ca/sponsors',
+    placeholderText: 'Support local businesses powering Home Coming weekend',
     width: 1800,
     height: 250,
     enabled: true,
   },
 
-  // Full-Screen Interstitial (1170x2532)
-  // Appears once per session when app opens
+  // Keep this disabled for now so the demo does not feel intrusive.
+  // It can be enabled later for a premium sponsor takeover.
   interstitial: {
     id: 'interstitial',
-    name: 'Full-Screen Spotlight',
-    imageUrl: '',
-    targetUrl: '',
-    placeholderText: 'FULL-SCREEN AD\n(1170x2532)\n\nTap anywhere to close',
+    name: 'Full-Screen Sponsor Takeover',
+    imageUrl: null,
+    targetUrl: 'https://www.walkertonhomecoming2026.ca/sponsors',
+    placeholderText: 'Premium full-screen sponsor takeover',
     width: 1170,
     height: 2532,
-    enabled: true,
+    enabled: false,
   },
 };
 
