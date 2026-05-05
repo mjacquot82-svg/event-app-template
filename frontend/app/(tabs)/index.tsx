@@ -95,7 +95,7 @@ function GridItem({ label, icon, color, onPress }: any) {
         style={styles.gridPressable}
       >
         <View style={[styles.iconWrap, { backgroundColor: color }]}> 
-          <Feather name={icon} size={22} color="#fff" />
+          <Feather name={icon} size={22} color={color === '#FFD23F' ? '#000' : '#fff'} />
         </View>
         <Text style={styles.gridLabel}>{label}</Text>
       </Pressable>
@@ -105,7 +105,15 @@ function GridItem({ label, icon, color, onPress }: any) {
 
 export default function HomeScreen() {
   const router = useRouter();
-  const filteredActions = eventConfig.homeActions.filter((a) => a.label !== 'Map');
+  const baseActions = eventConfig.homeActions.filter((a) => a.label !== 'Map');
+  const hasSponsorsAction = baseActions.some((a) => a.id === 'sponsors' || a.label === 'Sponsors');
+  const filteredActions = hasSponsorsAction
+    ? baseActions
+    : [
+        ...baseActions.slice(0, 2),
+        { id: 'sponsors', label: 'Sponsors', icon: 'award', color: '#FFD23F', route: '/sponsors' },
+        ...baseActions.slice(2),
+      ];
   const days = getDaysUntil('2026-07-30');
   const dynamicEvents = useMemo(() => getCurrentOrNextEvents(), []);
 
