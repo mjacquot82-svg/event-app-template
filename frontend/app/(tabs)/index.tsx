@@ -58,10 +58,11 @@ function getCurrentOrNextEvents() {
 function TextLogo() {
   return (
     <View style={styles.textLogoPanel}>
-      <Text style={styles.logoMingle}>Mingle</Text>
-      <Text style={styles.logoAmp}>&</Text>
-      <Text style={styles.logoRemix}>REMIX</Text>
-      <Text style={styles.logoYear}>2026</Text>
+      <Image
+        source={require('../../assets/images/logo.jpg')}
+        style={styles.headerLogo}
+        resizeMode="contain"
+      />
     </View>
   );
 }
@@ -214,6 +215,7 @@ const styles = StyleSheet.create({
   heroGlowPink: { position: 'absolute', width: 260, height: 260, borderRadius: 130, backgroundColor: 'rgba(246,0,143,0.30)', top: -95, right: -75 },
   heroGlowBlue: { position: 'absolute', width: 260, height: 260, borderRadius: 130, backgroundColor: 'rgba(22,191,214,0.32)', bottom: -95, left: -75 },
   textLogoPanel: { width: '96%', borderRadius: 20, backgroundColor: '#fff', paddingVertical: 12, alignItems: 'center', marginBottom: 12 },
+  headerLogo: { width: '70%', height: 64, maxWidth: 420, maxHeight: 84, resizeMode: 'contain', objectFit: 'contain' as any },
   logoMingle: { fontSize: 38, fontWeight: '900', color: '#F6008F', lineHeight: 40, letterSpacing: 0.5 },
   logoAmp: { fontSize: 26, fontWeight: '900', color: '#16BFD6', lineHeight: 28 },
   logoRemix: { fontSize: 34, fontWeight: '900', color: '#111', lineHeight: 36, letterSpacing: 2 },
