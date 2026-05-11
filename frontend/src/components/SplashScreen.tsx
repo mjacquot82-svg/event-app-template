@@ -35,6 +35,30 @@ export default function SplashScreen({ onFinish, duration = 2000 }: SplashScreen
     return null;
   }
 
+  const isHomeComing = (() => {
+    try {
+      // Lazy import to avoid circular issues during web SSR
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const cfg = require('../data/eventConfig').default;
+      return cfg?.appName?.toLowerCase().includes('walkerton');
+    } catch (e) {
+      return false;
+    }
+  })();
+
+  if (isHomeComing) {
+    // Show a centered, contained logo for the Home Coming app to avoid an oversized splash
+    return (
+      <View style={styles.container}>
+        <Image
+          source={require('../../assets/images/logo.jpg')}
+          style={styles.logoImage}
+          resizeMode="contain"
+        />
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <Image
@@ -60,5 +84,15 @@ const styles = StyleSheet.create({
     width: width,
     height: height,
     position: 'absolute',
+  },
+  // Smaller, centered logo for Home Coming splash
+  logoImage: {
+    width: Math.min(420, Math.round(width * 0.72)),
+    height: Math.min(420, Math.round(width * 0.72)),
+    maxWidth: 420,
+    maxHeight: 420,
+    resizeMode: 'contain',
+    // react-native-web supports objectFit for web builds
+    objectFit: 'contain' as any,
   },
 });

@@ -15,6 +15,7 @@ import {
 import { Feather } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import colors from '../theme/colors';
+import eventConfig from '../data/eventConfig';
 
 const DISMISS_KEY = 'pwa_install_dismissed_at';
 const DISMISS_DURATION = 24 * 60 * 60 * 1000;
@@ -206,16 +207,16 @@ export default function PWAInstallPrompt({ onDismiss }: PWAInstallPromptProps) {
           <View style={styles.handleBar} />
           
           <View style={styles.content}>
-            {/* Logo */}
+            {/* Logo (event-specific) */}
             <View style={styles.logoContainer}>
               <Image
-                source={require('../../assets/images/icon.png')}
+                source={eventConfig?.appName && eventConfig.appName.toLowerCase().includes('walkerton') ? require('../../assets/images/logo.jpg') : require('../../assets/images/icon.png')}
                 style={styles.logo}
                 resizeMode="contain"
               />
             </View>
 
-            <Text style={styles.title}>Install IPM 2026</Text>
+            <Text style={styles.title}>Install {eventConfig?.appName || 'App'}</Text>
             <Text style={styles.subtitle}>Add to your home screen for the best experience</Text>
 
             {/* Benefits */}

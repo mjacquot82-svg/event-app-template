@@ -12,15 +12,16 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import colors from '../src/theme/colors';
+import eventConfig from '../src/data/eventConfig';
 
 export default function ComingSoonPage() {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor={colors.background} />
       <View style={styles.content}>
-        {/* IPM 2026 Logo */}
+        {/* Event-specific Logo */}
         <Image
-          source={require('../assets/images/icon.png')}
+          source={eventConfig?.appName && eventConfig.appName.toLowerCase().includes('walkerton') ? require('../assets/images/logo.jpg') : require('../assets/images/icon.png')}
           style={styles.logo}
           resizeMode="contain"
         />

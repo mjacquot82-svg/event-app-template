@@ -2,8 +2,11 @@
 // @ts-nocheck
 import { ScrollViewStyleReset } from "expo-router/html";
 import type { PropsWithChildren } from "react";
+import eventConfig from '../src/data/eventConfig';
 
 export default function Root({ children }: PropsWithChildren) {
+  const favicon = (eventConfig?.appName && eventConfig.appName.toLowerCase().includes('walkerton')) ? '/assets/images/logo-black.jpg' : '/assets/images/favicon.png';
+
   return (
     <html lang="en" style={{ height: "100%" }}>
       <head>
@@ -18,6 +21,7 @@ export default function Root({ children }: PropsWithChildren) {
           If you want to enable scrolling, remove `ScrollViewStyleReset` and
           set `overflow: auto` on the body style below.
         */}
+        <link rel="icon" href={favicon} />
         <ScrollViewStyleReset />
         <style
           dangerouslySetInnerHTML={{
