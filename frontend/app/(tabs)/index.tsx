@@ -128,7 +128,6 @@ export default function HomeScreen() {
         <View style={styles.heroGlowPink} />
         <View style={styles.heroGlowBlue} />
         <TextLogo />
-        <Text style={styles.heroSubtitle}>{eventConfig.event.subtitle}</Text>
         <Text style={styles.heroDates}>{eventConfig.event.dates}</Text>
         <Text style={styles.heroLocation}>{eventConfig.event.location}</Text>
         <Text style={styles.heroTagline}>{eventConfig.event.tagline}</Text>
@@ -220,7 +219,6 @@ const styles = StyleSheet.create({
   logoAmp: { fontSize: 26, fontWeight: '900', color: '#16BFD6', lineHeight: 28 },
   logoRemix: { fontSize: 34, fontWeight: '900', color: '#111', lineHeight: 36, letterSpacing: 2 },
   logoYear: { fontSize: 18, fontWeight: '900', color: '#74D65E', marginTop: 2 },
-  heroSubtitle: { color: '#74D65E', fontSize: 13, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1.1 },
   heroDates: { color: '#FFFFFF', fontSize: 20, fontWeight: '900', marginTop: 8 },
   heroLocation: { color: '#D1D5DB', fontSize: 14, marginTop: 4 },
   heroTagline: { color: '#FFFFFF', fontSize: 13, textAlign: 'center', marginTop: 10, opacity: 0.92 },

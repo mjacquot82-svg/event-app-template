@@ -216,7 +216,7 @@ export default function PWAInstallPrompt({ onDismiss }: PWAInstallPromptProps) {
               />
             </View>
 
-            <Text style={styles.title}>Install {eventConfig?.appName || 'App'}</Text>
+            <Text style={styles.title}>Install App</Text>
             <Text style={styles.subtitle}>Add to your home screen for the best experience</Text>
 
             {/* Benefits */}
