@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "IPM 2026",
-    "slug": "ipm-2026",
+    "name": "Walkerton Home Coming 2026",
+    "slug": "walkerton-home-coming-2026",
     "version": "1.0.0",
     "icon": "./assets/images/v2-icon.png",
     "userInterfaceStyle": "dark",
@@ -13,7 +13,7 @@
     "web": {
       "favicon": "./assets/images/v2-icon.png",
       "backgroundColor": "#000000",
-      "description": "Official App for IPM 2026"
+      "description": "Official App for Walkerton Home Coming 2026"
     }
   }
 }
