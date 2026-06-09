@@ -66,6 +66,11 @@ function SponsorSection({ title, sponsors }: { title: string; sponsors: Sponsor[
 }
 
 export default function SponsorsScreen() {
+  const hasSponsors =
+    sponsorsByTier.presenting.length > 0 ||
+    sponsorsByTier.featured.length > 0 ||
+    sponsorsByTier.community.length > 0;
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
@@ -75,9 +80,23 @@ export default function SponsorsScreen() {
           subtitle="The businesses and organizations helping power Homecoming weekend."
         />
 
-        <SponsorSection title="Presenting Sponsors" sponsors={sponsorsByTier.presenting} />
-        <SponsorSection title="Featured Sponsors" sponsors={sponsorsByTier.featured} />
-        <SponsorSection title="Community Sponsors" sponsors={sponsorsByTier.community} />
+        {hasSponsors ? (
+          <>
+            <SponsorSection title="Presenting Sponsors" sponsors={sponsorsByTier.presenting} />
+            <SponsorSection title="Featured Sponsors" sponsors={sponsorsByTier.featured} />
+            <SponsorSection title="Community Sponsors" sponsors={sponsorsByTier.community} />
+          </>
+        ) : (
+          <View style={styles.placeholderCard}>
+            <Text style={styles.placeholderTitle}>Sponsors</Text>
+            <Text style={styles.placeholderBody}>
+              Official sponsor listings and logos will be added as sponsor information becomes available.
+            </Text>
+            <Text style={styles.placeholderBody}>
+              Thank you to all businesses and organizations supporting Walkerton Home Coming 2026.
+            </Text>
+          </View>
+        )}
 
         <View style={styles.bottomPadding} />
       </ScrollView>
@@ -92,6 +111,26 @@ const styles = StyleSheet.create({
   },
   content: {
     paddingBottom: 220,
+  },
+  placeholderCard: {
+    marginHorizontal: 20,
+    marginTop: 6,
+    borderRadius: 18,
+    backgroundColor: '#111',
+    borderWidth: 1,
+    borderColor: '#1F2937',
+    padding: 18,
+  },
+  placeholderTitle: {
+    fontSize: 24,
+    fontWeight: '900',
+    color: '#fff',
+    marginBottom: 12,
+  },
+  placeholderBody: {
+    color: '#D1D5DB',
+    lineHeight: 22,
+    marginBottom: 12,
   },
   section: {
     padding: 20,
