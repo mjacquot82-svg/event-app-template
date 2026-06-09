@@ -1,7 +1,7 @@
 // © 2026 1001538341 ONTARIO INC.
 
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, Image, useWindowDimensions } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 
@@ -22,8 +22,7 @@ function InfoRow({ day, hours }: { day: string; hours: string }) {
 }
 
 function ZoomableImageCard({ title, asset }: { title: string; asset: any }) {
-  const { width: windowWidth } = useWindowDimensions();
-  const imageWidth = windowWidth >= 1024 ? '82%' : '70%';
+  const imageWidth = '82%';
 
   return (
     <>
