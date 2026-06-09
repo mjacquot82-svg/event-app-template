@@ -6,12 +6,11 @@ import {
   Text,
   StyleSheet,
   Image,
-  useWindowDimensions,
+  ScrollView,
 } from 'react-native';
 import colors from '../theme/colors';
 
 const MAP_ASSET = require('../../assets/images/Capture2.png');
-const MAP_ASPECT_RATIO = 345 / 468;
 
 interface MapComponentProps {
   highlightedLocation?: string | null;
@@ -24,28 +23,25 @@ const MapComponent: React.FC<MapComponentProps> = ({
   showOnlyHighlighted: _showOnlyHighlighted = false,
   onLocationSelect: _onLocationSelect,
 }) => {
-  const { width: windowWidth, height: windowHeight } = useWindowDimensions();
-  const baseWidth = Math.max(windowWidth - 48, 240);
-  const baseHeight = baseWidth / MAP_ASPECT_RATIO;
-  const viewerMaxHeight = Math.max(windowHeight - 260, 280);
-
   return (
-    <View style={styles.container}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.content}
+      showsVerticalScrollIndicator={false}
+    >
       <View style={styles.headerCard}>
         <Text style={styles.title}>Walkerton Home Coming 2026</Text>
         <Text style={styles.subtitle}>Site Map</Text>
       </View>
 
-      <View style={[styles.viewer, { maxHeight: viewerMaxHeight }]}>
-        <View style={[styles.mapFrame, { width: baseWidth, height: baseHeight }]}>
-          <Image
-            source={MAP_ASSET}
-            style={styles.mapImage}
-            resizeMode="contain"
-          />
-        </View>
+      <View style={styles.imageCard}>
+        <Image
+          source={MAP_ASSET}
+          style={styles.mapImage}
+          resizeMode="contain"
+        />
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
@@ -53,9 +49,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
+  },
+  content: {
     paddingHorizontal: 12,
     paddingTop: 12,
-    paddingBottom: 20,
+    paddingBottom: 120,
   },
   headerCard: {
     borderRadius: 20,
@@ -77,25 +75,17 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: colors.textSecondary,
   },
-  viewer: {
-    flex: 1,
+  imageCard: {
     borderRadius: 24,
-    backgroundColor: '#050505',
+    backgroundColor: '#000000',
     borderWidth: 1,
     borderColor: colors.borderLight,
-    minHeight: 280,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 12,
-  },
-  mapFrame: {
-    borderRadius: 20,
     overflow: 'hidden',
-    backgroundColor: '#000000',
   },
   mapImage: {
     width: '100%',
-    height: '100%',
+    height: undefined,
+    aspectRatio: 345 / 468,
     backgroundColor: '#000000',
   },
 });

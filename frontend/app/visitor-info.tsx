@@ -1,7 +1,7 @@
 // © 2026 1001538341 ONTARIO INC.
 
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, Image, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 
@@ -9,7 +9,6 @@ const CYAN = '#16BFD6';
 const LIME = '#74D65E';
 const YELLOW = '#FFD23F';
 const PINK = '#F6008F';
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const BUS_ROUTE_ASSET = require('../assets/images/Bus Route.png');
 
 function InfoRow({ day, hours }: { day: string; hours: string }) {
@@ -22,14 +21,10 @@ function InfoRow({ day, hours }: { day: string; hours: string }) {
 }
 
 function ZoomableImageCard({ title, asset }: { title: string; asset: any }) {
-  const baseWidth = SCREEN_WIDTH - 72;
-  const aspectRatio = 345 / 468;
-  const height = baseWidth / aspectRatio;
-
   return (
     <View style={styles.imageCard}>
       <Text style={styles.imageCardTitle}>{title}</Text>
-      <View style={[styles.zoomFrame, { width: baseWidth, height }]}>
+      <View style={styles.zoomFrame}>
         <Image source={asset} style={styles.routeImage} resizeMode="contain" />
       </View>
     </View>
@@ -124,8 +119,8 @@ const styles = StyleSheet.create({
   routeText: { color: '#D1D5DB', fontSize: 15, fontWeight: '800', paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: '#252525' },
   imageCard: { backgroundColor: '#111', borderRadius: 16, padding: 16, borderWidth: 1, borderColor: '#1F2937', marginBottom: 12 },
   imageCardTitle: { fontSize: 16, fontWeight: '900', color: '#fff', marginBottom: 12 },
-  zoomFrame: { alignSelf: 'center', borderRadius: 12, overflow: 'hidden', backgroundColor: '#000' },
-  routeImage: { width: '100%', height: '100%', backgroundColor: '#000' },
+  zoomFrame: { borderRadius: 12, overflow: 'hidden', backgroundColor: '#000' },
+  routeImage: { width: '100%', height: undefined, aspectRatio: 345 / 468, backgroundColor: '#000' },
   noteCard: { marginHorizontal: 20, marginTop: 20, borderRadius: 16, backgroundColor: '#101010', borderWidth: 1, borderColor: LIME, padding: 16, flexDirection: 'row', gap: 10, alignItems: 'flex-start' },
   noteText: { flex: 1, color: '#D1D5DB', lineHeight: 20 },
   bottomPadding: { height: 160 },
