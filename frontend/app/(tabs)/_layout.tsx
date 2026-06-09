@@ -83,7 +83,7 @@ export default function TabLayout() {
           <Tabs.Screen name="index" options={{ title: 'Home' }} />
           <Tabs.Screen name="map" options={{ title: 'Map' }} />
           <Tabs.Screen name="schedule" options={{ title: 'Schedule' }} />
-          <Tabs.Screen name="visitor-info" options={{ title: 'Visitor Info', href: null }} />
+          <Tabs.Screen name="visitor-info" options={{ title: 'Getting Around', href: null }} />
           <Tabs.Screen name="leaderboard" options={{ title: 'Highlights', href: null }} />
           <Tabs.Screen name="about" options={{ title: 'About' }} />
           <Tabs.Screen name="sponsors" options={{ title: 'Sponsors', href: null }} />

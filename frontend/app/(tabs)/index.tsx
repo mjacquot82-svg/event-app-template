@@ -151,9 +151,9 @@ export default function HomeScreen() {
           <Feather name="music" size={22} color="#fff" />
         </View>
         <View style={styles.featureCopy}>
-          <Text style={styles.featureEyebrow}>Weekend Highlight</Text>
-          <Text style={styles.featureTitle}>Live music, reunions, parade fun, food, merch, and hometown energy.</Text>
-          <Text style={styles.featureBody}>Keep tickets, schedule updates, sponsor listings, and your weekend plan in one place.</Text>
+          <Text style={styles.featureEyebrow}>Homecoming Weekend</Text>
+          <Text style={styles.featureTitle}>Four days of reunions, live music, family activities, downtown events, parades, tournaments, and community celebrations across Walkerton.</Text>
+          <Text style={styles.featureBody}>Track events, explore maps, check transportation details, browse sponsors, and stay on top of the full weekend schedule in one place.</Text>
         </View>
       </View>
 

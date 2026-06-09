@@ -44,8 +44,8 @@ export default function VisitorInfoScreen() {
     <SafeAreaView style={styles.container} edges={['top']}>
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <HomecomingHero
-          eyebrow="Visitor Info"
-          title="Visitor Information"
+          eyebrow="Getting Around"
+          title="Getting Around"
           subtitle="Shuttles, parade route, and food service details for Homecoming weekend."
         />
 
