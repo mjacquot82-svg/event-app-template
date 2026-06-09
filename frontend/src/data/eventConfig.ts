@@ -85,6 +85,7 @@ export const eventConfig = {
     { id: 'kids', label: 'Kids Events', icon: 'smile', color: '#45DDF0', route: '/schedule' },
     { id: 'parade', label: 'Parade', icon: 'flag', color: '#F6008F', route: '/schedule' },
     { id: 'map', label: 'Map', icon: 'map', color: '#74D65E', route: '/map' },
+    { id: 'visitor-info', label: 'Visitor Info', icon: 'info', color: '#FFD23F', route: '/visitor-info' },
     { id: 'itinerary', label: 'My Weekend', icon: 'clipboard', color: '#16BFD6', route: '/itinerary' },
     { id: 'help', label: 'Help', icon: 'alert-circle', color: '#F6008F', route: '/sos' },
   ] as EventHomeAction[],

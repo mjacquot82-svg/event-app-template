@@ -15,13 +15,13 @@ const AD_SECTION_HEIGHT = 58;
 const APP_BLACK = '#000000';
 const NAV_BLACK = '#090909';
 
-const visibleTabs = ['index', 'schedule', 'leaderboard', 'about'];
+const visibleTabs = ['index', 'schedule', 'map', 'about'];
 
 function getIconName(routeName: string): keyof typeof Feather.glyphMap {
   switch (routeName) {
     case 'index': return 'home';
     case 'schedule': return 'calendar';
-    case 'leaderboard': return 'bar-chart-2';
+    case 'map': return 'map';
     case 'about': return 'award';
     default: return 'circle';
   }
@@ -31,7 +31,7 @@ function getLabel(routeName: string): string {
   switch (routeName) {
     case 'index': return 'Home';
     case 'schedule': return 'Schedule';
-    case 'leaderboard': return 'Highlights';
+    case 'map': return 'Map';
     case 'about': return 'About';
     default: return routeName;
   }
@@ -42,7 +42,7 @@ function getTabColor(routeName: string, isFocused: boolean) {
   switch (routeName) {
     case 'index': return '#16BFD6';
     case 'schedule': return '#74D65E';
-    case 'leaderboard': return '#FFD23F';
+    case 'map': return '#FFD23F';
     case 'about': return '#45DDF0';
     default: return '#8B95A1';
   }
@@ -93,10 +93,11 @@ export default function TabLayout() {
       <View style={[styles.contentArea, { marginTop: topAdHeight + topInset }]}>
         <Tabs tabBar={() => <EmptyTabBar />} screenOptions={{ headerShown: false }} sceneContainerStyle={styles.scene}>
           <Tabs.Screen name="index" options={{ title: 'Home' }} />
-          <Tabs.Screen name="map" options={{ title: 'Map', href: null }} />
+          <Tabs.Screen name="map" options={{ title: 'Map' }} />
           <Tabs.Screen name="schedule" options={{ title: 'Schedule' }} />
-          <Tabs.Screen name="leaderboard" options={{ title: 'Highlights' }} />
+          <Tabs.Screen name="leaderboard" options={{ title: 'Highlights', href: null }} />
           <Tabs.Screen name="about" options={{ title: 'About' }} />
+          <Tabs.Screen name="sponsors" options={{ title: 'Sponsors', href: null }} />
         </Tabs>
       </View>
 
