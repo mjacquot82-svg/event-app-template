@@ -106,14 +106,14 @@ function GridItem({ label, icon, color, onPress }: any) {
 
 export default function HomeScreen() {
   const router = useRouter();
-  const baseActions = eventConfig.homeActions.filter((a) => a.label !== 'Map');
+  const baseActions = eventConfig.homeActions;
   const hasSponsorsAction = baseActions.some((a) => a.id === 'sponsors' || a.label === 'Sponsors');
   const filteredActions = hasSponsorsAction
     ? baseActions
     : [
-        ...baseActions.slice(0, 2),
+        ...baseActions.slice(0, 3),
         { id: 'sponsors', label: 'Sponsors', icon: 'award', color: '#FFD23F', route: '/sponsors' },
-        ...baseActions.slice(2),
+        ...baseActions.slice(3),
       ];
   const days = getDaysUntil('2026-07-30');
   const dynamicEvents = useMemo(() => getCurrentOrNextEvents(), []);
