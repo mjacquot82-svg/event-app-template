@@ -212,7 +212,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
         activeOpacity={0.9}
       >
         <View style={styles.legendHeader}>
-          <Text style={styles.legendTitle}>IPM 2026</Text>
+          <Text style={styles.legendTitle}>Walkerton Home Coming 2026</Text>
           <Feather 
             name={showLegend ? "chevron-up" : "chevron-down"} 
             size={18} 
