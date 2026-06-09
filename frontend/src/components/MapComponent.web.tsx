@@ -14,7 +14,7 @@ import { Feather } from '@expo/vector-icons';
 import colors from '../theme/colors';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
-const MAP_ASSET = require('../../assets/images/Capture2.PNG');
+const MAP_ASSET = require('../../assets/images/Capture2.png');
 const MAP_SOURCE = Image.resolveAssetSource(MAP_ASSET);
 const MIN_ZOOM = 1;
 const MAX_ZOOM = 3;
