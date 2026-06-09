@@ -23,7 +23,7 @@ function InfoRow({ day, hours }: { day: string; hours: string }) {
 
 function ZoomableImageCard({ title, asset }: { title: string; asset: any }) {
   const { width: windowWidth } = useWindowDimensions();
-  const imageWidth = windowWidth >= 1024 ? '82%' : '100%';
+  const imageWidth = windowWidth >= 1024 ? '82%' : '70%';
 
   return (
     <>
