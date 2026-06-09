@@ -1,258 +1,110 @@
 // © 2026 1001538341 ONTARIO INC. All Rights Reserved.
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   Image,
   Dimensions,
-  TouchableOpacity,
-  Animated,
   ScrollView,
+  TouchableOpacity,
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import colors from '../theme/colors';
-import { 
-  mapLocations, 
-  categoryColors, 
-  categoryIcons,
-  findLocationByName,
-  MapLocation,
-  LocationCategory 
-} from '../config/mapLocations';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
-const MAP_HEIGHT = SCREEN_HEIGHT - 180;
+const MAP_ASSET = require('../../assets/images/Capture2.PNG');
+const MAP_SOURCE = Image.resolveAssetSource(MAP_ASSET);
+const MIN_ZOOM = 1;
+const MAX_ZOOM = 3;
+const ZOOM_STEP = 0.5;
 
 interface MapComponentProps {
   highlightedLocation?: string | null;
   showOnlyHighlighted?: boolean;
-  onLocationSelect?: (location: MapLocation) => void;
+  onLocationSelect?: (...args: any[]) => void;
 }
 
-const MapComponent: React.FC<MapComponentProps> = ({ 
-  highlightedLocation,
-  showOnlyHighlighted = false,
-  onLocationSelect 
+const clampZoom = (zoom: number) => Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, zoom));
+
+const MapComponent: React.FC<MapComponentProps> = ({
+  highlightedLocation: _highlightedLocation,
+  showOnlyHighlighted: _showOnlyHighlighted = false,
+  onLocationSelect: _onLocationSelect,
 }) => {
-  const [selectedPin, setSelectedPin] = useState<MapLocation | null>(null);
-  const [showLegend, setShowLegend] = useState(true);
-  const [showAllPins, setShowAllPins] = useState(!showOnlyHighlighted);
-  const pulseAnim = useRef(new Animated.Value(1)).current;
-  const scrollViewRef = useRef<ScrollView>(null);
+  const [zoom, setZoom] = useState(1);
+  const baseWidth = Math.min(SCREEN_WIDTH - 24, 1100);
+  const aspectRatio = MAP_SOURCE.width / MAP_SOURCE.height;
+  const baseHeight = baseWidth / aspectRatio;
 
-  // Reset showAllPins when showOnlyHighlighted prop changes
-  useEffect(() => {
-    setShowAllPins(!showOnlyHighlighted);
-  }, [showOnlyHighlighted]);
+  const scaledSize = useMemo(
+    () => ({
+      width: baseWidth * zoom,
+      height: baseHeight * zoom,
+    }),
+    [baseHeight, baseWidth, zoom]
+  );
 
-  // Find and highlight location when prop changes
-  useEffect(() => {
-    if (highlightedLocation) {
-      const location = findLocationByName(highlightedLocation);
-      if (location) {
-        setSelectedPin(location);
-      }
-    }
-  }, [highlightedLocation]);
-
-  // Pulse animation for selected pin
-  useEffect(() => {
-    if (selectedPin) {
-      const pulse = Animated.loop(
-        Animated.sequence([
-          Animated.timing(pulseAnim, {
-            toValue: 1.3,
-            duration: 600,
-            useNativeDriver: false, // Web doesn't support native driver
-          }),
-          Animated.timing(pulseAnim, {
-            toValue: 1,
-            duration: 600,
-            useNativeDriver: false,
-          }),
-        ])
-      );
-      pulse.start();
-      return () => pulse.stop();
-    }
-  }, [selectedPin, pulseAnim]);
-
-  const handlePinPress = (location: MapLocation) => {
-    setSelectedPin(selectedPin?.id === location.id ? null : location);
-    onLocationSelect?.(location);
-  };
-
-  const renderPin = (location: MapLocation) => {
-    const isSelected = selectedPin?.id === location.id;
-    const isHighlighted = highlightedLocation && 
-      findLocationByName(highlightedLocation)?.id === location.id;
-    const pinColor = categoryColors[location.category];
-    const iconName = categoryIcons[location.category] as any;
-
-    // Calculate absolute positions based on percentage
-    const pinLeft = (location.x / 100) * SCREEN_WIDTH;
-    const pinTop = (location.y / 100) * MAP_HEIGHT;
-
-    return (
-      <TouchableOpacity
-        key={location.id}
-        style={[
-          styles.pinContainer,
-          {
-            left: pinLeft - 15,
-            top: pinTop - 15,
-          },
-        ]}
-        onPress={() => handlePinPress(location)}
-        activeOpacity={0.8}
-      >
-        {(isSelected || isHighlighted) && (
-          <Animated.View
-            style={[
-              styles.pinPulse,
-              {
-                backgroundColor: pinColor,
-                transform: [{ scale: pulseAnim }],
-              },
-            ]}
-          />
-        )}
-        <View
-          style={[
-            styles.pin,
-            { backgroundColor: pinColor },
-            (isSelected || isHighlighted) && styles.pinSelected,
-          ]}
-        >
-          <Feather name={iconName} size={14} color="#FFFFFF" />
-        </View>
-        {(isSelected || isHighlighted) && (
-          <View style={styles.pinLabelContainer}>
-            <Text style={styles.pinLabel}>{location.name}</Text>
-          </View>
-        )}
-      </TouchableOpacity>
-    );
-  };
-
-  // Get unique categories for legend
-  const categories = [...new Set(mapLocations.map(loc => loc.category))];
-
-  // Filter pins based on showOnlyHighlighted mode and showAllPins toggle
-  const highlightedLocationData = highlightedLocation ? findLocationByName(highlightedLocation) : null;
-  const pinsToShow = (showOnlyHighlighted && !showAllPins && highlightedLocationData)
-    ? [highlightedLocationData]
-    : mapLocations;
-
-  // Check if we're in filtered mode (showing only one pin and have the option to show all)
-  const isFilteredMode = showOnlyHighlighted && highlightedLocationData && !showAllPins;
+  const updateZoom = (nextZoom: number) => setZoom(clampZoom(nextZoom));
 
   return (
     <View style={styles.container}>
-      {/* Map with pins */}
+      <View style={styles.headerCard}>
+        <Text style={styles.title}>Walkerton Home Coming 2026</Text>
+        <Text style={styles.subtitle}>Site Map</Text>
+      </View>
+
       <ScrollView
-        ref={scrollViewRef}
-        style={styles.mapContainer}
-        contentContainerStyle={styles.mapContent}
-        maximumZoomScale={3}
-        minimumZoomScale={1}
-        showsVerticalScrollIndicator={false}
+        horizontal
+        contentContainerStyle={styles.horizontalContent}
+        style={styles.viewer}
         showsHorizontalScrollIndicator={false}
-        bouncesZoom={true}
       >
-        <View style={styles.mapWrapper}>
-          <Image
-            source={require('../../assets/images/event-map.png')}
-            style={styles.mapImage}
-            resizeMode="cover"
-          />
-          
-          {/* Render pins (filtered if showOnlyHighlighted) */}
-          {pinsToShow.map(renderPin)}
-        </View>
+        <ScrollView
+          contentContainerStyle={styles.verticalContent}
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={[styles.mapFrame, scaledSize]}>
+            <Image
+              source={MAP_ASSET}
+              style={[styles.mapImage, scaledSize]}
+              resizeMode="contain"
+            />
+          </View>
+        </ScrollView>
       </ScrollView>
 
-      {/* Selected location info card */}
-      {selectedPin && (
-        <View style={styles.infoCard}>
-          <View style={styles.infoCardHeader}>
-            <View style={[styles.infoCardIcon, { backgroundColor: categoryColors[selectedPin.category] }]}>
-              <Feather 
-                name={categoryIcons[selectedPin.category] as any} 
-                size={20} 
-                color="#FFFFFF" 
-              />
-            </View>
-            <View style={styles.infoCardContent}>
-              <Text style={styles.infoCardTitle}>{selectedPin.name}</Text>
-              <Text style={styles.infoCardCategory}>
-                {selectedPin.category.charAt(0).toUpperCase() + selectedPin.category.slice(1)}
-              </Text>
-            </View>
-            <TouchableOpacity 
-              onPress={() => setSelectedPin(null)}
-              style={styles.infoCardClose}
-            >
-              <Feather name="x" size={20} color={colors.textMuted} />
-            </TouchableOpacity>
-          </View>
-          {selectedPin.description && (
-            <Text style={styles.infoCardDescription}>{selectedPin.description}</Text>
-          )}
+      <View style={styles.footerRow}>
+        <View style={styles.hintCard}>
+          <Feather name="move" size={16} color={colors.textMuted} />
+          <Text style={styles.hintText}>Use + / - to zoom and drag to explore the full map.</Text>
         </View>
-      )}
 
-      {/* Collapsible Legend */}
-      <TouchableOpacity 
-        style={styles.legendContainer}
-        onPress={() => setShowLegend(!showLegend)}
-        activeOpacity={0.9}
-      >
-        <View style={styles.legendHeader}>
-          <Text style={styles.legendTitle}>Walkerton Home Coming 2026</Text>
-          <Feather 
-            name={showLegend ? "chevron-up" : "chevron-down"} 
-            size={18} 
-            color={colors.textMuted} 
-          />
+        <View style={styles.controls}>
+          <TouchableOpacity
+            style={styles.controlButton}
+            onPress={() => updateZoom(zoom - ZOOM_STEP)}
+            activeOpacity={0.85}
+          >
+            <Feather name="minus" size={18} color="#FFFFFF" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.controlButton}
+            onPress={() => updateZoom(1)}
+            activeOpacity={0.85}
+          >
+            <Feather name="maximize-2" size={16} color="#FFFFFF" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.controlButton}
+            onPress={() => updateZoom(zoom + ZOOM_STEP)}
+            activeOpacity={0.85}
+          >
+            <Feather name="plus" size={18} color="#FFFFFF" />
+          </TouchableOpacity>
         </View>
-        {showLegend && (
-          <>
-            <Text style={styles.legendSubtitle}>Event Grounds</Text>
-            <View style={styles.legendDivider} />
-            {categories.map((category) => (
-              <View key={category} style={styles.legendItem}>
-                <View style={[styles.legendDot, { backgroundColor: categoryColors[category] }]} />
-                <Text style={styles.legendText}>
-                  {category.charAt(0).toUpperCase() + category.slice(1)}
-                </Text>
-              </View>
-            ))}
-          </>
-        )}
-      </TouchableOpacity>
-
-      {/* Show All Locations button - only visible when in filtered mode */}
-      {isFilteredMode && (
-        <TouchableOpacity 
-          style={styles.showAllButton}
-          onPress={() => setShowAllPins(true)}
-          activeOpacity={0.8}
-        >
-          <Feather name="layers" size={20} color="#FFFFFF" />
-          <Text style={styles.showAllButtonText}>Show All Locations</Text>
-        </TouchableOpacity>
-      )}
-
-      {/* Zoom hint - only show when NOT in filtered mode */}
-      {!isFilteredMode && (
-        <View style={styles.zoomHint}>
-          <Feather name="zoom-in" size={16} color={colors.textMuted} />
-          <Text style={styles.zoomHintText}>Pinch to zoom • Tap pins for info</Text>
-        </View>
-      )}
+      </View>
     </View>
   );
 };
@@ -261,221 +113,91 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
+    paddingHorizontal: 12,
+    paddingTop: 12,
+    paddingBottom: 20,
   },
-  mapContainer: {
+  headerCard: {
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: colors.borderLight,
+    backgroundColor: colors.card,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    marginBottom: 12,
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: '900',
+    color: colors.text,
+  },
+  subtitle: {
+    marginTop: 4,
+    fontSize: 14,
+    fontWeight: '700',
+    color: colors.textSecondary,
+  },
+  viewer: {
     flex: 1,
+    borderRadius: 24,
+    backgroundColor: '#050505',
+    borderWidth: 1,
+    borderColor: colors.borderLight,
+    maxHeight: SCREEN_HEIGHT - 260,
   },
-  mapContent: {
-    minHeight: MAP_HEIGHT,
+  horizontalContent: {
+    flexGrow: 1,
+    justifyContent: 'center',
   },
-  mapWrapper: {
-    position: 'relative',
-    width: SCREEN_WIDTH,
-    height: MAP_HEIGHT,
+  verticalContent: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 12,
+  },
+  mapFrame: {
+    borderRadius: 20,
+    overflow: 'hidden',
+    backgroundColor: '#000000',
   },
   mapImage: {
-    width: '100%',
-    height: '100%',
+    backgroundColor: '#000000',
   },
-  // Pin styles
-  pinContainer: {
-    position: 'absolute',
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 10,
-  },
-  pin: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: '#FFFFFF',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 3,
-    elevation: 5,
-  },
-  pinSelected: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    borderWidth: 3,
-  },
-  pinPulse: {
-    position: 'absolute',
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    opacity: 0.3,
-  },
-  pinLabelContainer: {
-    position: 'absolute',
-    top: 38,
-    backgroundColor: colors.surface,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
-    elevation: 3,
-    minWidth: 60,
-    alignItems: 'center',
-  },
-  pinLabel: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: colors.textPrimary,
-    textAlign: 'center',
-  },
-  // Info card styles
-  infoCard: {
-    position: 'absolute',
-    bottom: 130,
-    left: 16,
-    right: 16,
-    backgroundColor: colors.surface,
-    borderRadius: 16,
-    padding: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 8,
-  },
-  infoCardHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  infoCardIcon: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  infoCardContent: {
-    flex: 1,
-    marginLeft: 12,
-  },
-  infoCardTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: colors.textPrimary,
-  },
-  infoCardCategory: {
-    fontSize: 13,
-    color: colors.textSecondary,
-    marginTop: 2,
-  },
-  infoCardClose: {
-    padding: 4,
-  },
-  infoCardDescription: {
-    fontSize: 14,
-    color: colors.textSecondary,
+  footerRow: {
     marginTop: 12,
-    lineHeight: 20,
-  },
-  // Legend styles
-  legendContainer: {
-    position: 'absolute',
-    left: 16,
-    top: 16,
-    backgroundColor: colors.surface,
-    padding: 14,
-    borderRadius: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 4,
-    elevation: 4,
-    minWidth: 140,
-  },
-  legendHeader: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    gap: 12,
   },
-  legendTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: colors.textPrimary,
+  hintCard: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    borderRadius: 18,
+    backgroundColor: colors.card,
+    borderWidth: 1,
+    borderColor: colors.borderLight,
   },
-  legendSubtitle: {
-    fontSize: 12,
+  hintText: {
+    flex: 1,
+    fontSize: 13,
+    lineHeight: 18,
     color: colors.textSecondary,
-    marginTop: 2,
   },
-  legendDivider: {
-    height: 1,
-    backgroundColor: colors.border,
-    marginVertical: 10,
-  },
-  legendItem: {
+  controls: {
     flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 6,
     gap: 8,
   },
-  legendDot: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-  },
-  legendText: {
-    fontSize: 12,
-    color: colors.textSecondary,
-  },
-  // Zoom hint
-  zoomHint: {
-    position: 'absolute',
-    bottom: 90,
-    alignSelf: 'center',
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.surface,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
-    gap: 6,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  zoomHintText: {
-    fontSize: 12,
-    color: colors.textMuted,
-  },
-  // Show All Locations button - FULL WIDTH at bottom
-  showAllButton: {
-    position: 'absolute',
-    bottom: 90,
-    left: 16,
-    right: 16,
-    flexDirection: 'row',
+  controlButton: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: colors.primary,
-    paddingVertical: 16,
-    borderRadius: 16,
-    gap: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 6,
-    elevation: 8,
-  },
-  showAllButtonText: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#FFFFFF',
   },
 });
 
