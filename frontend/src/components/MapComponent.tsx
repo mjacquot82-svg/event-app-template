@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Image,
   ScrollView,
+  useWindowDimensions,
 } from 'react-native';
 import colors from '../theme/colors';
 
@@ -23,6 +24,9 @@ const MapComponent: React.FC<MapComponentProps> = ({
   showOnlyHighlighted: _showOnlyHighlighted = false,
   onLocationSelect: _onLocationSelect,
 }) => {
+  const { width: windowWidth } = useWindowDimensions();
+  const imageWidth = windowWidth >= 1024 ? '82%' : '100%';
+
   return (
     <ScrollView
       style={styles.container}
@@ -34,7 +38,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
         <Text style={styles.subtitle}>Site Map</Text>
       </View>
 
-      <View style={styles.imageCard}>
+      <View style={[styles.imageCard, { width: imageWidth }]}>
         <Image
           source={MAP_ASSET}
           style={styles.mapImage}
@@ -76,6 +80,7 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
   },
   imageCard: {
+    alignSelf: 'center',
     borderRadius: 24,
     backgroundColor: '#000000',
     borderWidth: 1,

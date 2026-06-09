@@ -1,7 +1,7 @@
 // © 2026 1001538341 ONTARIO INC.
 
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, Image } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Image, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 
@@ -21,10 +21,13 @@ function InfoRow({ day, hours }: { day: string; hours: string }) {
 }
 
 function ZoomableImageCard({ title, asset }: { title: string; asset: any }) {
+  const { width: windowWidth } = useWindowDimensions();
+  const imageWidth = windowWidth >= 1024 ? '82%' : '100%';
+
   return (
     <View style={styles.imageCard}>
       <Text style={styles.imageCardTitle}>{title}</Text>
-      <View style={styles.zoomFrame}>
+      <View style={[styles.zoomFrame, { width: imageWidth }]}>
         <Image source={asset} style={styles.routeImage} resizeMode="contain" />
       </View>
     </View>
@@ -119,7 +122,7 @@ const styles = StyleSheet.create({
   routeText: { color: '#D1D5DB', fontSize: 15, fontWeight: '800', paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: '#252525' },
   imageCard: { backgroundColor: '#111', borderRadius: 16, padding: 16, borderWidth: 1, borderColor: '#1F2937', marginBottom: 12 },
   imageCardTitle: { fontSize: 16, fontWeight: '900', color: '#fff', marginBottom: 12 },
-  zoomFrame: { borderRadius: 12, overflow: 'hidden', backgroundColor: '#000' },
+  zoomFrame: { alignSelf: 'center', borderRadius: 12, overflow: 'hidden', backgroundColor: '#000' },
   routeImage: { width: '100%', height: undefined, aspectRatio: 345 / 468, backgroundColor: '#000' },
   noteCard: { marginHorizontal: 20, marginTop: 20, borderRadius: 16, backgroundColor: '#101010', borderWidth: 1, borderColor: LIME, padding: 16, flexDirection: 'row', gap: 10, alignItems: 'flex-start' },
   noteText: { flex: 1, color: '#D1D5DB', lineHeight: 20 },
