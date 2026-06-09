@@ -1,6 +1,6 @@
 // © 2026 1001538341 ONTARIO INC.
 
-import React, { useMemo, useState } from 'react';
+import React from 'react';
 import { View, Text, StyleSheet, ScrollView, Image, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
@@ -10,6 +10,7 @@ const LIME = '#74D65E';
 const YELLOW = '#FFD23F';
 const PINK = '#F6008F';
 const BUS_ROUTE_ASSET = require('../assets/images/Bus Route.png');
+const BUS_ROUTE_ASPECT_RATIO = 1199 / 1312;
 
 function InfoRow({ day, hours }: { day: string; hours: string }) {
   return (
@@ -23,30 +24,17 @@ function InfoRow({ day, hours }: { day: string; hours: string }) {
 function ZoomableImageCard({ title, asset }: { title: string; asset: any }) {
   const { width: windowWidth } = useWindowDimensions();
   const imageWidth = windowWidth >= 1024 ? '82%' : '100%';
-  const [frameWidth, setFrameWidth] = useState(0);
-  const [imageRatio, setImageRatio] = useState<number | null>(null);
-  const imageHeight = useMemo(() => {
-    if (!frameWidth || !imageRatio) return undefined;
-    return frameWidth / imageRatio;
-  }, [frameWidth, imageRatio]);
 
   return (
     <View style={styles.imageCard}>
       <Text style={styles.imageCardTitle}>{title}</Text>
       <View
         style={[styles.zoomFrame, { width: imageWidth }]}
-        onLayout={(event) => setFrameWidth(event.nativeEvent.layout.width)}
       >
         <Image
           source={asset}
-          style={[styles.routeImage, imageHeight ? { height: imageHeight } : null]}
+          style={styles.routeImage}
           resizeMode="contain"
-          onLoad={(event) => {
-            const { width, height } = event.nativeEvent.source;
-            if (width && height) {
-              setImageRatio(width / height);
-            }
-          }}
         />
       </View>
     </View>
@@ -142,7 +130,7 @@ const styles = StyleSheet.create({
   imageCard: { backgroundColor: '#111', borderRadius: 16, borderWidth: 1, borderColor: '#1F2937', marginBottom: 12, overflow: 'hidden' },
   imageCardTitle: { fontSize: 16, fontWeight: '900', color: '#fff', paddingHorizontal: 16, paddingTop: 16, paddingBottom: 8 },
   zoomFrame: { alignSelf: 'center', borderRadius: 12, overflow: 'hidden', backgroundColor: '#000', marginBottom: 12 },
-  routeImage: { width: '100%', backgroundColor: '#000' },
+  routeImage: { width: '100%', height: undefined, aspectRatio: BUS_ROUTE_ASPECT_RATIO, backgroundColor: '#000' },
   noteCard: { marginHorizontal: 20, marginTop: 20, borderRadius: 16, backgroundColor: '#101010', borderWidth: 1, borderColor: LIME, padding: 16, flexDirection: 'row', gap: 10, alignItems: 'flex-start' },
   noteText: { flex: 1, color: '#D1D5DB', lineHeight: 20 },
   bottomPadding: { height: 160 },
