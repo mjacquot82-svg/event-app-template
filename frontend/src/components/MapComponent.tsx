@@ -85,7 +85,6 @@ const styles = StyleSheet.create({
   imageCard: {
     alignSelf: 'center',
     borderRadius: 24,
-    backgroundColor: '#000000',
     borderWidth: 1,
     borderColor: colors.borderLight,
     overflow: 'hidden',

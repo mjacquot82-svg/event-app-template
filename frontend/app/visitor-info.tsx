@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
   routeText: { color: '#D1D5DB', fontSize: 15, fontWeight: '800', paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: '#252525' },
   imageCard: { backgroundColor: '#111', borderRadius: 16, borderWidth: 1, borderColor: '#1F2937', marginBottom: 12, overflow: 'hidden' },
   imageCardTitle: { fontSize: 16, fontWeight: '900', color: '#fff', paddingHorizontal: 16, paddingTop: 16, paddingBottom: 8 },
-  zoomFrame: { alignSelf: 'center', borderRadius: 12, overflow: 'hidden', backgroundColor: '#000', marginBottom: 12 },
+  zoomFrame: { alignSelf: 'center', borderRadius: 12, overflow: 'hidden', marginBottom: 12 },
   routeImage: { width: '100%', height: undefined, aspectRatio: BUS_ROUTE_ASPECT_RATIO, backgroundColor: '#000' },
   noteCard: { marginHorizontal: 20, marginTop: 20, borderRadius: 16, backgroundColor: '#101010', borderWidth: 1, borderColor: LIME, padding: 16, flexDirection: 'row', gap: 10, alignItems: 'flex-start' },
   noteText: { flex: 1, color: '#D1D5DB', lineHeight: 20 },
