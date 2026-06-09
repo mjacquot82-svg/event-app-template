@@ -19,17 +19,20 @@ export default function HomecomingHero({ title, subtitle, eyebrow }: HomecomingH
         <View style={styles.overlay} />
         <View style={styles.topShade} />
         <View style={styles.bottomShade} />
+        <View style={styles.sideShadeLeft} />
+        <View style={styles.sideShadeRight} />
 
         <View style={styles.content}>
           {eyebrow ? <Text style={styles.eyebrow}>{eyebrow}</Text> : null}
           <Text style={styles.title}>{title}</Text>
-          {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
 
           <View style={styles.metaRow}>
             <Text style={styles.metaPrimary}>July 30 – August 3, 2026</Text>
             <Text style={styles.metaDivider}>•</Text>
             <Text style={styles.metaSecondary}>Walkerton, Ontario</Text>
           </View>
+
+          {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
         </View>
       </ImageBackground>
     </View>
@@ -74,12 +77,28 @@ const styles = StyleSheet.create({
     height: 132,
     backgroundColor: 'rgba(0, 0, 0, 0.68)',
   },
+  sideShadeLeft: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: 0,
+    width: 56,
+    backgroundColor: 'rgba(0, 0, 0, 0.12)',
+  },
+  sideShadeRight: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    right: 0,
+    width: 56,
+    backgroundColor: 'rgba(0, 0, 0, 0.12)',
+  },
   content: {
     paddingHorizontal: 18,
     paddingVertical: 18,
+    alignItems: 'center',
   },
   eyebrow: {
-    alignSelf: 'flex-start',
     color: BLUE,
     fontSize: 12,
     fontWeight: '900',
@@ -98,6 +117,7 @@ const styles = StyleSheet.create({
     fontSize: 28,
     lineHeight: 31,
     fontWeight: '900',
+    textAlign: 'center',
     textShadowColor: 'rgba(0,0,0,0.55)',
     textShadowOffset: { width: 0, height: 2 },
     textShadowRadius: 8,
@@ -107,13 +127,15 @@ const styles = StyleSheet.create({
     fontSize: 13,
     lineHeight: 19,
     fontWeight: '700',
-    marginTop: 8,
-    maxWidth: '88%',
+    marginTop: 10,
+    maxWidth: '92%',
+    textAlign: 'center',
   },
   metaRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     alignItems: 'center',
+    justifyContent: 'center',
     marginTop: 12,
   },
   metaPrimary: {
