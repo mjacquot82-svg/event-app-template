@@ -89,7 +89,11 @@ export default function HomeScreen() {
   const dynamicEvents = useMemo(() => getCurrentOrNextEvents(), []);
 
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.scrollContent}
+      showsVerticalScrollIndicator={false}
+    >
       <View style={styles.countdownWrap}>
         <Text style={styles.countdownText}>⏳ {days} Days Until Homecoming</Text>
       </View>
@@ -162,6 +166,7 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#000' },
+  scrollContent: { paddingBottom: 120 },
   countdownWrap: { alignItems: 'center', marginTop: 10, marginBottom: 2 },
   countdownText: { color: '#74D65E', fontWeight: '900', fontSize: 13 },
   revenueRow: { flexDirection: 'row', gap: 10, paddingHorizontal: 16, marginBottom: 14 },
