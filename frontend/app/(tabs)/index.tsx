@@ -5,7 +5,6 @@ import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import eventConfig from '../../src/data/eventConfig';
 import HomecomingHero from '../../src/components/HomecomingHero';
-import { featuredSponsors } from '../../src/data/sponsors';
 
 type HomeEvent = {
   id: string;
@@ -54,24 +53,6 @@ function getCurrentOrNextEvents() {
   const nextEvents = homeEvents.filter((event) => event.date === next.date).slice(0, 3);
   const label = new Date(`${next.date}T12:00:00`).toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
   return { title: `Coming Up: ${label}`, events: nextEvents };
-}
-
-function SponsorCard({ sponsor }: any) {
-  return (
-    <Pressable onPress={() => sponsor.url && Linking.openURL(sponsor.url)} style={[styles.sponsorCard, { borderColor: sponsor.color }]}> 
-      {sponsor.logo ? (
-        <Image source={{ uri: sponsor.logo }} style={styles.sponsorLogo} resizeMode="contain" />
-      ) : (
-        <View style={[styles.sponsorBadge, { backgroundColor: sponsor.color }]}> 
-          <Text style={styles.sponsorBadgeText}>{sponsor.tier.toUpperCase()}</Text>
-        </View>
-      )}
-      <View style={styles.sponsorCopy}>
-        <Text style={styles.sponsorName}>{sponsor.name}</Text>
-        <Text style={styles.sponsorTagline}>{sponsor.tagline}</Text>
-      </View>
-    </Pressable>
-  );
 }
 
 function GridItem({ label, icon, color, onPress }: any) {
@@ -175,13 +156,6 @@ export default function HomeScreen() {
         </View>
       </View>
 
-      <View style={styles.sponsorSection}>
-        <View style={styles.sectionHeaderRow}>
-          <Text style={styles.sectionTitle}>Featured Sponsors</Text>
-          <Text style={styles.sectionHint}>Community directory</Text>
-        </View>
-        {featuredSponsors.map((sponsor) => <SponsorCard key={sponsor.id} sponsor={sponsor} />)}
-      </View>
     </ScrollView>
   );
 }
@@ -216,14 +190,4 @@ const styles = StyleSheet.create({
   gridPressable: { alignItems: 'center', paddingVertical: 17, paddingHorizontal: 6 },
   iconWrap: { width: 48, height: 48, borderRadius: 14, alignItems: 'center', justifyContent: 'center', marginBottom: 8 },
   gridLabel: { fontSize: 12, fontWeight: '800', color: '#fff', textAlign: 'center' },
-  sponsorSection: { paddingHorizontal: 16, paddingBottom: 120 },
-  sectionHeaderRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  sectionHint: { color: '#74D65E', fontSize: 11, fontWeight: '800', marginBottom: 10 },
-  sponsorCard: { borderWidth: 2, borderRadius: 16, padding: 12, marginBottom: 10, backgroundColor: '#111', flexDirection: 'row', alignItems: 'center' },
-  sponsorLogo: { width: 46, height: 46, marginRight: 10, borderRadius: 8, backgroundColor: '#fff' },
-  sponsorBadge: { borderRadius: 10, paddingHorizontal: 8, paddingVertical: 8, marginRight: 10 },
-  sponsorBadgeText: { color: '#FFFFFF', fontWeight: '900', fontSize: 9 },
-  sponsorCopy: { flex: 1 },
-  sponsorName: { fontWeight: '900', fontSize: 14, color: '#fff' },
-  sponsorTagline: { fontSize: 12, color: '#B7BDC7', marginTop: 2 },
 });
