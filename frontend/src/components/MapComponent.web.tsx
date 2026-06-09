@@ -6,16 +6,15 @@ import {
   Text,
   StyleSheet,
   Image,
-  Dimensions,
   ScrollView,
   TouchableOpacity,
+  useWindowDimensions,
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import colors from '../theme/colors';
 
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const MAP_ASSET = require('../../assets/images/Capture2.png');
-const MAP_SOURCE = Image.resolveAssetSource(MAP_ASSET);
+const MAP_ASPECT_RATIO = 345 / 468;
 const MIN_ZOOM = 1;
 const MAX_ZOOM = 3;
 const ZOOM_STEP = 0.5;
@@ -33,10 +32,11 @@ const MapComponent: React.FC<MapComponentProps> = ({
   showOnlyHighlighted: _showOnlyHighlighted = false,
   onLocationSelect: _onLocationSelect,
 }) => {
+  const { width: windowWidth, height: windowHeight } = useWindowDimensions();
   const [zoom, setZoom] = useState(1);
-  const baseWidth = Math.min(SCREEN_WIDTH - 24, 1100);
-  const aspectRatio = MAP_SOURCE.width / MAP_SOURCE.height;
-  const baseHeight = baseWidth / aspectRatio;
+  const baseWidth = Math.min(Math.max(windowWidth - 48, 240), 1100);
+  const baseHeight = baseWidth / MAP_ASPECT_RATIO;
+  const viewerMaxHeight = Math.max(windowHeight - 260, 280);
 
   const scaledSize = useMemo(
     () => ({
@@ -58,7 +58,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
       <ScrollView
         horizontal
         contentContainerStyle={styles.horizontalContent}
-        style={styles.viewer}
+        style={[styles.viewer, { maxHeight: viewerMaxHeight }]}
         showsHorizontalScrollIndicator={false}
       >
         <ScrollView
@@ -68,7 +68,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
           <View style={[styles.mapFrame, scaledSize]}>
             <Image
               source={MAP_ASSET}
-              style={[styles.mapImage, scaledSize]}
+              style={styles.mapImage}
               resizeMode="contain"
             />
           </View>
@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#050505',
     borderWidth: 1,
     borderColor: colors.borderLight,
-    maxHeight: SCREEN_HEIGHT - 260,
+    minHeight: 280,
   },
   horizontalContent: {
     flexGrow: 1,
@@ -161,6 +161,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#000000',
   },
   mapImage: {
+    width: '100%',
+    height: '100%',
     backgroundColor: '#000000',
   },
   footerRow: {
