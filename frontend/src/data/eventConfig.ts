@@ -78,8 +78,8 @@ export const eventConfig = {
     merch: 'https://www.walkertonhomecoming2026.ca',
   },
   homeActions: [
-    { id: 'schedule', label: 'Schedule', icon: 'calendar', color: '#74D65E', route: '/schedule' },
-    { id: 'map', label: 'Map', icon: 'map', color: '#74D65E', route: '/map' },
+    { id: 'schedule', label: 'Schedule', icon: 'calendar', color: '#74D65E', route: '/(tabs)/schedule' },
+    { id: 'map', label: 'Map', icon: 'map', color: '#74D65E', route: '/(tabs)/map' },
     { id: 'visitor-info', label: 'Visitor Info', icon: 'info', color: '#FFD23F', route: '/visitor-info' },
   ] as EventHomeAction[],
   about: {

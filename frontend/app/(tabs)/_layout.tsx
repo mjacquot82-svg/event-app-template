@@ -6,12 +6,9 @@ import { Feather } from '@expo/vector-icons';
 import { StyleSheet, View, Platform, TouchableOpacity, Text } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import colors from '../../src/theme/colors';
-import AdBanner from '../../src/components/AdBanner';
-import adCampaignsConfig from '../../src/config/AdCampaignsConfig';
 
 const ICON_SIZE = 24;
 const NAV_ICONS_HEIGHT = 68;
-const AD_SECTION_HEIGHT = 58;
 const APP_BLACK = '#000000';
 const NAV_BLACK = '#090909';
 
@@ -61,7 +58,7 @@ function TabItem({ routeName }: { routeName: string }) {
   const tabColor = getTabColor(routeName, isFocused);
 
   const onPress = () => {
-    router.push(routeName === 'index' ? '/' : `/${routeName}`);
+    router.push(routeName === 'index' ? '/(tabs)' : `/(tabs)/${routeName}`);
   };
 
   return (
@@ -76,21 +73,12 @@ function TabItem({ routeName }: { routeName: string }) {
 
 export default function TabLayout() {
   const insets = useSafeAreaInsets();
-  const topInset = insets.top || 0;
   const bottomInset = Platform.OS === 'web' ? 0 : insets.bottom || 0;
-  const topAdHeight = adCampaignsConfig.topBanner.enabled ? 98 : 0;
-  const bottomAdEnabled = adCampaignsConfig.bottomBanner.enabled;
-  const totalBottomBarHeight = (bottomAdEnabled ? AD_SECTION_HEIGHT : 0) + NAV_ICONS_HEIGHT + bottomInset;
+  const totalBottomBarHeight = NAV_ICONS_HEIGHT + bottomInset;
 
   return (
     <View style={styles.root}>
-      {adCampaignsConfig.topBanner.enabled && (
-        <View style={[styles.topAdWrapper, { paddingTop: topInset }]}>
-          <AdBanner adUnit={adCampaignsConfig.topBanner} position="top" />
-        </View>
-      )}
-
-      <View style={[styles.contentArea, { marginTop: topAdHeight + topInset }]}>
+      <View style={styles.contentArea}>
         <Tabs tabBar={() => <EmptyTabBar />} screenOptions={{ headerShown: false }} sceneContainerStyle={styles.scene}>
           <Tabs.Screen name="index" options={{ title: 'Home' }} />
           <Tabs.Screen name="map" options={{ title: 'Map' }} />
@@ -102,11 +90,6 @@ export default function TabLayout() {
       </View>
 
       <View style={[styles.combinedBottomBar, { height: totalBottomBarHeight, paddingBottom: bottomInset }]}> 
-        {bottomAdEnabled && (
-          <View style={styles.adSection}>
-            <AdBanner adUnit={adCampaignsConfig.bottomBanner} position="bottom" />
-          </View>
-        )}
         <View style={styles.iconsSection}>
           {visibleTabs.map((routeName) => <TabItem key={routeName} routeName={routeName} />)}
         </View>
@@ -117,11 +100,9 @@ export default function TabLayout() {
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: APP_BLACK },
-  topAdWrapper: { position: 'absolute', top: 0, left: 0, right: 0, zIndex: 100, backgroundColor: APP_BLACK },
   contentArea: { flex: 1, backgroundColor: APP_BLACK },
   scene: { flex: 1, backgroundColor: APP_BLACK },
   combinedBottomBar: { position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: NAV_BLACK, borderTopWidth: 1, borderTopColor: '#1F2937', zIndex: 100 },
-  adSection: { alignItems: 'center', paddingVertical: 4, backgroundColor: APP_BLACK },
   iconsSection: { flexDirection: 'row', height: NAV_ICONS_HEIGHT, paddingTop: 8, backgroundColor: NAV_BLACK },
   tabItem: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   iconPill: { width: 38, height: 30, borderRadius: 16, alignItems: 'center', justifyContent: 'center' },

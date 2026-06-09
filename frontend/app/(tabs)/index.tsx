@@ -112,7 +112,7 @@ export default function HomeScreen() {
     ? baseActions
     : [
         ...baseActions.slice(0, 3),
-        { id: 'sponsors', label: 'Sponsors', icon: 'award', color: '#FFD23F', route: '/sponsors' },
+        { id: 'sponsors', label: 'Sponsors', icon: 'award', color: '#FFD23F', route: '/(tabs)/sponsors' },
         ...baseActions.slice(3),
       ];
   const days = getDaysUntil('2026-07-30');
@@ -147,7 +147,7 @@ export default function HomeScreen() {
       <View style={styles.todayCard}>
         <View style={styles.todayHeader}>
           <Text style={styles.todayTitle}>{dynamicEvents.title}</Text>
-          <Pressable onPress={() => router.push('/schedule')}>
+          <Pressable onPress={() => router.push('/(tabs)/schedule')}>
             <Text style={styles.viewAll}>View schedule</Text>
           </Pressable>
         </View>
@@ -167,7 +167,7 @@ export default function HomeScreen() {
         <View style={styles.featureCopy}>
           <Text style={styles.featureEyebrow}>Weekend Highlight</Text>
           <Text style={styles.featureTitle}>Live music, reunions, parade fun, food, merch, and hometown energy.</Text>
-          <Text style={styles.featureBody}>Keep tickets, schedule updates, sponsor offers, and your weekend plan in one place.</Text>
+          <Text style={styles.featureBody}>Keep tickets, schedule updates, sponsor listings, and your weekend plan in one place.</Text>
         </View>
       </View>
 
@@ -189,16 +189,10 @@ export default function HomeScreen() {
         </View>
       </View>
 
-      <View style={styles.sponsorStrip}>
-        <Text style={styles.sponsorStripLabel}>Sponsor Visibility</Text>
-        <Text style={styles.sponsorStripTitle}>Put local businesses where visitors actually look.</Text>
-        <Text style={styles.sponsorStripText}>Available placements include top banners, home screen features, sponsor cards, and schedule callouts.</Text>
-      </View>
-
       <View style={styles.sponsorSection}>
         <View style={styles.sectionHeaderRow}>
           <Text style={styles.sectionTitle}>Featured Sponsors</Text>
-          <Text style={styles.sectionHint}>Logo-ready</Text>
+          <Text style={styles.sectionHint}>Community directory</Text>
         </View>
         {featuredSponsors.map((sponsor) => <SponsorCard key={sponsor.id} sponsor={sponsor} />)}
       </View>
@@ -248,10 +242,6 @@ const styles = StyleSheet.create({
   gridPressable: { alignItems: 'center', paddingVertical: 17, paddingHorizontal: 6 },
   iconWrap: { width: 48, height: 48, borderRadius: 14, alignItems: 'center', justifyContent: 'center', marginBottom: 8 },
   gridLabel: { fontSize: 12, fontWeight: '800', color: '#fff', textAlign: 'center' },
-  sponsorStrip: { marginHorizontal: 16, marginTop: 4, marginBottom: 16, borderRadius: 18, backgroundColor: '#16BFD6', padding: 16 },
-  sponsorStripLabel: { color: '#000', fontSize: 11, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1 },
-  sponsorStripTitle: { color: '#000', fontSize: 18, fontWeight: '900', marginTop: 4 },
-  sponsorStripText: { color: '#001014', fontSize: 12, lineHeight: 18, marginTop: 6 },
   sponsorSection: { paddingHorizontal: 16, paddingBottom: 120 },
   sectionHeaderRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   sectionHint: { color: '#74D65E', fontSize: 11, fontWeight: '800', marginBottom: 10 },

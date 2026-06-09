@@ -26,7 +26,7 @@ export default function LeaderboardScreen() {
           </View>
           <Text style={styles.placeholderTitle}>Highlights Hub</Text>
           <Text style={styles.placeholderText}>
-            Featured concerts, sponsor spotlights, photo moments, contests, and top weekend announcements can live here.
+            Featured concerts, photo moments, contests, and top weekend announcements can live here.
           </Text>
         </View>
 
@@ -49,8 +49,8 @@ export default function LeaderboardScreen() {
           <View style={[styles.featureCard, { borderColor: CYAN }]}>
             <Feather name="camera" size={24} color={CYAN} />
             <View style={styles.featureContent}>
-              <Text style={styles.featureTitle}>Photo & Sponsor Spots</Text>
-              <Text style={styles.featureText}>Future home for sponsor-backed photo walls and highlight galleries.</Text>
+              <Text style={styles.featureTitle}>Photo Moments</Text>
+              <Text style={styles.featureText}>Future home for community photo walls and highlight galleries.</Text>
             </View>
           </View>
         </View>
