@@ -80,7 +80,7 @@ export const eventConfig = {
   homeActions: [
     { id: 'schedule', label: 'Schedule', icon: 'calendar', color: '#74D65E', route: '/(tabs)/schedule' },
     { id: 'map', label: 'Map', icon: 'map', color: '#74D65E', route: '/(tabs)/map' },
-    { id: 'visitor-info', label: 'Visitor Info', icon: 'info', color: '#FFD23F', route: '/visitor-info' },
+    { id: 'visitor-info', label: 'Visitor Info', icon: 'info', color: '#FFD23F', route: '/(tabs)/visitor-info' },
   ] as EventHomeAction[],
   about: {
     highlightTitle: 'Mingle & Remix',
