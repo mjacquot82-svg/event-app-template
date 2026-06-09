@@ -4,6 +4,7 @@ import { View, Text, StyleSheet, ScrollView, Linking, Image, Pressable, Animated
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import eventConfig from '../../src/data/eventConfig';
+import HomecomingHero from '../../src/components/HomecomingHero';
 import { featuredSponsors } from '../../src/data/sponsors';
 
 type HomeEvent = {
@@ -53,18 +54,6 @@ function getCurrentOrNextEvents() {
   const nextEvents = homeEvents.filter((event) => event.date === next.date).slice(0, 3);
   const label = new Date(`${next.date}T12:00:00`).toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
   return { title: `Coming Up: ${label}`, events: nextEvents };
-}
-
-function TextLogo() {
-  return (
-    <View style={styles.textLogoPanel}>
-      <Image
-        source={require('../../assets/images/logo.jpg')}
-        style={styles.headerLogo}
-        resizeMode="contain"
-      />
-    </View>
-  );
 }
 
 function SponsorCard({ sponsor }: any) {
@@ -124,14 +113,11 @@ export default function HomeScreen() {
         <Text style={styles.countdownText}>⏳ {days} Days Until Homecoming</Text>
       </View>
 
-      <View style={styles.heroCard}>
-        <View style={styles.heroGlowPink} />
-        <View style={styles.heroGlowBlue} />
-        <TextLogo />
-        <Text style={styles.heroDates}>{eventConfig.event.dates}</Text>
-        <Text style={styles.heroLocation}>{eventConfig.event.location}</Text>
-        <Text style={styles.heroTagline}>{eventConfig.event.tagline}</Text>
-      </View>
+      <HomecomingHero
+        eyebrow="Homecoming"
+        title={eventConfig.event.shortName}
+        subtitle={eventConfig.event.tagline}
+      />
 
       <View style={styles.revenueRow}>
         <Pressable style={[styles.revenueButton, styles.ticketButton]} onPress={() => Linking.openURL(eventConfig.links.tickets)}>
@@ -204,18 +190,6 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#000' },
   countdownWrap: { alignItems: 'center', marginTop: 10, marginBottom: 2 },
   countdownText: { color: '#74D65E', fontWeight: '900', fontSize: 13 },
-  heroCard: { marginHorizontal: 16, marginTop: 12, marginBottom: 14, borderRadius: 26, minHeight: 300, overflow: 'hidden', backgroundColor: '#090909', alignItems: 'center', justifyContent: 'center', padding: 18, borderWidth: 1, borderColor: 'rgba(22,191,214,0.55)' },
-  heroGlowPink: { position: 'absolute', width: 260, height: 260, borderRadius: 130, backgroundColor: 'rgba(246,0,143,0.30)', top: -95, right: -75 },
-  heroGlowBlue: { position: 'absolute', width: 260, height: 260, borderRadius: 130, backgroundColor: 'rgba(22,191,214,0.32)', bottom: -95, left: -75 },
-  textLogoPanel: { width: '96%', borderRadius: 20, backgroundColor: '#fff', paddingVertical: 12, alignItems: 'center', marginBottom: 12 },
-  headerLogo: { width: '70%', height: 64, maxWidth: 420, maxHeight: 84, resizeMode: 'contain', objectFit: 'contain' as any },
-  logoMingle: { fontSize: 38, fontWeight: '900', color: '#F6008F', lineHeight: 40, letterSpacing: 0.5 },
-  logoAmp: { fontSize: 26, fontWeight: '900', color: '#16BFD6', lineHeight: 28 },
-  logoRemix: { fontSize: 34, fontWeight: '900', color: '#111', lineHeight: 36, letterSpacing: 2 },
-  logoYear: { fontSize: 18, fontWeight: '900', color: '#74D65E', marginTop: 2 },
-  heroDates: { color: '#FFFFFF', fontSize: 20, fontWeight: '900', marginTop: 8 },
-  heroLocation: { color: '#D1D5DB', fontSize: 14, marginTop: 4 },
-  heroTagline: { color: '#FFFFFF', fontSize: 13, textAlign: 'center', marginTop: 10, opacity: 0.92 },
   revenueRow: { flexDirection: 'row', gap: 10, paddingHorizontal: 16, marginBottom: 14 },
   revenueButton: { flex: 1, minHeight: 50, borderRadius: 16, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: 8 },
   ticketButton: { backgroundColor: '#F6008F' },

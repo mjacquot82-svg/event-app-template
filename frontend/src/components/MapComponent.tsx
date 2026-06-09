@@ -3,7 +3,6 @@
 import React from 'react';
 import {
   View,
-  Text,
   StyleSheet,
   Image,
   ScrollView,
@@ -34,11 +33,6 @@ const MapComponent: React.FC<MapComponentProps> = ({
       contentContainerStyle={styles.content}
       showsVerticalScrollIndicator={false}
     >
-      <View style={styles.headerCard}>
-        <Text style={styles.title}>Walkerton Home Coming 2026</Text>
-        <Text style={styles.subtitle}>Site Map</Text>
-      </View>
-
       <View
         style={[styles.imageCard, { width: imageWidth }]}
       >
@@ -59,28 +53,8 @@ const styles = StyleSheet.create({
   },
   content: {
     paddingHorizontal: 12,
-    paddingTop: 12,
+    paddingTop: 0,
     paddingBottom: 120,
-  },
-  headerCard: {
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: colors.borderLight,
-    backgroundColor: colors.card,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    marginBottom: 12,
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: '900',
-    color: colors.text,
-  },
-  subtitle: {
-    marginTop: 4,
-    fontSize: 14,
-    fontWeight: '700',
-    color: colors.textSecondary,
   },
   imageCard: {
     alignSelf: 'center',

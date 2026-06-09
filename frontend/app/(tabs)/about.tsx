@@ -1,10 +1,11 @@
 // © 2026 1001538341 ONTARIO INC.
 
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, Linking, TouchableOpacity, Platform, Image } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Linking, TouchableOpacity, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 import eventConfig from '../../src/data/eventConfig';
+import HomecomingHero from '../../src/components/HomecomingHero';
 
 const BLUE = '#16BFD6';
 
@@ -26,17 +27,11 @@ export default function AboutScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-
-        <View style={styles.header}>
-          <Text style={styles.title}>About the Event</Text>
-          <View style={styles.logoPanel}>
-            <Image
-              source={require('../../assets/images/logo.jpg')}
-              style={styles.logo}
-              resizeMode="contain"
-            />
-          </View>
-        </View>
+        <HomecomingHero
+          eyebrow="About"
+          title="About the Event"
+          subtitle="What Homecoming weekend is all about, and how to make the most of it."
+        />
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Event Details</Text>
@@ -83,24 +78,6 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#000' },
   scrollView: { flex: 1, backgroundColor: '#000' },
   scrollContent: { paddingBottom: 220 },
-  header: { padding: 20, borderBottomWidth: 2, borderBottomColor: BLUE, backgroundColor: '#06141A' },
-  title: { fontSize: 26, fontWeight: '900', color: '#fff' },
-  logoPanel: {
-    marginTop: 10,
-    backgroundColor: '#fff',
-    borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-  },
-  logo: {
-    width: '100%',
-    maxWidth: 360,
-    height: 54,
-    resizeMode: 'contain',
-    objectFit: 'contain' as any,
-  },
   section: { padding: 20 },
   sectionTitle: { fontSize: 16, fontWeight: '900', color: '#fff', marginBottom: 10 },
   detailCard: { backgroundColor: '#111', borderRadius: 16, padding: 16, borderWidth: 1, borderColor: '#1F2937' },

@@ -4,6 +4,7 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView, Image, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
+import HomecomingHero from '../../src/components/HomecomingHero';
 
 const CYAN = '#16BFD6';
 const LIME = '#74D65E';
@@ -42,10 +43,11 @@ export default function VisitorInfoScreen() {
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        <View style={styles.header}>
-          <Text style={styles.title}>Visitor Info</Text>
-          <Text style={styles.subtitle}>Shuttles, parade route, and food service details for Homecoming weekend.</Text>
-        </View>
+        <HomecomingHero
+          eyebrow="Visitor Info"
+          title="Visitor Information"
+          subtitle="Shuttles, parade route, and food service details for Homecoming weekend."
+        />
 
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
@@ -112,9 +114,6 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#000' },
   scrollView: { flex: 1, backgroundColor: '#000' },
   scrollContent: { paddingBottom: 220 },
-  header: { padding: 20, borderBottomWidth: 2, borderBottomColor: CYAN, backgroundColor: '#06141A' },
-  title: { fontSize: 26, fontWeight: '900', color: '#fff' },
-  subtitle: { color: '#D1D5DB', marginTop: 4, lineHeight: 20 },
   section: { padding: 20, paddingBottom: 0 },
   sectionHeader: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 12 },
   sectionTitle: { fontSize: 18, fontWeight: '900', color: '#fff' },

@@ -1,10 +1,10 @@
 // © 2026 1001538341 ONTARIO INC.
 
 import React, { useMemo, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal, Image } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
-import eventConfig from '../../src/data/eventConfig';
+import HomecomingHero from '../../src/components/HomecomingHero';
 
 type DemoEvent = {
   id: string;
@@ -110,17 +110,11 @@ export default function ScheduleScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <View style={styles.header}>
-        <View style={styles.logoPanel}>
-          <Image
-            source={require('../../assets/images/logo.jpg')}
-            style={styles.logo}
-            resizeMode="contain"
-          />
-        </View>
-        <Text style={styles.title}>Weekend Schedule</Text>
-        <Text style={styles.subtitle}>{eventConfig.event.dates} · {schedule.length} events</Text>
-      </View>
+      <HomecomingHero
+        eyebrow="Schedule"
+        title="Weekend Schedule"
+        subtitle={`${schedule.length} events across the full Homecoming weekend.`}
+      />
 
       <View style={styles.filterWrap}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterScroll}>
@@ -195,25 +189,6 @@ export default function ScheduleScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#000' },
-  header: { paddingHorizontal: 20, paddingTop: 12, paddingBottom: 16, backgroundColor: '#061207', borderBottomWidth: 2, borderBottomColor: '#74D65E' },
-  logoPanel: {
-    backgroundColor: '#fff',
-    borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    marginBottom: 10,
-  },
-  logo: {
-    width: '100%',
-    maxWidth: 360,
-    height: 52,
-    resizeMode: 'contain',
-    objectFit: 'contain' as any,
-  },
-  title: { color: '#FFFFFF', fontSize: 28, fontWeight: '900', marginTop: 4 },
-  subtitle: { color: '#D1D5DB', fontSize: 13, marginTop: 4 },
   filterWrap: { backgroundColor: '#000', borderBottomWidth: 1, borderBottomColor: '#1F2937' },
   filterScroll: { paddingHorizontal: 16, paddingVertical: 12 },
   filterPill: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20, backgroundColor: '#111', marginRight: 8, borderWidth: 1, borderColor: '#252525' },

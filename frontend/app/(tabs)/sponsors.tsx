@@ -5,6 +5,7 @@ import { View, Text, StyleSheet, ScrollView, Pressable, Linking } from 'react-na
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 import { Sponsor, sponsorsByTier } from '../../src/data/sponsors';
+import HomecomingHero from '../../src/components/HomecomingHero';
 
 const GOLD = '#FFD23F';
 
@@ -68,10 +69,11 @@ export default function SponsorsScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <View style={styles.header}>
-          <Text style={styles.title}>Sponsors</Text>
-          <Text style={styles.subtitle}>Our community partners and supporters</Text>
-        </View>
+        <HomecomingHero
+          eyebrow="Sponsors"
+          title="Community Partners"
+          subtitle="The businesses and organizations helping power Homecoming weekend."
+        />
 
         <SponsorSection title="Presenting Sponsors" sponsors={sponsorsByTier.presenting} />
         <SponsorSection title="Featured Sponsors" sponsors={sponsorsByTier.featured} />
@@ -90,21 +92,6 @@ const styles = StyleSheet.create({
   },
   content: {
     paddingBottom: 220,
-  },
-  header: {
-    padding: 20,
-    borderBottomWidth: 2,
-    borderBottomColor: GOLD,
-    backgroundColor: '#1A1400',
-  },
-  title: {
-    fontSize: 26,
-    fontWeight: '900',
-    color: '#fff',
-  },
-  subtitle: {
-    color: '#D1D5DB',
-    marginTop: 4,
   },
   section: {
     padding: 20,
