@@ -13,14 +13,14 @@ type DemoEvent = {
   time: string;
   title: string;
   location: string;
-  category: 'Music' | 'Kids' | 'Parade' | 'Food' | 'Community' | 'Merch' | 'Tickets';
+  category: 'Music' | 'Kids' | 'Food' | 'Parade' | 'Sports' | 'Special Events' | 'Community';
   description: string;
   sponsor?: string;
 };
 
 const schedule: DemoEvent[] = [
   { id: 'thu-open', day: 'Thursday', date: 'July 30', time: '5:00 PM', title: 'Welcome Home Kickoff', location: 'Downtown Walkerton', category: 'Community', description: 'Opening night check-in, welcome booths, music downtown, food vendors, and a first chance to reconnect with old friends.', sponsor: 'Presented by Main Stage Sponsor' },
-  { id: 'thu-merch', day: 'Thursday', date: 'July 30', time: '6:30 PM', title: 'Merch Pickup & Pop-Up Shop', location: 'Homecoming Hub', category: 'Merch', description: 'Pick up pre-ordered clothing, browse limited-edition Homecoming gear, and grab weekend info.' },
+  { id: 'thu-merch', day: 'Thursday', date: 'July 30', time: '6:30 PM', title: 'Merch Pickup & Pop-Up Shop', location: 'Homecoming Hub', category: 'Special Events', description: 'Pick up pre-ordered clothing, browse limited-edition Homecoming gear, and grab weekend info.' },
   { id: 'fri-kids', day: 'Friday', date: 'July 31', time: '11:00 AM', title: 'Kids Remix Zone Opens', location: 'Community Park', category: 'Kids', description: 'Family activities, games, face painting, inflatables, and youth-friendly entertainment throughout the afternoon.', sponsor: 'Kids Zone Sponsor' },
   { id: 'fri-food', day: 'Friday', date: 'July 31', time: '4:00 PM', title: 'Food Truck Friday', location: 'Downtown Food Row', category: 'Food', description: 'Local eats, patios, treats, and community food vendors. A perfect stop before the evening concerts.', sponsor: 'Downtown Food Sponsor' },
   { id: 'fri-music', day: 'Friday', date: 'July 31', time: '9:00 PM', title: 'Friday Night Mingle Concert', location: 'Main Stage', category: 'Music', description: 'A high-energy throwback night built for reconnecting, dancing, and kicking off the weekend properly.', sponsor: 'Main Stage Sponsor' },
@@ -33,7 +33,13 @@ const schedule: DemoEvent[] = [
 ];
 
 const categoryColors: Record<DemoEvent['category'], string> = {
-  Music: '#F6008F', Kids: '#45DDF0', Parade: '#FFD23F', Food: '#74D65E', Community: '#16BFD6', Merch: '#B7BDC7', Tickets: '#F6008F',
+  Music: '#F6008F',
+  Kids: '#45DDF0',
+  Food: '#74D65E',
+  Parade: '#FFD23F',
+  Sports: '#3A86FF',
+  'Special Events': '#FF9F1C',
+  Community: '#16BFD6',
 };
 
 export default function ScheduleScreen() {
@@ -81,7 +87,7 @@ export default function ScheduleScreen() {
           <Feather name="calendar" size={20} color="#000" />
           <View style={{ flex: 1 }}>
             <Text style={styles.ticketTitle}>Plan the weekend your way</Text>
-            <Text style={styles.ticketText}>Filter by music, kids events, parade, food, merch, and community moments.</Text>
+            <Text style={styles.ticketText}>Filter by music, kids events, food, parade, sports, special events, and community moments.</Text>
           </View>
         </View>
 
