@@ -70,7 +70,19 @@ const schedule: DemoEvent[] = [
   { id: 'sun-trivia-night', day: 'Sunday', date: 'August 2', time: 'Time TBA', title: 'Trivia Night', location: 'Location TBA', category: 'Community', description: 'Trivia Night on Sunday, August 2.' },
   { id: 'sun-pork-dinner', day: 'Sunday', date: 'August 2', time: 'Time TBA', title: 'Pork Dinner', location: 'Location TBA', category: 'Food', description: 'Pork Dinner on Sunday, August 2.' },
   { id: 'sun-little-rock-dance', day: 'Sunday', date: 'August 2', time: 'Time TBA', title: 'Little Rock Dance', location: 'Location TBA', category: 'Music', description: 'Little Rock Dance on Sunday, August 2.' },
-  { id: 'mon-finale', day: 'Monday', date: 'August 3', time: '7:30 PM', title: 'Finale Night & Fireworks', location: 'Main Stage Grounds', category: 'Music', description: 'Closing celebration with music, thank-yous, sponsor recognition, and a community sendoff.', sponsor: 'Community Sponsor Spotlight' },
+  { id: 'mon-grab-go-breakfast', day: 'Monday', date: 'August 3', time: 'Time TBA', title: 'Grab & Go Breakfast', location: 'Location TBA', category: 'Food', description: 'Grab & Go Breakfast on Monday, August 3.' },
+  { id: 'mon-yoga-sound-bath', day: 'Monday', date: 'August 3', time: 'Time TBA', title: 'Yoga Sound Bath', location: 'Location TBA', category: 'Community', description: 'Yoga Sound Bath on Monday, August 3.' },
+  { id: 'mon-painting-with-cara', day: 'Monday', date: 'August 3', time: 'Time TBA', title: 'Painting With Cara', location: 'Location TBA', category: 'Community', description: 'Painting With Cara on Monday, August 3.' },
+  { id: 'mon-parade', day: 'Monday', date: 'August 3', time: 'Time TBA', title: 'Parade', location: 'Parade Route', category: 'Parade', description: 'Parade on Monday, August 3.' },
+  { id: 'mon-music-greg-mclean', day: 'Monday', date: 'August 3', time: 'Time TBA', title: 'Music by Greg McLean', location: 'Main Stage', category: 'Music', description: 'Music by Greg McLean on Monday, August 3.' },
+  { id: 'mon-music-andrew-mcveety', day: 'Monday', date: 'August 3', time: 'Time TBA', title: 'Music by Andrew McVeety', location: 'Main Stage', category: 'Music', description: 'Music by Andrew McVeety on Monday, August 3.' },
+  { id: 'mon-kids-inflatables', day: 'Monday', date: 'August 3', time: 'Time TBA', title: 'Kids Inflatables', location: 'Location TBA', category: 'Kids', description: 'Kids Inflatables on Monday, August 3.' },
+  { id: 'mon-bike-strider-parade', day: 'Monday', date: 'August 3', time: 'Time TBA', title: 'Bike / Strider Parade', location: 'Location TBA', category: 'Kids', description: 'Bike / Strider Parade on Monday, August 3.' },
+  { id: 'mon-face-painting', day: 'Monday', date: 'August 3', time: 'Time TBA', title: 'Face Painting', location: 'Location TBA', category: 'Kids', description: 'Face Painting on Monday, August 3.' },
+  { id: 'mon-chuckles-the-clown', day: 'Monday', date: 'August 3', time: 'Time TBA', title: 'Chuckles the Clown', location: 'Location TBA', category: 'Kids', description: 'Chuckles the Clown on Monday, August 3.' },
+  { id: 'mon-music-born-in-the-eighties', day: 'Monday', date: 'August 3', time: 'Time TBA', title: 'Music by Born in the Eighties', location: 'Main Stage', category: 'Music', description: 'Music by Born in the Eighties on Monday, August 3.' },
+  { id: 'mon-pulled-pork-dinner', day: 'Monday', date: 'August 3', time: 'Time TBA', title: 'Pulled Pork Dinner', location: 'Location TBA', category: 'Food', description: 'Pulled Pork Dinner on Monday, August 3.' },
+  { id: 'mon-fireworks', day: 'Monday', date: 'August 3', time: 'Time TBA', title: 'Fireworks', location: 'Location TBA', category: 'Special Events', description: 'Fireworks on Monday, August 3.' },
 ];
 
 const categoryColors: Record<DemoEvent['category'], string> = {
