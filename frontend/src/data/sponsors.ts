@@ -8,6 +8,8 @@ export type Sponsor = {
   name: string;
   tier: SponsorTier;
   tagline: string;
+  description?: string;
+  logo?: string;
   url?: string;
   color: string;
 };
@@ -18,7 +20,6 @@ export const sponsors: Sponsor[] = [
     name: 'Main Stage Sponsor',
     tier: 'presenting',
     tagline: 'Presenting sponsor for live music and headline events',
-    url: 'https://example.com/sponsor-main-stage',
     color: '#F6008F',
   },
   {
@@ -26,7 +27,6 @@ export const sponsors: Sponsor[] = [
     name: 'Downtown Food Sponsor',
     tier: 'featured',
     tagline: 'Supporting food trucks, patios, and local tastes',
-    url: 'https://example.com/sponsor-food',
     color: '#16BFD6',
   },
   {
@@ -34,7 +34,6 @@ export const sponsors: Sponsor[] = [
     name: 'Parade Route Sponsor',
     tier: 'featured',
     tagline: 'Helping bring the parade through town',
-    url: 'https://example.com/sponsor-parade',
     color: '#74D65E',
   },
   {
@@ -42,7 +41,6 @@ export const sponsors: Sponsor[] = [
     name: 'Kids Zone Sponsor',
     tier: 'community',
     tagline: 'Supporting family-friendly homecoming activities',
-    url: 'https://example.com/sponsor-kids',
     color: '#FFD23F',
   },
 ];
@@ -50,3 +48,9 @@ export const sponsors: Sponsor[] = [
 export const featuredSponsors = sponsors.filter((sponsor) =>
   sponsor.tier === 'presenting' || sponsor.tier === 'featured'
 );
+
+export const sponsorsByTier = {
+  presenting: sponsors.filter((sponsor) => sponsor.tier === 'presenting'),
+  featured: sponsors.filter((sponsor) => sponsor.tier === 'featured'),
+  community: sponsors.filter((sponsor) => sponsor.tier === 'community'),
+};
