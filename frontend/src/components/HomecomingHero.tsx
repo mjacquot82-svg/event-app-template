@@ -13,7 +13,7 @@ type HomecomingHeroProps = {
   countdownText?: string;
 };
 
-export default function HomecomingHero({ title, subtitle, countdownText }: HomecomingHeroProps) {
+export default function HomecomingHero({ countdownText }: HomecomingHeroProps) {
   return (
     <View style={styles.frame}>
       <ImageBackground source={HERO_IMAGE} resizeMode="cover" style={styles.hero} imageStyle={styles.heroImage}>
@@ -25,16 +25,12 @@ export default function HomecomingHero({ title, subtitle, countdownText }: Homec
 
         <View style={styles.content}>
           <Image source={HERO_IMAGE} style={styles.foregroundLogo} resizeMode="contain" />
-          {countdownText ? <Text style={styles.countdown}>{countdownText}</Text> : null}
-          <Text style={styles.title}>{title}</Text>
-
           <View style={styles.metaRow}>
             <Text style={styles.metaPrimary}>July 30 – August 3, 2026</Text>
             <Text style={styles.metaDivider}>•</Text>
             <Text style={styles.metaSecondary}>Walkerton, Ontario</Text>
           </View>
-
-          {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
+          {countdownText ? <Text style={styles.countdown}>{countdownText}</Text> : null}
         </View>
       </ImageBackground>
     </View>
@@ -104,33 +100,14 @@ const styles = StyleSheet.create({
   foregroundLogo: {
     width: 184,
     height: 58,
-    marginBottom: 10,
+    marginBottom: 8,
     opacity: 0.96,
   },
   countdown: {
     color: '#74D65E',
     fontSize: 14,
     fontWeight: '900',
-    marginBottom: 8,
-    textAlign: 'center',
-  },
-  title: {
-    color: '#FFFFFF',
-    fontSize: 26,
-    lineHeight: 29,
-    fontWeight: '900',
-    textAlign: 'center',
-    textShadowColor: 'rgba(0,0,0,0.55)',
-    textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 8,
-  },
-  subtitle: {
-    color: '#E5E7EB',
-    fontSize: 13,
-    lineHeight: 19,
-    fontWeight: '700',
-    marginTop: 8,
-    maxWidth: '92%',
+    marginTop: 10,
     textAlign: 'center',
   },
   metaRow: {
@@ -138,7 +115,7 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 12,
+    marginTop: 0,
   },
   metaPrimary: {
     color: BLUE,
