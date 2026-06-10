@@ -1,10 +1,9 @@
 // © 2026 1001538341 ONTARIO INC.
 
 import React from 'react';
-import { Image, StyleSheet, Text, View } from 'react-native';
+import { ImageBackground, StyleSheet, Text, View } from 'react-native';
 
 const HERO_IMAGE = require('../../assets/images/logo.jpg');
-const BLUE = '#16BFD6';
 
 type HomecomingHeroProps = {
   title: string;
@@ -16,21 +15,19 @@ type HomecomingHeroProps = {
 export default function HomecomingHero({ countdownText }: HomecomingHeroProps) {
   return (
     <View style={styles.frame}>
-      <View style={styles.hero}>
+      <ImageBackground source={HERO_IMAGE} style={styles.hero} imageStyle={styles.heroImage}>
         <View style={styles.overlay} />
         <View style={styles.topShade} />
         <View style={styles.bottomShade} />
 
         <View style={styles.content}>
-          <Image source={HERO_IMAGE} style={styles.foregroundLogo} resizeMode="contain" />
-          <View style={styles.metaRow}>
+          <View style={styles.detailsBlock}>
             <Text style={styles.metaPrimary}>July 30 – August 3, 2026</Text>
-            <Text style={styles.metaDivider}>•</Text>
             <Text style={styles.metaSecondary}>Walkerton, Ontario</Text>
           </View>
           {countdownText ? <Text style={styles.countdown}>{countdownText}</Text> : null}
         </View>
-      </View>
+      </ImageBackground>
     </View>
   );
 }
@@ -48,12 +45,15 @@ const styles = StyleSheet.create({
   },
   hero: {
     height: 232,
-    justifyContent: 'center',
+    justifyContent: 'flex-end',
     backgroundColor: '#090909',
+  },
+  heroImage: {
+    resizeMode: 'cover',
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0, 0, 0, 0.20)',
+    backgroundColor: 'rgba(0, 0, 0, 0.12)',
   },
   topShade: {
     position: 'absolute',
@@ -68,21 +68,15 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    height: 96,
-    backgroundColor: 'rgba(0, 0, 0, 0.22)',
+    height: 88,
+    backgroundColor: 'rgba(0, 0, 0, 0.16)',
   },
   content: {
-    paddingHorizontal: 18,
-    paddingVertical: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  foregroundLogo: {
-    width: '96%',
-    maxWidth: 560,
-    height: 116,
-    marginBottom: 10,
-    opacity: 1,
+    flex: 1,
+    justifyContent: 'flex-end',
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 18,
   },
   countdown: {
     color: '#74D65E',
@@ -91,26 +85,26 @@ const styles = StyleSheet.create({
     marginTop: 12,
     textAlign: 'center',
   },
-  metaRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 0,
+  detailsBlock: {
+    marginLeft: 166,
+    marginBottom: 2,
+    alignSelf: 'flex-start',
   },
   metaPrimary: {
-    color: BLUE,
-    fontSize: 13,
+    color: '#CFFAFE',
+    fontSize: 12,
     fontWeight: '900',
-  },
-  metaDivider: {
-    color: '#A7F3D0',
-    marginHorizontal: 8,
-    fontWeight: '900',
+    textShadowColor: 'rgba(0, 0, 0, 0.65)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 3,
   },
   metaSecondary: {
-    color: '#F9FAFB',
-    fontSize: 13,
+    color: '#FFFFFF',
+    fontSize: 12,
     fontWeight: '800',
+    marginTop: 2,
+    textShadowColor: 'rgba(0, 0, 0, 0.65)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 3,
   },
 });
