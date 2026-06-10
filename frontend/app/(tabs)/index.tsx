@@ -76,15 +76,7 @@ function GridItem({ label, icon, color, onPress }: any) {
 
 export default function HomeScreen() {
   const router = useRouter();
-  const baseActions = eventConfig.homeActions;
-  const hasSponsorsAction = baseActions.some((a) => a.id === 'sponsors' || a.label === 'Sponsors');
-  const filteredActions = hasSponsorsAction
-    ? baseActions
-    : [
-        ...baseActions.slice(0, 3),
-        { id: 'sponsors', label: 'Sponsors', icon: 'award', color: '#FFD23F', route: '/(tabs)/sponsors' },
-        ...baseActions.slice(3),
-      ];
+  const homeActions = eventConfig.homeActions;
   const days = getDaysUntil('2026-07-30');
   const dynamicEvents = useMemo(() => getCurrentOrNextEvents(), []);
 
@@ -133,7 +125,7 @@ export default function HomeScreen() {
       <View style={styles.gridWrapper}>
         <Text style={styles.sectionTitle}>Plan Your Weekend</Text>
         <View style={styles.grid}>
-          {filteredActions.map((item) => (
+          {homeActions.map((item) => (
             <GridItem
               key={item.id}
               label={item.label}
@@ -174,8 +166,8 @@ const styles = StyleSheet.create({
   gridWrapper: { paddingHorizontal: 16 },
   sectionTitle: { color: '#fff', fontSize: 17, fontWeight: '900', marginBottom: 10 },
   grid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' },
-  gridItem: { width: '31%', backgroundColor: '#111', borderRadius: 18, marginBottom: 14, borderWidth: 1, borderColor: '#252525' },
-  gridPressable: { alignItems: 'center', paddingVertical: 17, paddingHorizontal: 6 },
-  iconWrap: { width: 48, height: 48, borderRadius: 14, alignItems: 'center', justifyContent: 'center', marginBottom: 8 },
-  gridLabel: { fontSize: 12, fontWeight: '800', color: '#fff', textAlign: 'center' },
+  gridItem: { width: '48%', backgroundColor: '#111', borderRadius: 18, marginBottom: 14, borderWidth: 1, borderColor: '#252525' },
+  gridPressable: { alignItems: 'center', paddingVertical: 22, paddingHorizontal: 10 },
+  iconWrap: { width: 54, height: 54, borderRadius: 16, alignItems: 'center', justifyContent: 'center', marginBottom: 10 },
+  gridLabel: { fontSize: 13, fontWeight: '800', color: '#fff', textAlign: 'center' },
 });
