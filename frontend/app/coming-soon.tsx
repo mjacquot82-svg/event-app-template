@@ -21,7 +21,7 @@ export default function ComingSoonPage() {
       <View style={styles.content}>
         {/* Event-specific Logo */}
         <Image
-          source={eventConfig?.appName && eventConfig.appName.toLowerCase().includes('walkerton') ? require('../assets/images/logo.jpg') : require('../assets/images/icon.png')}
+          source={eventConfig?.appName && eventConfig.appName.toLowerCase().includes('walkerton') ? require('../assets/images/whc-logo.png') : require('../assets/images/icon.png')}
           style={styles.logo}
           resizeMode="contain"
         />

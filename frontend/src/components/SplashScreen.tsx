@@ -1,5 +1,5 @@
 // © 2026 1001538341 ONTARIO INC. All Rights Reserved.
-// Static Splash Screen - No animation, just the IPM Final image for the App.
+// Static Splash Screen - No animation, just the event branding for the app.
 
 import React, { useEffect } from 'react';
 import { View, StyleSheet, Image, Dimensions, Platform } from 'react-native';
@@ -51,7 +51,7 @@ export default function SplashScreen({ onFinish, duration = 2000 }: SplashScreen
     return (
       <View style={styles.container}>
         <Image
-          source={require('../../assets/images/logo.jpg')}
+          source={require('../../assets/images/whc-logo.png')}
           style={styles.logoImage}
           resizeMode="contain"
         />

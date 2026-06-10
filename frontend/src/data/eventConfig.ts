@@ -37,7 +37,7 @@ export const eventConfig = {
   assets: {
     bannerImage: require('../../assets/images/ipm-2026-banner.png'),
     // Home Coming specific logo asset
-    logoUri: require('../../assets/images/logo.jpg'),
+    logoUri: require('../../assets/images/whc-logo.png'),
   },
   brand: {
     primary: '#16BFD6',
