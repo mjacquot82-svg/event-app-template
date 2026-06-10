@@ -39,8 +39,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#090909',
   },
   bannerImage: {
-    width: '92%',
+    width: '98%',
     maxWidth: 560,
-    height: 156,
+    height: 176,
   },
 });
