@@ -6,7 +6,7 @@
     "icon": "./assets/images/whc-logo.png",
     "userInterfaceStyle": "dark",
     "splash": {
-      "image": "./assets/images/splash-icon.png",
+      "image": "./assets/images/homecoming-splash-poster-proposal.png",
       "resizeMode": "contain",
       "backgroundColor": "#000000"
     },

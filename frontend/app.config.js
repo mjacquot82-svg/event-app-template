@@ -46,7 +46,7 @@ export default {
       [
         "expo-splash-screen",
         {
-          image: "./assets/images/splash-icon.png",
+          image: "./assets/images/homecoming-splash-poster-proposal.png",
           imageWidth: 360,
           resizeMode: "contain",
           backgroundColor: "#000000"
