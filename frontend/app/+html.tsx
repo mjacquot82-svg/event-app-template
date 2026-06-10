@@ -5,7 +5,7 @@ import type { PropsWithChildren } from "react";
 import eventConfig from '../src/data/eventConfig';
 
 export default function Root({ children }: PropsWithChildren) {
-  const favicon = (eventConfig?.appName && eventConfig.appName.toLowerCase().includes('walkerton')) ? '/assets/images/whc-logo.png' : '/assets/images/favicon.png';
+  const favicon = (eventConfig?.appName && eventConfig.appName.toLowerCase().includes('walkerton')) ? '/whc-logo.png' : '/assets/images/favicon.png';
 
   return (
     <html lang="en" style={{ height: "100%" }}>
