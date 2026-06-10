@@ -95,20 +95,12 @@ export default function HomeScreen() {
       showsVerticalScrollIndicator={false}
     >
       <HomecomingHero
-        countdownText={`${days} Days Until Homecoming`}
         title={eventConfig.event.shortName}
         subtitle={eventConfig.event.tagline}
       />
 
-      <View style={styles.revenueRow}>
-        <Pressable style={[styles.revenueButton, styles.ticketButton]} onPress={() => Linking.openURL(eventConfig.links.tickets)}>
-          <Feather name="tag" size={18} color="#fff" />
-          <Text style={styles.revenueButtonText}>Get Tickets</Text>
-        </Pressable>
-        <Pressable style={[styles.revenueButton, styles.merchButton]} onPress={() => Linking.openURL(eventConfig.links.merch)}>
-          <Feather name="shopping-bag" size={18} color="#000" />
-          <Text style={[styles.revenueButtonText, { color: '#000' }]}>Order Merch</Text>
-        </Pressable>
+      <View style={styles.countdownSection}>
+        <Text style={styles.countdownText}>⏳ {days} Days Until Homecoming</Text>
       </View>
 
       <View style={styles.todayCard}>
@@ -163,11 +155,8 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#000' },
   scrollContent: { paddingBottom: 120 },
-  revenueRow: { flexDirection: 'row', gap: 10, paddingHorizontal: 16, marginBottom: 14 },
-  revenueButton: { flex: 1, minHeight: 50, borderRadius: 16, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: 8 },
-  ticketButton: { backgroundColor: '#F6008F' },
-  merchButton: { backgroundColor: '#74D65E' },
-  revenueButtonText: { color: '#fff', fontWeight: '900', fontSize: 14 },
+  countdownSection: { marginHorizontal: 16, marginBottom: 16, borderRadius: 18, backgroundColor: '#111', borderWidth: 1, borderColor: '#1F2937', paddingVertical: 16, paddingHorizontal: 18, alignItems: 'center' },
+  countdownText: { color: '#74D65E', fontWeight: '900', fontSize: 18, textAlign: 'center' },
   todayCard: { marginHorizontal: 16, marginBottom: 16, borderRadius: 18, backgroundColor: '#111', padding: 16, borderWidth: 1, borderColor: '#252525' },
   todayHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
   todayTitle: { color: '#fff', fontWeight: '900', fontSize: 16 },
