@@ -1,7 +1,7 @@
 // © 2026 1001538341 ONTARIO INC.
 
 import React from 'react';
-import { ImageBackground, StyleSheet, Text, View } from 'react-native';
+import { Image, StyleSheet, Text, View } from 'react-native';
 
 const HERO_IMAGE = require('../../assets/images/logo.jpg');
 
@@ -15,19 +15,20 @@ type HomecomingHeroProps = {
 export default function HomecomingHero({ countdownText }: HomecomingHeroProps) {
   return (
     <View style={styles.frame}>
-      <ImageBackground source={HERO_IMAGE} style={styles.hero} imageStyle={styles.heroImage}>
+      <View style={styles.hero}>
         <View style={styles.overlay} />
         <View style={styles.topShade} />
         <View style={styles.bottomShade} />
 
         <View style={styles.content}>
+          <Image source={HERO_IMAGE} style={styles.bannerImage} resizeMode="contain" />
           <View style={styles.detailsBlock}>
             <Text style={styles.metaPrimary}>July 30 – August 3, 2026</Text>
             <Text style={styles.metaSecondary}>Walkerton, Ontario</Text>
           </View>
           {countdownText ? <Text style={styles.countdown}>{countdownText}</Text> : null}
         </View>
-      </ImageBackground>
+      </View>
     </View>
   );
 }
@@ -45,11 +46,8 @@ const styles = StyleSheet.create({
   },
   hero: {
     height: 232,
-    justifyContent: 'flex-end',
+    justifyContent: 'center',
     backgroundColor: '#090909',
-  },
-  heroImage: {
-    resizeMode: 'cover',
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
@@ -73,10 +71,17 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    justifyContent: 'flex-end',
+    justifyContent: 'center',
+    alignItems: 'center',
     paddingHorizontal: 20,
     paddingTop: 16,
     paddingBottom: 12,
+  },
+  bannerImage: {
+    width: '100%',
+    maxWidth: 560,
+    height: 132,
+    marginBottom: 6,
   },
   countdown: {
     color: '#74D65E',
@@ -86,9 +91,8 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   detailsBlock: {
-    marginLeft: 166,
-    marginBottom: -4,
-    alignSelf: 'flex-start',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   metaPrimary: {
     color: '#CFFAFE',
