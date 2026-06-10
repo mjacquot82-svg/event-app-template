@@ -3,7 +3,7 @@
 import React from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 
-const HERO_IMAGE = require('../../assets/images/logo.jpg');
+const HERO_IMAGE = require('../../assets/images/Untitled.png');
 
 type HomecomingHeroProps = {
   title: string;

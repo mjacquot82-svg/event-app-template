@@ -3,15 +3,15 @@
     "name": "Walkerton Home Coming 2026",
     "slug": "walkerton-home-coming-2026",
     "version": "1.0.0",
-    "icon": "./assets/images/v2-icon.png",
+    "icon": "./assets/images/whc-logo.png",
     "userInterfaceStyle": "dark",
     "splash": {
-      "image": "./assets/images/whc-logo-splash.png",
+      "image": "./assets/images/homecoming-splash-banner.png",
       "resizeMode": "contain",
       "backgroundColor": "#000000"
     },
     "web": {
-      "favicon": "./assets/images/v2-icon.png",
+      "favicon": "./assets/images/whc-logo.png",
       "backgroundColor": "#000000",
       "description": "Official App for Walkerton Home Coming 2026"
     }

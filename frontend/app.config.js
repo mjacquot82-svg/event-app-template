@@ -6,7 +6,7 @@ export default {
     slug: "walkerton-home-coming-2026",
     version: "1.0.0",
     orientation: "portrait",
-    icon: "./assets/images/v2-icon.png",
+    icon: "./assets/images/whc-logo.png",
     scheme: "walkertonhomecoming2026",
     userInterfaceStyle: "dark",
     newArchEnabled: false,
@@ -20,8 +20,8 @@ export default {
     },
     android: {
       adaptiveIcon: {
-        foregroundImage: "./assets/images/adaptive-icon.png",
-        backgroundColor: "#F5F5F0"
+        foregroundImage: "./assets/images/whc-logo.png",
+        backgroundColor: "#000000"
       },
       edgeToEdgeEnabled: true,
       permissions: [
@@ -32,7 +32,7 @@ export default {
     },
     web: {
       bundler: "metro",
-      favicon: "./assets/images/favicon.png",
+      favicon: "./assets/images/whc-logo.png",
       output: "single",
       build: {
         babel: {
@@ -46,8 +46,8 @@ export default {
       [
         "expo-splash-screen",
         {
-          image: "./assets/images/whc-logo-splash.png",
-          imageWidth: 460,
+          image: "./assets/images/homecoming-splash-banner.png",
+          imageWidth: 360,
           resizeMode: "contain",
           backgroundColor: "#000000"
         }
