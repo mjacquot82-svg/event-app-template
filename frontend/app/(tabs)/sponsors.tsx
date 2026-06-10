@@ -1,13 +1,15 @@
 // © 2026 1001538341 ONTARIO INC.
 
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, Pressable, Linking } from 'react-native';
+import React, { useMemo, useState } from 'react';
+import { View, Text, StyleSheet, ScrollView, Pressable, Linking, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 import { Sponsor, sponsorsByTier } from '../../src/data/sponsors';
 import HomecomingHero from '../../src/components/HomecomingHero';
 
 const GOLD = '#FFD23F';
+const FILTER_OPTIONS = ['All', 'Diamond', 'Platinum', 'Gold', 'Silver', 'Bronze'] as const;
+type SponsorFilter = typeof FILTER_OPTIONS[number];
 
 function tierLabel(tier: Sponsor['tier']) {
   switch (tier) {
@@ -70,12 +72,24 @@ function SponsorSection({ title, sponsors }: { title: string; sponsors: Sponsor[
 }
 
 export default function SponsorsScreen() {
+  const [selectedTier, setSelectedTier] = useState<SponsorFilter>('All');
   const hasSponsors =
     sponsorsByTier.diamond.length > 0 ||
     sponsorsByTier.platinum.length > 0 ||
     sponsorsByTier.gold.length > 0 ||
     sponsorsByTier.silver.length > 0 ||
     sponsorsByTier.bronze.length > 0;
+  const filteredByTier = useMemo(() => {
+    if (selectedTier === 'All') return sponsorsByTier;
+
+    return {
+      diamond: selectedTier === 'Diamond' ? sponsorsByTier.diamond : [],
+      platinum: selectedTier === 'Platinum' ? sponsorsByTier.platinum : [],
+      gold: selectedTier === 'Gold' ? sponsorsByTier.gold : [],
+      silver: selectedTier === 'Silver' ? sponsorsByTier.silver : [],
+      bronze: selectedTier === 'Bronze' ? sponsorsByTier.bronze : [],
+    };
+  }, [selectedTier]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -88,11 +102,28 @@ export default function SponsorsScreen() {
 
         {hasSponsors ? (
           <>
-            <SponsorSection title="Diamond Sponsors" sponsors={sponsorsByTier.diamond} />
-            <SponsorSection title="Platinum Sponsors" sponsors={sponsorsByTier.platinum} />
-            <SponsorSection title="Gold Sponsors" sponsors={sponsorsByTier.gold} />
-            <SponsorSection title="Silver Sponsors" sponsors={sponsorsByTier.silver} />
-            <SponsorSection title="Bronze Sponsors" sponsors={sponsorsByTier.bronze} />
+            <View style={styles.filterWrap}>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterScroll}>
+                {FILTER_OPTIONS.map((option) => {
+                  const active = option === selectedTier;
+                  return (
+                    <TouchableOpacity
+                      key={option}
+                      style={[styles.filterPill, active && styles.filterPillActive]}
+                      onPress={() => setSelectedTier(option)}
+                    >
+                      <Text style={[styles.filterText, active && styles.filterTextActive]}>{option}</Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </ScrollView>
+            </View>
+
+            <SponsorSection title="Diamond Sponsors" sponsors={filteredByTier.diamond} />
+            <SponsorSection title="Platinum Sponsors" sponsors={filteredByTier.platinum} />
+            <SponsorSection title="Gold Sponsors" sponsors={filteredByTier.gold} />
+            <SponsorSection title="Silver Sponsors" sponsors={filteredByTier.silver} />
+            <SponsorSection title="Bronze Sponsors" sponsors={filteredByTier.bronze} />
             <Text style={styles.footerNote}>
               Sponsor logos and additional sponsor information will be added as available.
             </Text>
@@ -122,6 +153,36 @@ const styles = StyleSheet.create({
   },
   content: {
     paddingBottom: 220,
+  },
+  filterWrap: {
+    backgroundColor: '#000',
+    borderBottomWidth: 1,
+    borderBottomColor: '#1F2937',
+  },
+  filterScroll: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  filterPill: {
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 20,
+    backgroundColor: '#111',
+    marginRight: 8,
+    borderWidth: 1,
+    borderColor: '#252525',
+  },
+  filterPillActive: {
+    backgroundColor: '#74D65E',
+    borderColor: '#74D65E',
+  },
+  filterText: {
+    fontSize: 13,
+    color: '#D1D5DB',
+    fontWeight: '800',
+  },
+  filterTextActive: {
+    color: '#000',
   },
   placeholderCard: {
     marginHorizontal: 20,
