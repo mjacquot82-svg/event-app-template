@@ -23,7 +23,7 @@ export default function HomecomingHero(_: HomecomingHeroProps) {
 
 const styles = StyleSheet.create({
   frame: {
-    marginHorizontal: 16,
+    marginHorizontal: 12,
     marginTop: 12,
     marginBottom: 14,
     borderRadius: 26,
@@ -39,8 +39,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#090909',
   },
   bannerImage: {
-    width: '98%',
+    width: '100%',
     maxWidth: 560,
-    height: 176,
+    height: 188,
   },
 });
