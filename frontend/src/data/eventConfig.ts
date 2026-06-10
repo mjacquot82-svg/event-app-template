@@ -90,10 +90,10 @@ export const eventConfig = {
     secondaryCardTitle: 'Back to Walkerton',
     secondaryCardIcon: 'music',
     secondaryText:
-      'This demo event celebrates the feeling of coming home: old friends, new memories, downtown energy, community pride, local music, family activities, and a weekend built around reconnecting.',
+      'Walkerton Home Coming 2026 celebrates the feeling of coming home: old friends, new memories, downtown energy, community pride, local music, family activities, and a weekend built around reconnecting.',
   },
   footer: {
-    copyrightLines: ['Demo Event Template', 'Walkerton Home Coming 2026 sample content'],
+    copyrightLines: ['App Built & Provided By', 'Jennifer Jacquot Photography'],
   },
 };
 
