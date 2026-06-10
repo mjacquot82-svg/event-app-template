@@ -1,7 +1,7 @@
 // © 2026 1001538341 ONTARIO INC.
 
 import React from 'react';
-import { ImageBackground, StyleSheet, Text, View } from 'react-native';
+import { Image, ImageBackground, StyleSheet, Text, View } from 'react-native';
 
 const HERO_IMAGE = require('../../assets/images/logo.jpg');
 const BLUE = '#16BFD6';
@@ -10,9 +10,10 @@ type HomecomingHeroProps = {
   title: string;
   subtitle?: string;
   eyebrow?: string;
+  countdownText?: string;
 };
 
-export default function HomecomingHero({ title, subtitle, eyebrow }: HomecomingHeroProps) {
+export default function HomecomingHero({ title, subtitle, countdownText }: HomecomingHeroProps) {
   return (
     <View style={styles.frame}>
       <ImageBackground source={HERO_IMAGE} resizeMode="cover" style={styles.hero} imageStyle={styles.heroImage}>
@@ -23,7 +24,8 @@ export default function HomecomingHero({ title, subtitle, eyebrow }: HomecomingH
         <View style={styles.sideShadeRight} />
 
         <View style={styles.content}>
-          {eyebrow ? <Text style={styles.eyebrow}>{eyebrow}</Text> : null}
+          <Image source={HERO_IMAGE} style={styles.foregroundLogo} resizeMode="contain" />
+          {countdownText ? <Text style={styles.countdown}>{countdownText}</Text> : null}
           <Text style={styles.title}>{title}</Text>
 
           <View style={styles.metaRow}>
@@ -55,27 +57,27 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   heroImage: {
-    opacity: 0.98,
+    opacity: 0.52,
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0, 0, 0, 0.38)',
+    backgroundColor: 'rgba(0, 0, 0, 0.52)',
   },
   topShade: {
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
-    height: 92,
-    backgroundColor: 'rgba(0, 0, 0, 0.30)',
+    height: 86,
+    backgroundColor: 'rgba(0, 0, 0, 0.26)',
   },
   bottomShade: {
     position: 'absolute',
     left: 0,
     right: 0,
     bottom: 0,
-    height: 132,
-    backgroundColor: 'rgba(0, 0, 0, 0.68)',
+    height: 140,
+    backgroundColor: 'rgba(0, 0, 0, 0.70)',
   },
   sideShadeLeft: {
     position: 'absolute',
@@ -83,7 +85,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     width: 56,
-    backgroundColor: 'rgba(0, 0, 0, 0.12)',
+    backgroundColor: 'rgba(0, 0, 0, 0.16)',
   },
   sideShadeRight: {
     position: 'absolute',
@@ -91,31 +93,31 @@ const styles = StyleSheet.create({
     bottom: 0,
     right: 0,
     width: 56,
-    backgroundColor: 'rgba(0, 0, 0, 0.12)',
+    backgroundColor: 'rgba(0, 0, 0, 0.16)',
   },
   content: {
     paddingHorizontal: 18,
     paddingVertical: 18,
     alignItems: 'center',
+    justifyContent: 'center',
   },
-  eyebrow: {
-    color: BLUE,
-    fontSize: 12,
+  foregroundLogo: {
+    width: 184,
+    height: 58,
+    marginBottom: 10,
+    opacity: 0.96,
+  },
+  countdown: {
+    color: '#74D65E',
+    fontSize: 14,
     fontWeight: '900',
-    letterSpacing: 1,
-    textTransform: 'uppercase',
     marginBottom: 8,
-    backgroundColor: 'rgba(0, 0, 0, 0.52)',
-    borderRadius: 999,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderWidth: 1,
-    borderColor: 'rgba(22,191,214,0.35)',
+    textAlign: 'center',
   },
   title: {
     color: '#FFFFFF',
-    fontSize: 28,
-    lineHeight: 31,
+    fontSize: 26,
+    lineHeight: 29,
     fontWeight: '900',
     textAlign: 'center',
     textShadowColor: 'rgba(0,0,0,0.55)',
@@ -127,7 +129,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     lineHeight: 19,
     fontWeight: '700',
-    marginTop: 10,
+    marginTop: 8,
     maxWidth: '92%',
     textAlign: 'center',
   },
