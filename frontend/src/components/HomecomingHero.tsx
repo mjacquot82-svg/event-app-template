@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
     paddingHorizontal: 20,
     paddingTop: 16,
-    paddingBottom: 18,
+    paddingBottom: 12,
   },
   countdown: {
     color: '#74D65E',
@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
   },
   detailsBlock: {
     marginLeft: 166,
-    marginBottom: 2,
+    marginBottom: -4,
     alignSelf: 'flex-start',
   },
   metaPrimary: {
