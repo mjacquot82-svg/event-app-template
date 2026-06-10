@@ -6,7 +6,7 @@
     "icon": "./assets/images/v2-icon.png",
     "userInterfaceStyle": "dark",
     "splash": {
-      "image": "./assets/images/whc-logo.png",
+      "image": "./assets/images/whc-logo-splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#000000"
     },

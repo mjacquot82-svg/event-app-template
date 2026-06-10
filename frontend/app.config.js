@@ -46,8 +46,8 @@ export default {
       [
         "expo-splash-screen",
         {
-          image: "./assets/images/whc-logo.png",
-          imageWidth: 360,
+          image: "./assets/images/whc-logo-splash.png",
+          imageWidth: 460,
           resizeMode: "contain",
           backgroundColor: "#000000"
         }
