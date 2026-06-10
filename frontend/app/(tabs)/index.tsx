@@ -91,6 +91,11 @@ export default function HomeScreen() {
         subtitle={eventConfig.event.tagline}
       />
 
+      <View style={styles.heroMetaSection}>
+        <Text style={styles.heroMetaPrimary}>July 30 – August 3, 2026</Text>
+        <Text style={styles.heroMetaSecondary}>Walkerton, Ontario</Text>
+      </View>
+
       <View style={styles.countdownSection}>
         <Text style={styles.countdownText}>⏳ {days} Days Until Homecoming</Text>
       </View>
@@ -147,6 +152,9 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#000' },
   scrollContent: { paddingBottom: 120 },
+  heroMetaSection: { marginHorizontal: 16, marginBottom: 12, alignItems: 'center' },
+  heroMetaPrimary: { color: '#CFFAFE', fontWeight: '900', fontSize: 16, textAlign: 'center' },
+  heroMetaSecondary: { color: '#F9FAFB', fontWeight: '800', fontSize: 15, textAlign: 'center', marginTop: 4 },
   countdownSection: { marginHorizontal: 16, marginBottom: 16, borderRadius: 18, backgroundColor: '#111', borderWidth: 1, borderColor: '#1F2937', paddingVertical: 16, paddingHorizontal: 18, alignItems: 'center' },
   countdownText: { color: '#74D65E', fontWeight: '900', fontSize: 18, textAlign: 'center' },
   todayCard: { marginHorizontal: 16, marginBottom: 16, borderRadius: 18, backgroundColor: '#111', padding: 16, borderWidth: 1, borderColor: '#252525' },
