@@ -4,8 +4,8 @@
 
 export type EventSponsor = {
   name: string;
-  tier: 'presenting' | 'featured' | 'community';
-  tagline: string;
+  tier: 'diamond' | 'platinum' | 'gold' | 'silver' | 'bronze';
+  tagline?: string;
   url?: string;
   color: string;
 };
@@ -60,36 +60,7 @@ const eventSetup = {
     highlights: true,
   },
 
-  sponsors: [
-    {
-      name: 'Main Stage Sponsor',
-      tier: 'presenting',
-      tagline: 'Presenting sponsor for live music and headline events',
-      url: 'https://example.com/sponsor-main-stage',
-      color: '#F6008F',
-    },
-    {
-      name: 'Downtown Food Sponsor',
-      tier: 'featured',
-      tagline: 'Supporting food trucks, patios, and local tastes',
-      url: 'https://example.com/sponsor-food',
-      color: '#16BFD6',
-    },
-    {
-      name: 'Parade Route Sponsor',
-      tier: 'featured',
-      tagline: 'Helping bring the parade through town',
-      url: 'https://example.com/sponsor-parade',
-      color: '#74D65E',
-    },
-    {
-      name: 'Kids Zone Sponsor',
-      tier: 'community',
-      tagline: 'Supporting family-friendly homecoming activities',
-      url: 'https://example.com/sponsor-kids',
-      color: '#FFD23F',
-    },
-  ] satisfies EventSponsor[],
+  sponsors: [] satisfies EventSponsor[],
 };
 
 export default eventSetup;

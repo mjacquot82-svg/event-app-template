@@ -11,12 +11,16 @@ const GOLD = '#FFD23F';
 
 function tierLabel(tier: Sponsor['tier']) {
   switch (tier) {
-    case 'presenting':
-      return 'Presenting Sponsor';
-    case 'featured':
-      return 'Featured Sponsor';
-    case 'community':
-      return 'Community Sponsor';
+    case 'diamond':
+      return 'Diamond Sponsor';
+    case 'platinum':
+      return 'Platinum Sponsor';
+    case 'gold':
+      return 'Gold Sponsor';
+    case 'silver':
+      return 'Silver Sponsor';
+    case 'bronze':
+      return 'Bronze Sponsor';
     default:
       return 'Sponsor';
   }
@@ -35,7 +39,7 @@ function SponsorCard({ sponsor }: { sponsor: Sponsor }) {
           <View style={[styles.tierBadge, { backgroundColor: sponsor.color }]}>
             <Text style={styles.tierBadgeText}>{tierLabel(sponsor.tier)}</Text>
           </View>
-          <Text style={styles.sponsorTagline}>{sponsor.tagline}</Text>
+          {sponsor.tagline ? <Text style={styles.sponsorTagline}>{sponsor.tagline}</Text> : null}
           {sponsor.description ? (
             <Text style={styles.sponsorDescription}>{sponsor.description}</Text>
           ) : null}
@@ -67,9 +71,11 @@ function SponsorSection({ title, sponsors }: { title: string; sponsors: Sponsor[
 
 export default function SponsorsScreen() {
   const hasSponsors =
-    sponsorsByTier.presenting.length > 0 ||
-    sponsorsByTier.featured.length > 0 ||
-    sponsorsByTier.community.length > 0;
+    sponsorsByTier.diamond.length > 0 ||
+    sponsorsByTier.platinum.length > 0 ||
+    sponsorsByTier.gold.length > 0 ||
+    sponsorsByTier.silver.length > 0 ||
+    sponsorsByTier.bronze.length > 0;
 
   return (
     <SafeAreaView style={styles.container}>
@@ -82,9 +88,14 @@ export default function SponsorsScreen() {
 
         {hasSponsors ? (
           <>
-            <SponsorSection title="Presenting Sponsors" sponsors={sponsorsByTier.presenting} />
-            <SponsorSection title="Featured Sponsors" sponsors={sponsorsByTier.featured} />
-            <SponsorSection title="Community Sponsors" sponsors={sponsorsByTier.community} />
+            <SponsorSection title="Diamond Sponsors" sponsors={sponsorsByTier.diamond} />
+            <SponsorSection title="Platinum Sponsors" sponsors={sponsorsByTier.platinum} />
+            <SponsorSection title="Gold Sponsors" sponsors={sponsorsByTier.gold} />
+            <SponsorSection title="Silver Sponsors" sponsors={sponsorsByTier.silver} />
+            <SponsorSection title="Bronze Sponsors" sponsors={sponsorsByTier.bronze} />
+            <Text style={styles.footerNote}>
+              Sponsor logos and additional sponsor information will be added as available.
+            </Text>
           </>
         ) : (
           <View style={styles.placeholderCard}>
@@ -167,7 +178,9 @@ const styles = StyleSheet.create({
   logoPlaceholderText: {
     color: '#8B95A1',
     fontWeight: '800',
-    fontSize: 12,
+    fontSize: 10,
+    textAlign: 'center',
+    paddingHorizontal: 8,
   },
   cardCopy: {
     flex: 1,
@@ -214,6 +227,13 @@ const styles = StyleSheet.create({
   visitButtonText: {
     color: '#000',
     fontWeight: '900',
+  },
+  footerNote: {
+    color: '#B7BDC7',
+    fontSize: 13,
+    lineHeight: 20,
+    marginHorizontal: 20,
+    marginTop: 8,
   },
   bottomPadding: {
     height: 160,
