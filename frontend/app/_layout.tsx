@@ -1,6 +1,6 @@
 // © 2026 1001538341 ONTARIO INC. All Rights Reserved.
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -13,7 +13,6 @@ import {
 } from '../src/utils/notificationService';
 import { AdProvider } from '../src/context/AdContext';
 import PWAInstallPrompt from '../src/components/PWAInstallPrompt';
-import SplashScreen from '../src/components/SplashScreen';
 
 // Initialize Webpushr for web platform
 const initWebpushr = () => {
@@ -49,12 +48,6 @@ const initWebpushr = () => {
 };
 
 export default function RootLayout() {
-  const [showSplash, setShowSplash] = useState(true);
-  
-  const handleSplashFinish = () => {
-    setShowSplash(false);
-  };
-
   useEffect(() => {
     initWebpushr();
     
@@ -84,25 +77,15 @@ export default function RootLayout() {
       <SafeAreaProvider>
         <AdProvider>
           <StatusBar style="dark" backgroundColor={colors.background} />
-          
-          {/* LOGIC: Show ONLY Splash first. Once done, show the App Stack. */}
-          {showSplash ? (
-            <SplashScreen 
-              onFinish={handleSplashFinish} 
-              duration={2000} 
-            />
-          ) : (
-            <>
-              <Stack screenOptions={{ headerShown: false }}>
-                {/* 'index' must be here to match your app/index.tsx redirect */}
-                <Stack.Screen name="index" options={{ headerShown: false }} />
-                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-                <Stack.Screen name="preview-2026" options={{ headerShown: false }} />
-                <Stack.Screen name="coming-soon" options={{ headerShown: false }} />
-              </Stack>
-              <PWAInstallPrompt />
-            </>
-          )}
+
+          <Stack screenOptions={{ headerShown: false }}>
+            {/* 'index' must be here to match your app/index.tsx redirect */}
+            <Stack.Screen name="index" options={{ headerShown: false }} />
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen name="preview-2026" options={{ headerShown: false }} />
+            <Stack.Screen name="coming-soon" options={{ headerShown: false }} />
+          </Stack>
+          <PWAInstallPrompt />
         </AdProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>

@@ -6,9 +6,9 @@ export default {
     slug: "walkerton-home-coming-2026",
     version: "1.0.0",
     orientation: "portrait",
-    icon: "./assets/images/icon.png",
+    icon: "./assets/images/v2-icon.png",
     scheme: "walkertonhomecoming2026",
-    userInterfaceStyle: "light",
+    userInterfaceStyle: "dark",
     newArchEnabled: false,
     jsEngine: "jsc",
     ios: {
@@ -46,10 +46,10 @@ export default {
       [
         "expo-splash-screen",
         {
-          image: "./assets/images/splash-icon.png",
-          imageWidth: 280,
+          image: "./assets/images/whc-logo.png",
+          imageWidth: 360,
           resizeMode: "contain",
-          backgroundColor: "#2D2926"
+          backgroundColor: "#000000"
         }
       ],
       [
