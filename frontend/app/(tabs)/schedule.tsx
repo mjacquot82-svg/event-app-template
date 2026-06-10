@@ -175,7 +175,6 @@ export default function ScheduleScreen() {
                 <Text style={styles.modalLocation}>{selectedEvent.location}</Text>
                 <Text style={styles.modalDescription}>{selectedEvent.description}</Text>
                 {selectedEvent.sponsor ? <Text style={styles.modalSponsor}>{selectedEvent.sponsor}</Text> : null}
-                <TouchableOpacity style={styles.modalButton} onPress={() => setSelectedEvent(null)}><Text style={styles.modalButtonText}>Add to My Weekend</Text></TouchableOpacity>
               </>
             )}
           </View>
@@ -219,6 +218,4 @@ const styles = StyleSheet.create({
   modalLocation: { color: '#D1D5DB', marginTop: 6, fontWeight: '700' },
   modalDescription: { color: '#D1D5DB', fontSize: 15, lineHeight: 22, marginTop: 16 },
   modalSponsor: { color: '#16BFD6', fontSize: 14, fontWeight: '900', marginTop: 16 },
-  modalButton: { backgroundColor: '#74D65E', borderRadius: 16, padding: 16, alignItems: 'center', marginTop: 22 },
-  modalButtonText: { color: '#000', fontWeight: '900' },
 });
