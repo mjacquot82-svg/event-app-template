@@ -33,9 +33,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#090909',
   },
   hero: {
-    height: 232,
+    height: 204,
     justifyContent: 'center',
     alignItems: 'center',
+    paddingVertical: 8,
     backgroundColor: '#090909',
   },
   bannerImage: {
