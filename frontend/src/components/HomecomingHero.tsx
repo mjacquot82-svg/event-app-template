@@ -3,7 +3,7 @@
 import React from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 
-const HERO_IMAGE = require('../../assets/images/Untitled.png');
+const HERO_IMAGE = require('../../assets/images/logo.jpg');
 
 type HomecomingHeroProps = {
   title: string;
@@ -14,8 +14,8 @@ type HomecomingHeroProps = {
 export default function HomecomingHero(_: HomecomingHeroProps) {
   return (
     <View style={styles.frame}>
-      <View style={styles.hero}>
-        <Image source={HERO_IMAGE} style={styles.bannerImage} resizeMode="contain" />
+      <View style={styles.heroImageContainer}>
+        <Image source={HERO_IMAGE} style={styles.bannerImage} resizeMode="cover" />
       </View>
     </View>
   );
@@ -32,16 +32,14 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(22,191,214,0.55)',
     backgroundColor: '#090909',
   },
-  hero: {
+  heroImageContainer: {
+    width: '100%',
     height: 204,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: 8,
-    backgroundColor: '#090909',
+    overflow: 'hidden',
   },
   bannerImage: {
     width: '100%',
-    maxWidth: 560,
-    height: 188,
+    height: '100%',
+    display: 'flex',
   },
 });
