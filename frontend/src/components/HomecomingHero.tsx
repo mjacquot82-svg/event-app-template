@@ -3,7 +3,7 @@
 import React from 'react';
 import { Image, StyleSheet, View, useWindowDimensions } from 'react-native';
 
-const HERO_IMAGE = require('../../assets/images/logo.jpg');
+const HERO_IMAGE = require('../../assets/images/whc-logo.png');
 const HERO_ASPECT_RATIO = 1880 / 400;
 
 type HomecomingHeroProps = {
