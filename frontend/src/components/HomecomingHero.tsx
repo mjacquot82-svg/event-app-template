@@ -1,7 +1,7 @@
 // © 2026 1001538341 ONTARIO INC.
 
 import React from 'react';
-import { Image, StyleSheet, View } from 'react-native';
+import { Image, StyleSheet, View, useWindowDimensions } from 'react-native';
 
 const HERO_IMAGE = require('../../assets/images/logo.jpg');
 const HERO_ASPECT_RATIO = 1880 / 400;
@@ -13,8 +13,11 @@ type HomecomingHeroProps = {
 };
 
 export default function HomecomingHero(_: HomecomingHeroProps) {
+  const { width } = useWindowDimensions();
+  const isWide = width >= 768;
+
   return (
-    <View style={styles.heroWrap}>
+    <View style={[styles.heroWrap, isWide ? styles.heroWrapWide : styles.heroWrapMobile]}>
       <Image source={HERO_IMAGE} style={styles.bannerImage} resizeMode="contain" />
     </View>
   );
@@ -22,12 +25,16 @@ export default function HomecomingHero(_: HomecomingHeroProps) {
 
 const styles = StyleSheet.create({
   heroWrap: {
+    alignSelf: 'center',
+    marginTop: 2,
+    marginBottom: 6,
+  },
+  heroWrapWide: {
     width: '100%',
     maxWidth: 980,
-    alignSelf: 'center',
-    marginHorizontal: 12,
-    marginTop: 12,
-    marginBottom: 14,
+  },
+  heroWrapMobile: {
+    width: '94%',
   },
   bannerImage: {
     width: '100%',

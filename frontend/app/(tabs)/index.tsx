@@ -161,7 +161,7 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#000' },
   scrollContent: { paddingBottom: 120 },
-  heroMetaSection: { marginHorizontal: 16, marginBottom: 12, alignItems: 'center' },
+  heroMetaSection: { marginHorizontal: 16, marginBottom: 8, alignItems: 'center' },
   heroMetaPrimary: { color: '#16BFD6', fontWeight: '900', fontSize: 16, textAlign: 'center' },
   heroMetaSecondary: { color: '#16BFD6', fontWeight: '800', fontSize: 15, textAlign: 'center', marginTop: 4 },
   countdownSection: { marginHorizontal: 16, marginBottom: 16, borderRadius: 18, backgroundColor: '#111', borderWidth: 1, borderColor: '#1F2937', paddingVertical: 16, paddingHorizontal: 18, alignItems: 'center' },
