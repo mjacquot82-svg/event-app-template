@@ -14,9 +14,9 @@ type HomecomingHeroProps = {
 export default function HomecomingHero(_: HomecomingHeroProps) {
   const { width } = useWindowDimensions();
   const isWide = width >= 768;
-  const heroHeight = isWide ? 216 : 172;
-  const horizontalPadding = isWide ? 24 : 14;
-  const verticalPadding = isWide ? 18 : 12;
+  const heroHeight = isWide ? 280 : 220;
+  const horizontalPadding = isWide ? 4 : 0;
+  const verticalPadding = isWide ? 4 : 0;
 
   return (
     <View style={styles.frame}>
@@ -62,5 +62,7 @@ const styles = StyleSheet.create({
   bannerImage: {
     width: '100%',
     height: '100%',
+    maxWidth: '100%',
+    maxHeight: '100%',
   },
 });
