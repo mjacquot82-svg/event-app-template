@@ -81,6 +81,8 @@ export const eventConfig = {
     { id: 'merch', label: 'Buy Merch', icon: 'shopping-bag', color: '#F6008F', url: 'https://www.walkertonhomecoming2026.ca' },
     { id: 'visitor-info', label: 'Getting Around', icon: 'map-pin', color: '#16BFD6', route: '/(tabs)/visitor-info' },
     { id: 'sponsors', label: 'Sponsors', icon: 'award', color: '#16BFD6', route: '/(tabs)/sponsors' },
+    { id: 'facebook', label: 'Facebook', icon: 'facebook', color: '#1877F2', url: 'https://www.facebook.com/p/Walkerton-Homecoming-2026-61568641512947/' },
+    { id: 'instagram', label: 'Instagram', icon: 'instagram', color: '#E4405F', url: 'https://www.instagram.com/walkertonhomecoming2026/' },
   ] as EventHomeAction[],
   about: {
     highlightTitle: 'Mingle & Remix',

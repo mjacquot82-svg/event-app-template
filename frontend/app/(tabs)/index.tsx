@@ -1,6 +1,6 @@
 // © 2026 1001538341 ONTARIO INC.
 import React, { useMemo, useRef } from 'react';
-import { View, Text, StyleSheet, ScrollView, Linking, Image, Pressable, Animated } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Linking, Pressable, Animated, Platform } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import eventConfig from '../../src/data/eventConfig';
@@ -74,6 +74,15 @@ function GridItem({ label, icon, color, onPress }: any) {
   );
 }
 
+function openExternalUrl(url: string) {
+  if (Platform.OS === 'web' && typeof window !== 'undefined') {
+    window.open(url, '_blank', 'noopener,noreferrer');
+    return;
+  }
+
+  Linking.openURL(url);
+}
+
 export default function HomeScreen() {
   const router = useRouter();
   const homeActions = eventConfig.homeActions;
@@ -138,7 +147,7 @@ export default function HomeScreen() {
               color={item.color}
               onPress={() => {
                 if (item.route) router.push(item.route);
-                if (item.url) Linking.openURL(item.url);
+                if (item.url) openExternalUrl(item.url);
               }}
             />
           ))}
