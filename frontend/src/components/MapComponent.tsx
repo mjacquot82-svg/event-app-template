@@ -17,15 +17,34 @@ interface MapComponentProps {
   highlightedLocation?: string | null;
   showOnlyHighlighted?: boolean;
   onLocationSelect?: (...args: any[]) => void;
+  scrollable?: boolean;
 }
 
 const MapComponent: React.FC<MapComponentProps> = ({
   highlightedLocation: _highlightedLocation,
   showOnlyHighlighted: _showOnlyHighlighted = false,
   onLocationSelect: _onLocationSelect,
+  scrollable = true,
 }) => {
   const { width: windowWidth } = useWindowDimensions();
   const imageWidth = windowWidth >= 1024 ? '82%' : '100%';
+  const mapContent = (
+    <View style={styles.content}>
+      <View
+        style={[styles.imageCard, { width: imageWidth }]}
+      >
+        <Image
+          source={MAP_ASSET}
+          style={styles.mapImage}
+          resizeMode="contain"
+        />
+      </View>
+    </View>
+  );
+
+  if (!scrollable) {
+    return <View style={styles.staticContainer}>{mapContent}</View>;
+  }
 
   return (
     <ScrollView
@@ -49,6 +68,9 @@ const MapComponent: React.FC<MapComponentProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: colors.background,
+  },
+  staticContainer: {
     backgroundColor: colors.background,
   },
   content: {

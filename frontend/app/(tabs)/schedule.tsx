@@ -108,58 +108,64 @@ export default function ScheduleScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <HomecomingHero
-        eyebrow="Schedule"
-        title="Weekend Schedule"
-        subtitle={`${schedule.length} events across the full Homecoming weekend.`}
-      />
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        <HomecomingHero
+          eyebrow="Schedule"
+          title="Weekend Schedule"
+          subtitle={`${schedule.length} events across the full Homecoming weekend.`}
+        />
 
-      <View style={styles.filterWrap}>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterScroll}>
-          {categories.map((category) => {
-            const active = category === selectedCategory;
-            return (
-              <TouchableOpacity key={category} style={[styles.filterPill, active && styles.filterPillActive]} onPress={() => setSelectedCategory(category)}>
-                <Text style={[styles.filterText, active && styles.filterTextActive]}>{category}</Text>
-              </TouchableOpacity>
-            );
-          })}
-        </ScrollView>
-      </View>
-
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        <View style={styles.ticketCallout}>
-          <Feather name="calendar" size={20} color="#000" />
-          <View style={{ flex: 1 }}>
-            <Text style={styles.ticketTitle}>Plan the weekend your way</Text>
-            <Text style={styles.ticketText}>Filter by music, family activities, food, sports and games, and community events.</Text>
-          </View>
+        <View style={styles.filterWrap}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterScroll}>
+            {categories.map((category) => {
+              const active = category === selectedCategory;
+              return (
+                <TouchableOpacity key={category} style={[styles.filterPill, active && styles.filterPillActive]} onPress={() => setSelectedCategory(category)}>
+                  <Text style={[styles.filterText, active && styles.filterTextActive]}>{category}</Text>
+                </TouchableOpacity>
+              );
+            })}
+          </ScrollView>
         </View>
 
-        {Object.entries(grouped).map(([day, events]) => (
-          <View key={day} style={styles.daySection}>
-            <Text style={styles.dayTitle}>{day}</Text>
-            {events.map((event) => (
-              <TouchableOpacity key={event.id} style={[styles.eventCard, { borderColor: categoryColors[event.category] }]} onPress={() => setSelectedEvent(event)}>
-                <View style={[styles.colorBar, { backgroundColor: categoryColors[event.category] }]} />
-                <View style={styles.eventBody}>
-                  <View style={styles.eventTopRow}>
-                    <Text style={styles.eventTime}>{event.time}</Text>
-                    <Text style={[styles.categoryBadge, { color: categoryColors[event.category] }]}>{event.category}</Text>
-                  </View>
-                  <Text style={styles.eventTitle}>{event.title}</Text>
-                  <View style={styles.locationRow}>
-                    <Feather name="map-pin" size={12} color="#8B95A1" />
-                    <Text style={styles.locationText}>{event.location}</Text>
-                  </View>
-                  <Text style={styles.eventDescription} numberOfLines={2}>{event.description}</Text>
-                  {event.sponsor ? <Text style={styles.sponsorLine}>Sponsored: {event.sponsor}</Text> : null}
-                </View>
-              </TouchableOpacity>
-            ))}
+        <View style={styles.content}>
+          <View style={styles.ticketCallout}>
+            <Feather name="calendar" size={20} color="#000" />
+            <View style={{ flex: 1 }}>
+              <Text style={styles.ticketTitle}>Plan the weekend your way</Text>
+              <Text style={styles.ticketText}>Filter by music, family activities, food, sports and games, and community events.</Text>
+            </View>
           </View>
-        ))}
-        <View style={styles.bottomPadding} />
+
+          {Object.entries(grouped).map(([day, events]) => (
+            <View key={day} style={styles.daySection}>
+              <Text style={styles.dayTitle}>{day}</Text>
+              {events.map((event) => (
+                <TouchableOpacity key={event.id} style={[styles.eventCard, { borderColor: categoryColors[event.category] }]} onPress={() => setSelectedEvent(event)}>
+                  <View style={[styles.colorBar, { backgroundColor: categoryColors[event.category] }]} />
+                  <View style={styles.eventBody}>
+                    <View style={styles.eventTopRow}>
+                      <Text style={styles.eventTime}>{event.time}</Text>
+                      <Text style={[styles.categoryBadge, { color: categoryColors[event.category] }]}>{event.category}</Text>
+                    </View>
+                    <Text style={styles.eventTitle}>{event.title}</Text>
+                    <View style={styles.locationRow}>
+                      <Feather name="map-pin" size={12} color="#8B95A1" />
+                      <Text style={styles.locationText}>{event.location}</Text>
+                    </View>
+                    <Text style={styles.eventDescription} numberOfLines={2}>{event.description}</Text>
+                    {event.sponsor ? <Text style={styles.sponsorLine}>Sponsored: {event.sponsor}</Text> : null}
+                  </View>
+                </TouchableOpacity>
+              ))}
+            </View>
+          ))}
+          <View style={styles.bottomPadding} />
+        </View>
       </ScrollView>
 
       <Modal visible={!!selectedEvent} transparent animationType="slide" onRequestClose={() => setSelectedEvent(null)}>
@@ -186,13 +192,14 @@ export default function ScheduleScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#000' },
+  scrollContent: { paddingBottom: 160 },
   filterWrap: { backgroundColor: '#000', borderBottomWidth: 1, borderBottomColor: '#1F2937' },
   filterScroll: { paddingHorizontal: 16, paddingVertical: 12 },
   filterPill: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20, backgroundColor: '#111', marginRight: 8, borderWidth: 1, borderColor: '#252525' },
   filterPillActive: { backgroundColor: '#74D65E', borderColor: '#74D65E' },
   filterText: { fontSize: 13, color: '#D1D5DB', fontWeight: '800' },
   filterTextActive: { color: '#000' },
-  content: { flex: 1, paddingHorizontal: 16, backgroundColor: '#000' },
+  content: { paddingHorizontal: 16, backgroundColor: '#000' },
   ticketCallout: { flexDirection: 'row', gap: 12, backgroundColor: '#74D65E', borderRadius: 18, padding: 16, marginTop: 16, marginBottom: 18 },
   ticketTitle: { color: '#000', fontSize: 15, fontWeight: '900' },
   ticketText: { color: '#061207', fontSize: 12, lineHeight: 17, marginTop: 4 },

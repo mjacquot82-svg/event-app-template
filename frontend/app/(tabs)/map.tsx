@@ -1,7 +1,7 @@
 // © 2026 1001538341 ONTARIO INC. All Rights Reserved.
 
 import React from 'react';
-import { View, StyleSheet, StatusBar } from 'react-native';
+import { View, StyleSheet, StatusBar, ScrollView } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import MapComponent from '../../src/components/MapComponent';
@@ -15,17 +15,24 @@ export default function MapScreen() {
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <StatusBar barStyle="dark-content" backgroundColor={colors.background} />
-      <HomecomingHero
-        eyebrow="Map"
-        title="Festival Grounds"
-        subtitle="Find key locations, venue areas, and event destinations around Walkerton."
-      />
-      <View style={styles.mapWrap}>
-        <MapComponent 
-          highlightedLocation={location || null} 
-          showOnlyHighlighted={showOnly === 'true'}
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        <HomecomingHero
+          eyebrow="Map"
+          title="Festival Grounds"
+          subtitle="Find key locations, venue areas, and event destinations around Walkerton."
         />
-      </View>
+        <View style={styles.mapWrap}>
+          <MapComponent
+            highlightedLocation={location || null}
+            showOnlyHighlighted={showOnly === 'true'}
+            scrollable={false}
+          />
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -35,7 +42,8 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
-  mapWrap: {
-    flex: 1,
+  scrollContent: {
+    paddingBottom: 0,
   },
+  mapWrap: {},
 });
