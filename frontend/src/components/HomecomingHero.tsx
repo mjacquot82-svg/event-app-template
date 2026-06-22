@@ -30,7 +30,7 @@ export default function HomecomingHero(_: HomecomingHeroProps) {
           },
         ]}
       >
-        <Image source={HERO_IMAGE} style={styles.bannerImage} resizeMode="contain" />
+        <Image source={HERO_IMAGE} style={styles.bannerImage} resizeMode="cover" />
       </View>
     </View>
   );
