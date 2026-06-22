@@ -19,7 +19,7 @@ export default function HomecomingHero(_: HomecomingHeroProps) {
   const verticalPadding = isWide ? 4 : 0;
 
   return (
-    <View style={styles.frame}>
+    <View style={[styles.frame, isWide && styles.frameWide]}>
       <View
         style={[
           styles.heroImageContainer,
@@ -51,6 +51,11 @@ const styles = StyleSheet.create({
     shadowRadius: 18,
     shadowOffset: { width: 0, height: 8 },
     elevation: 6,
+  },
+  frameWide: {
+    width: '100%',
+    maxWidth: 980,
+    alignSelf: 'center',
   },
   heroImageContainer: {
     width: '100%',
