@@ -1,7 +1,7 @@
 // © 2026 1001538341 ONTARIO INC.
 
 import React from 'react';
-import { Image, StyleSheet, View } from 'react-native';
+import { Image, StyleSheet, View, useWindowDimensions } from 'react-native';
 
 const HERO_IMAGE = require('../../assets/images/logo.jpg');
 
@@ -12,10 +12,25 @@ type HomecomingHeroProps = {
 };
 
 export default function HomecomingHero(_: HomecomingHeroProps) {
+  const { width } = useWindowDimensions();
+  const isWide = width >= 768;
+  const heroHeight = isWide ? 216 : 172;
+  const horizontalPadding = isWide ? 24 : 14;
+  const verticalPadding = isWide ? 18 : 12;
+
   return (
     <View style={styles.frame}>
-      <View style={styles.heroImageContainer}>
-        <Image source={HERO_IMAGE} style={styles.bannerImage} resizeMode="cover" />
+      <View
+        style={[
+          styles.heroImageContainer,
+          {
+            height: heroHeight,
+            paddingHorizontal: horizontalPadding,
+            paddingVertical: verticalPadding,
+          },
+        ]}
+      >
+        <Image source={HERO_IMAGE} style={styles.bannerImage} resizeMode="contain" />
       </View>
     </View>
   );
@@ -30,16 +45,22 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     borderWidth: 1,
     borderColor: 'rgba(22,191,214,0.55)',
-    backgroundColor: '#090909',
+    backgroundColor: '#071017',
+    shadowColor: '#16BFD6',
+    shadowOpacity: 0.18,
+    shadowRadius: 18,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 6,
   },
   heroImageContainer: {
     width: '100%',
-    height: 204,
     overflow: 'hidden',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#071017',
   },
   bannerImage: {
     width: '100%',
     height: '100%',
-    display: 'flex',
   },
 });
