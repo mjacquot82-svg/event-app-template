@@ -1,7 +1,7 @@
 // © 2026 1001538341 ONTARIO INC.
 
 import React from 'react';
-import { StyleSheet, View, useWindowDimensions } from 'react-native';
+import { Image, StyleSheet, View, useWindowDimensions } from 'react-native';
 
 const HERO_ASPECT_RATIO = 838 / 627;
 
@@ -17,7 +17,11 @@ export default function HomecomingHero(_: HomecomingHeroProps) {
 
   return (
     <View style={[styles.heroWrap, isWide ? styles.heroWrapWide : styles.heroWrapMobile]}>
-      <View style={styles.bannerPlaceholder} />
+      <Image
+        source={require('../../assets/images/hero-safe-area-guide.png')}
+        style={styles.bannerPlaceholder}
+        resizeMode="contain"
+      />
     </View>
   );
 }
