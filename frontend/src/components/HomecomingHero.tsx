@@ -3,6 +3,7 @@
 import React from 'react';
 import { Image, StyleSheet, View, useWindowDimensions } from 'react-native';
 
+const HERO_IMAGE = require('../../assets/images/whc-logo-cropped.png');
 const HERO_ASPECT_RATIO = 838 / 627;
 
 type HomecomingHeroProps = {
@@ -17,11 +18,7 @@ export default function HomecomingHero(_: HomecomingHeroProps) {
 
   return (
     <View style={[styles.heroWrap, isWide ? styles.heroWrapWide : styles.heroWrapMobile]}>
-      <Image
-        source={require('../../assets/images/Untitled design (21).jpg')}
-        style={styles.bannerPlaceholder}
-        resizeMode="contain"
-      />
+      <Image source={HERO_IMAGE} style={styles.bannerImage} resizeMode="contain" />
     </View>
   );
 }
@@ -39,12 +36,9 @@ const styles = StyleSheet.create({
   heroWrapMobile: {
     width: '94%',
   },
-  bannerPlaceholder: {
+  bannerImage: {
     width: '100%',
     aspectRatio: HERO_ASPECT_RATIO,
     alignSelf: 'center',
-    backgroundColor: '#FFFFFF',
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: 'rgba(0, 0, 0, 0.35)',
   },
 });
