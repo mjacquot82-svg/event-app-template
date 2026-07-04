@@ -73,12 +73,11 @@ export const eventConfig = {
   links: {
     officialWebsite: 'https://www.walkertonhomecoming2026.ca',
     tickets: 'https://www.walkertonhomecoming2026.ca/tickets',
-    // The guessed /merch path currently 404s. Use the official website until a live store URL is provided.
-    merch: 'https://www.walkertonhomecoming2026.ca',
+    merch: 'https://www.walkertonhomecoming2026.ca/shop/homecoming-merchandise/I6PLTIHAXJ26J6YBYY3JY7OQ',
   },
   homeActions: [
     { id: 'tickets', label: 'Buy Tickets', icon: 'tag', color: '#74D65E', url: 'https://www.walkertonhomecoming2026.ca/tickets' },
-    { id: 'merch', label: 'Buy Merch', icon: 'shopping-bag', color: '#F6008F', url: 'https://www.walkertonhomecoming2026.ca' },
+    { id: 'merch', label: 'Buy Merch', icon: 'shopping-bag', color: '#F6008F', url: 'https://www.walkertonhomecoming2026.ca/shop/homecoming-merchandise/I6PLTIHAXJ26J6YBYY3JY7OQ' },
     { id: 'visitor-info', label: 'Getting Around', icon: 'map-pin', color: '#16BFD6', route: '/(tabs)/visitor-info' },
     { id: 'sponsors', label: 'Sponsors', icon: 'award', color: '#16BFD6', route: '/(tabs)/sponsors' },
     { id: 'facebook', label: 'Facebook', icon: 'facebook', color: '#1877F2', url: 'https://www.facebook.com/p/Walkerton-Homecoming-2026-61568641512947/' },

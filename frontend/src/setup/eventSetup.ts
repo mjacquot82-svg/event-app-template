@@ -36,7 +36,7 @@ const eventSetup = {
   links: {
     officialWebsite: 'https://www.walkertonhomecoming2026.ca',
     tickets: 'https://www.walkertonhomecoming2026.ca/tickets',
-    merch: 'https://www.walkertonhomecoming2026.ca/merch',
+    merch: 'https://www.walkertonhomecoming2026.ca/shop/homecoming-merchandise/I6PLTIHAXJ26J6YBYY3JY7OQ',
     sponsors: 'https://www.walkertonhomecoming2026.ca/sponsors',
   },
 
