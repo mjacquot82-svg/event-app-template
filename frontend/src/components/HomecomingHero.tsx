@@ -18,7 +18,7 @@ export default function HomecomingHero(_: HomecomingHeroProps) {
   return (
     <View style={[styles.heroWrap, isWide ? styles.heroWrapWide : styles.heroWrapMobile]}>
       <Image
-        source={require('../../assets/images/hero-safe-area-guide.png')}
+        source={require('../../assets/images/Untitled design (21).jpg')}
         style={styles.bannerPlaceholder}
         resizeMode="contain"
       />
