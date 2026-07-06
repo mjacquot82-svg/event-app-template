@@ -17,7 +17,7 @@ import { useRouter } from 'expo-router';
 import { eventConfig } from '../../src/data/eventConfig';
 import { colors } from '../../src/theme/colors';
 
-const HERO_IMAGE = require('../../assets/images/new.jpg');
+const HERO_IMAGE = require('../../assets/images/logo.jpg');
 
 type HomeEvent = {
   id: string;
@@ -126,7 +126,7 @@ export default function HomeScreen() {
   const { width, height } = useWindowDimensions();
   const isWide = width >= 960;
   const contentMaxWidth = isWide ? 1080 : 760;
-  const heroHeight = Math.max(220, Math.min(Math.round(height * 0.33), isWide ? 420 : 340));
+  const heroHeight = Math.max(138, Math.min(Math.round(height * 0.2), isWide ? 220 : 190));
   const days = getDaysUntil('2026-07-30');
   const dynamicEvents = useMemo(() => getCurrentOrNextEvents(), []);
 
@@ -163,13 +163,8 @@ export default function HomeScreen() {
     >
       <View style={[styles.page, { maxWidth: contentMaxWidth }]}>
         <View style={[styles.heroCard, { height: heroHeight }]}>
-          <Image source={HERO_IMAGE} style={styles.heroImage} resizeMode="cover" />
-          <View style={styles.heroOverlay}>
-            <View style={styles.heroBadge}>
-              <Text style={styles.heroBadgeText}>Walkerton Home Coming 2026</Text>
-            </View>
-            <Text style={styles.heroTitle}>Mingle & Remix</Text>
-            <Text style={styles.heroSubtitle}>{eventConfig.event.tagline}</Text>
+          <View style={styles.heroImageFrame}>
+            <Image source={HERO_IMAGE} style={styles.heroImage} resizeMode="contain" />
           </View>
         </View>
 
@@ -273,54 +268,25 @@ const styles = StyleSheet.create({
     borderRadius: 22,
     overflow: 'hidden',
     backgroundColor: '#FFFFFF',
-    marginBottom: 14,
+    marginBottom: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
     shadowColor: '#000000',
-    shadowOpacity: 0.26,
-    shadowRadius: 22,
-    shadowOffset: { width: 0, height: 16 },
-    elevation: 10,
+    shadowOpacity: 0.12,
+    shadowRadius: 14,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 4,
+  },
+  heroImageFrame: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FFFFFF',
   },
   heroImage: {
-    ...StyleSheet.absoluteFillObject,
-    width: '100%',
-    height: '100%',
-  },
-  heroOverlay: {
-    flex: 1,
-    justifyContent: 'flex-end',
-    paddingHorizontal: 22,
-    paddingVertical: 20,
-    backgroundColor: 'rgba(0, 0, 0, 0.18)',
-  },
-  heroBadge: {
-    alignSelf: 'flex-start',
-    paddingHorizontal: 12,
-    paddingVertical: 7,
-    borderRadius: 999,
-    backgroundColor: 'rgba(0, 0, 0, 0.62)',
-    marginBottom: 10,
-  },
-  heroBadgeText: {
-    color: '#FFFFFF',
-    fontSize: 11,
-    fontWeight: '800',
-    letterSpacing: 0.5,
-    textTransform: 'uppercase',
-  },
-  heroTitle: {
-    color: '#FFFFFF',
-    fontSize: 34,
-    lineHeight: 36,
-    fontWeight: '900',
-    maxWidth: 420,
-  },
-  heroSubtitle: {
-    color: 'rgba(255, 255, 255, 0.92)',
-    fontSize: 15,
-    lineHeight: 21,
-    marginTop: 6,
-    maxWidth: 520,
-    fontWeight: '600',
+    width: '94%',
+    height: '92%',
+    alignSelf: 'center',
   },
   detailsCard: {
     borderRadius: 22,
