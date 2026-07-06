@@ -4,8 +4,28 @@ import { ScrollViewStyleReset } from "expo-router/html";
 import type { PropsWithChildren } from "react";
 import eventConfig from '../src/data/eventConfig';
 
+const normalizeBasePath = (value?: string) => {
+  if (!value) {
+    return "";
+  }
+
+  const trimmed = value.trim();
+  if (!trimmed || trimmed === "/") {
+    return "";
+  }
+
+  return `/${trimmed.replace(/^\/+/, "").replace(/\/+$/, "")}`;
+};
+
+const withBasePath = (path: string) => {
+  const basePath = normalizeBasePath(process.env.EXPO_BASE_URL);
+  return `${basePath}${path.startsWith("/") ? path : `/${path}`}`;
+};
+
 export default function Root({ children }: PropsWithChildren) {
-  const favicon = (eventConfig?.appName && eventConfig.appName.toLowerCase().includes('walkerton')) ? '/whc-logo.png' : '/assets/images/favicon.png';
+  const favicon = (eventConfig?.appName && eventConfig.appName.toLowerCase().includes('walkerton'))
+    ? withBasePath('/whc-logo.png')
+    : withBasePath('/assets/images/favicon.png');
 
   return (
     <html lang="en" style={{ height: "100%" }}>
@@ -22,6 +42,8 @@ export default function Root({ children }: PropsWithChildren) {
           set `overflow: auto` on the body style below.
         */}
         <link rel="icon" href={favicon} />
+        <link rel="apple-touch-icon" href={withBasePath('/whc-logo.png')} />
+        <link rel="manifest" href={withBasePath('/manifest.json')} />
         <ScrollViewStyleReset />
         <style
           dangerouslySetInnerHTML={{
