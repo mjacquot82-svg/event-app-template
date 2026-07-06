@@ -93,7 +93,10 @@ export const eventConfig = {
       'Walkerton Home Coming 2026 celebrates the feeling of coming home: old friends, new memories, downtown energy, community pride, local music, family activities, and a weekend built around reconnecting.',
   },
   footer: {
-    copyrightLines: ['App Built & Provided By', 'Jennifer Jacquot Photography'],
+    builtByLabel: 'Built by',
+    companyName: 'Jacquot Digital Solutions',
+    websiteLabel: 'jdsstudio.ca',
+    websiteUrl: 'https://jdsstudio.ca',
   },
 };
 

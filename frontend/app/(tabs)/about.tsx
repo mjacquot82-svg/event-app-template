@@ -20,6 +20,10 @@ export default function AboutScreen() {
     Linking.openURL(url as string);
   };
 
+  const openFooterWebsite = () => {
+    Linking.openURL(eventConfig.footer.websiteUrl);
+  };
+
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <ScrollView
@@ -67,9 +71,11 @@ export default function AboutScreen() {
           </View>
 
           <View style={styles.footer}>
-            {eventConfig.footer.copyrightLines.map((line, i) => (
-              <Text key={i} style={styles.footerText}>{line}</Text>
-            ))}
+            <Text style={styles.footerText}>{eventConfig.footer.builtByLabel}</Text>
+            <Text style={styles.footerCompany}>{eventConfig.footer.companyName}</Text>
+            <TouchableOpacity onPress={openFooterWebsite} activeOpacity={0.8} style={styles.footerLinkWrap}>
+              <Text style={styles.footerLink}>{eventConfig.footer.websiteLabel}</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </ScrollView>
@@ -116,5 +122,8 @@ const styles = StyleSheet.create({
   directionsButtonText: { color: '#000', fontWeight: '900' },
   description: { fontSize: 14, lineHeight: 20, color: '#D1D5DB' },
   footer: { alignItems: 'center', padding: 20 },
-  footerText: { fontSize: 10, color: '#8B95A1' },
+  footerText: { fontSize: 10, lineHeight: 14, color: '#8B95A1', textAlign: 'center' },
+  footerCompany: { fontSize: 12, lineHeight: 16, fontWeight: '700', color: '#AEB6C0', textAlign: 'center', marginTop: 4 },
+  footerLinkWrap: { marginTop: 4 },
+  footerLink: { fontSize: 10, lineHeight: 14, color: BLUE, textAlign: 'center' },
 });

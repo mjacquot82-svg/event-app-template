@@ -100,6 +100,8 @@ function ActionCard({
   compact?: boolean;
 }) {
   const scaleAnim = useRef(new Animated.Value(1)).current;
+  const iconSize = compact ? 18 : 20;
+  const iconColor = action.color === '#FFD23F' ? '#111111' : '#FFFFFF';
 
   return (
     <Animated.View style={[compact ? styles.compactActionShell : styles.actionShell, { transform: [{ scale: scaleAnim }] }]}>
@@ -113,7 +115,14 @@ function ActionCard({
         ]}
       >
         <View style={[styles.actionIconWrap, { backgroundColor: action.color }]}>
-          <Feather name={action.icon as any} size={compact ? 18 : 20} color={action.color === '#FFD23F' ? '#111111' : '#FFFFFF'} />
+          <View style={[styles.actionIconFrame, compact ? styles.compactActionIconFrame : null]}>
+            <Feather
+              name={action.icon as any}
+              size={iconSize}
+              color={iconColor}
+              style={[styles.actionIcon, compact ? styles.compactActionIcon : null]}
+            />
+          </View>
         </View>
         <Text style={compact ? styles.compactActionLabel : styles.actionLabel}>{action.label}</Text>
       </Pressable>
@@ -190,7 +199,7 @@ export default function HomeScreen() {
 
         <View style={styles.sectionCard}>
           <View style={styles.sectionHeader}>
-            <View>
+            <View style={styles.sectionHeaderContent}>
               <Text style={styles.sectionEyebrow}>Coming Up</Text>
               <Text style={styles.sectionTitle}>{dynamicEvents.title}</Text>
             </View>
@@ -379,6 +388,10 @@ const styles = StyleSheet.create({
     gap: 12,
     marginBottom: 18,
   },
+  sectionHeaderContent: {
+    flex: 1,
+    minWidth: 0,
+  },
   sectionEyebrow: {
     color: colors.primary,
     fontSize: 12,
@@ -398,14 +411,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
+    flexShrink: 0,
+    maxWidth: '100%',
+    paddingHorizontal: 12,
+    paddingVertical: 9,
     borderRadius: 999,
     backgroundColor: 'rgba(22, 191, 214, 0.12)',
   },
   scheduleLinkText: {
     color: colors.primary,
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: '800',
   },
   eventsList: {
@@ -498,6 +513,24 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 22,
+  },
+  actionIconFrame: {
+    width: 20,
+    height: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  compactActionIconFrame: {
+    width: 18,
+    height: 18,
+  },
+  actionIcon: {
+    lineHeight: 20,
+    textAlign: 'center',
+    includeFontPadding: false,
+  },
+  compactActionIcon: {
+    lineHeight: 18,
   },
   actionLabel: {
     color: '#FFFFFF',
