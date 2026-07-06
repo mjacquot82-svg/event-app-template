@@ -114,17 +114,19 @@ function ActionCard({
           pressed ? styles.actionCardPressed : null,
         ]}
       >
-        <View style={[styles.actionIconWrap, { backgroundColor: action.color }]}>
-          <View style={[styles.actionIconFrame, compact ? styles.compactActionIconFrame : null]}>
-            <Feather
-              name={action.icon as any}
-              size={iconSize}
-              color={iconColor}
-              style={[styles.actionIcon, compact ? styles.compactActionIcon : null]}
-            />
+        <View style={compact ? styles.compactActionContent : styles.actionContent}>
+          <View style={[styles.actionIconWrap, { backgroundColor: action.color }]}>
+            <View style={[styles.actionIconFrame, compact ? styles.compactActionIconFrame : null]}>
+              <Feather
+                name={action.icon as any}
+                size={iconSize}
+                color={iconColor}
+                style={[styles.actionIcon, compact ? styles.compactActionIcon : null]}
+              />
+            </View>
           </View>
+          <Text style={compact ? styles.compactActionLabel : styles.actionLabel}>{action.label}</Text>
         </View>
-        <Text style={compact ? styles.compactActionLabel : styles.actionLabel}>{action.label}</Text>
       </Pressable>
     </Animated.View>
   );
@@ -491,20 +493,27 @@ const styles = StyleSheet.create({
   actionCard: {
     minHeight: 134,
     borderRadius: 22,
-    backgroundColor: '#101114',
+    backgroundColor: '#14161A',
     paddingHorizontal: 18,
     paddingVertical: 20,
-    justifyContent: 'space-between',
+    alignItems: 'center',
+    justifyContent: 'center',
     borderWidth: 1,
-    borderColor: '#1E2229',
+    borderColor: '#252B34',
     shadowColor: '#000000',
-    shadowOpacity: 0.14,
-    shadowRadius: 14,
-    shadowOffset: { width: 0, height: 8 },
-    elevation: 4,
+    shadowOpacity: 0.18,
+    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 10 },
+    elevation: 5,
   },
   actionCardPressed: {
     opacity: 0.94,
+  },
+  actionContent: {
+    flex: 1,
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   actionIconWrap: {
     width: 48,
@@ -537,6 +546,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 20,
     fontWeight: '800',
+    textAlign: 'center',
   },
   compactActionRow: {
     marginTop: 2,
@@ -546,18 +556,29 @@ const styles = StyleSheet.create({
   },
   compactActionCard: {
     borderRadius: 18,
-    backgroundColor: '#101114',
+    backgroundColor: '#14161A',
     paddingHorizontal: 16,
     paddingVertical: 14,
-    flexDirection: 'row',
+    minHeight: 108,
     alignItems: 'center',
+    justifyContent: 'center',
     borderWidth: 1,
-    borderColor: '#1E2229',
+    borderColor: '#252B34',
+    shadowColor: '#000000',
+    shadowOpacity: 0.14,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 4,
+  },
+  compactActionContent: {
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   compactActionLabel: {
     color: '#FFFFFF',
     fontSize: 14,
     fontWeight: '800',
-    marginLeft: 12,
+    textAlign: 'center',
   },
 });
