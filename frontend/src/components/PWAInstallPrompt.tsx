@@ -210,7 +210,7 @@ export default function PWAInstallPrompt({ onDismiss }: PWAInstallPromptProps) {
             {/* Logo (event-specific) */}
             <View style={styles.logoContainer}>
               <Image
-                source={eventConfig?.appName && eventConfig.appName.toLowerCase().includes('walkerton') ? require('../../assets/images/new.jpg') : require('../../assets/images/icon.png')}
+                source={eventConfig?.appName && eventConfig.appName.toLowerCase().includes('walkerton') ? require('../../assets/images/whc-logo.png') : require('../../assets/images/icon.png')}
                 style={styles.logo}
                 resizeMode="contain"
               />

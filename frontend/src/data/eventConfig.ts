@@ -36,7 +36,7 @@ export const eventConfig = {
   },
   assets: {
     bannerImage: require('../../assets/images/Untitled.png'),
-    logoUri: require('../../assets/images/new.jpg'),
+    logoUri: require('../../assets/images/whc-logo.png'),
   },
   brand: {
     primary: '#16BFD6',

@@ -34,7 +34,7 @@ export default function SplashScreen({ onFinish, duration = 2000 }: SplashScreen
   return (
     <View style={styles.container}>
       <Image
-        source={require('../../assets/images/new.jpg')}
+        source={require('../../assets/images/whc-logo.png')}
         style={styles.logoImage}
         resizeMode="contain"
       />
