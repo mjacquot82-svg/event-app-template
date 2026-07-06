@@ -3,7 +3,7 @@
   "short_name": "Walkerton Home Coming 2026",
   "icons": [
     {
-      "src": "/whc-logo.png",
+      "src": "/assets/images/new.jpg",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
