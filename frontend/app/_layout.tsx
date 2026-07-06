@@ -7,10 +7,6 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Platform } from 'react-native';
 import colors from '../src/theme/colors';
-import { 
-  registerForPushNotificationsAsync, 
-  addNotificationListeners 
-} from '../src/utils/notificationService';
 import { AdProvider } from '../src/context/AdContext';
 import PWAInstallPrompt from '../src/components/PWAInstallPrompt';
 
@@ -50,26 +46,6 @@ const initWebpushr = () => {
 export default function RootLayout() {
   useEffect(() => {
     initWebpushr();
-    
-    const initNotifications = async () => {
-      const token = await registerForPushNotificationsAsync();
-      if (token) {
-        console.log('Push notification token:', token);
-      }
-    };
-
-    initNotifications();
-
-    const cleanup = addNotificationListeners(
-      (notification) => {
-        console.log('Notification received:', notification);
-      },
-      (response) => {
-        console.log('Notification tapped:', response);
-      }
-    );
-
-    return cleanup;
   }, []);
 
   return (

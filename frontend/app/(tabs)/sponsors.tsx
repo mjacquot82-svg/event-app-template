@@ -6,8 +6,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 import { Sponsor, sponsorsByTier } from '../../src/data/sponsors';
 import HomecomingHero from '../../src/components/HomecomingHero';
+import { colors } from '../../src/theme/colors';
 
-const GOLD = '#FFD23F';
 const FILTER_OPTIONS = ['All', 'Diamond', 'Platinum', 'Gold', 'Silver', 'Bronze'] as const;
 type SponsorFilter = typeof FILTER_OPTIONS[number];
 
@@ -30,17 +30,21 @@ function tierLabel(tier: Sponsor['tier']) {
 
 function SponsorCard({ sponsor }: { sponsor: Sponsor }) {
   return (
-    <View style={[styles.sponsorCard, { borderColor: sponsor.color }]}>
+    <View style={styles.sponsorCard}>
       <View style={styles.cardTopRow}>
-        <View style={styles.logoPlaceholder}>
-          <Text style={styles.logoPlaceholderText}>{sponsor.logo ? 'Logo Ready' : 'Logo'}</Text>
-        </View>
-
         <View style={styles.cardCopy}>
-          <Text style={styles.sponsorName}>{sponsor.name}</Text>
-          <View style={[styles.tierBadge, { backgroundColor: sponsor.color }]}>
-            <Text style={styles.tierBadgeText}>{tierLabel(sponsor.tier)}</Text>
+          <View style={styles.nameRow}>
+            <Text style={styles.sponsorName}>{sponsor.name}</Text>
+            <View style={[styles.tierBadge, { backgroundColor: sponsor.color }]}>
+              <Text style={styles.tierBadgeText}>{tierLabel(sponsor.tier)}</Text>
+            </View>
           </View>
+
+          <View style={styles.dividerRow}>
+            <View style={[styles.dividerAccent, { backgroundColor: sponsor.color }]} />
+            <Text style={styles.tierMeta}>{tierLabel(sponsor.tier)}</Text>
+          </View>
+
           {sponsor.tagline ? <Text style={styles.sponsorTagline}>{sponsor.tagline}</Text> : null}
           {sponsor.description ? (
             <Text style={styles.sponsorDescription}>{sponsor.description}</Text>
@@ -49,7 +53,7 @@ function SponsorCard({ sponsor }: { sponsor: Sponsor }) {
       </View>
 
       {sponsor.url ? (
-        <Pressable style={styles.visitButton} onPress={() => Linking.openURL(sponsor.url)}>
+        <Pressable style={[styles.visitButton, { backgroundColor: sponsor.color }]} onPress={() => Linking.openURL(sponsor.url)}>
           <Feather name="external-link" size={16} color="#000" />
           <Text style={styles.visitButtonText}>Visit Website</Text>
         </Pressable>
@@ -63,7 +67,10 @@ function SponsorSection({ title, sponsors }: { title: string; sponsors: Sponsor[
 
   return (
     <View style={styles.section}>
-      <Text style={styles.sectionTitle}>{title}</Text>
+      <View style={styles.sectionHeader}>
+        <Text style={styles.sectionEyebrow}>Sponsor tier</Text>
+        <Text style={styles.sectionTitle}>{title}</Text>
+      </View>
       {sponsors.map((sponsor) => (
         <SponsorCard key={sponsor.id} sponsor={sponsor} />
       ))}
@@ -94,53 +101,63 @@ export default function SponsorsScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <HomecomingHero
-          eyebrow="Sponsors"
-          title="Community Partners"
-          subtitle="The businesses and organizations helping power Homecoming weekend."
-        />
+        <View style={styles.page}>
+          <HomecomingHero
+            eyebrow="Sponsors"
+            title="Community Partners"
+            subtitle="The businesses and organizations helping power Homecoming weekend."
+          />
 
-        {hasSponsors ? (
-          <>
-            <View style={styles.filterWrap}>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterScroll}>
-                {FILTER_OPTIONS.map((option) => {
-                  const active = option === selectedTier;
-                  return (
-                    <TouchableOpacity
-                      key={option}
-                      style={[styles.filterPill, active && styles.filterPillActive]}
-                      onPress={() => setSelectedTier(option)}
-                    >
-                      <Text style={[styles.filterText, active && styles.filterTextActive]}>{option}</Text>
-                    </TouchableOpacity>
-                  );
-                })}
-              </ScrollView>
-            </View>
-
-            <SponsorSection title="Diamond Sponsors" sponsors={filteredByTier.diamond} />
-            <SponsorSection title="Platinum Sponsors" sponsors={filteredByTier.platinum} />
-            <SponsorSection title="Gold Sponsors" sponsors={filteredByTier.gold} />
-            <SponsorSection title="Silver Sponsors" sponsors={filteredByTier.silver} />
-            <SponsorSection title="Bronze Sponsors" sponsors={filteredByTier.bronze} />
-            <Text style={styles.footerNote}>
-              Sponsor logos and additional sponsor information will be added as available.
-            </Text>
-          </>
-        ) : (
-          <View style={styles.placeholderCard}>
-            <Text style={styles.placeholderTitle}>Sponsors</Text>
-            <Text style={styles.placeholderBody}>
-              Official sponsor listings and logos will be added as sponsor information becomes available.
-            </Text>
-            <Text style={styles.placeholderBody}>
-              Thank you to all businesses and organizations supporting Walkerton Home Coming 2026.
+          <View style={styles.introCard}>
+            <Text style={styles.eyebrow}>Supporters</Text>
+            <Text style={styles.pageTitle}>Local sponsors powering the weekend</Text>
+            <Text style={styles.pageSubtitle}>
+              Browse our sponsor tiers and discover the businesses backing Home Coming across the community.
             </Text>
           </View>
-        )}
 
-        <View style={styles.bottomPadding} />
+          {hasSponsors ? (
+            <>
+              <View style={styles.filterWrap}>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterScroll}>
+                  {FILTER_OPTIONS.map((option) => {
+                    const active = option === selectedTier;
+                    return (
+                      <TouchableOpacity
+                        key={option}
+                        style={[styles.filterPill, active && styles.filterPillActive]}
+                        onPress={() => setSelectedTier(option)}
+                      >
+                        <Text style={[styles.filterText, active && styles.filterTextActive]}>{option}</Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </ScrollView>
+              </View>
+
+              <SponsorSection title="Diamond Sponsors" sponsors={filteredByTier.diamond} />
+              <SponsorSection title="Platinum Sponsors" sponsors={filteredByTier.platinum} />
+              <SponsorSection title="Gold Sponsors" sponsors={filteredByTier.gold} />
+              <SponsorSection title="Silver Sponsors" sponsors={filteredByTier.silver} />
+              <SponsorSection title="Bronze Sponsors" sponsors={filteredByTier.bronze} />
+              <Text style={styles.footerNote}>
+                Thank you to every business and organization helping bring Walkerton Home Coming 2026 to life.
+              </Text>
+            </>
+          ) : (
+            <View style={styles.placeholderCard}>
+              <Text style={styles.placeholderTitle}>Sponsors</Text>
+              <Text style={styles.placeholderBody}>
+                Official sponsor listings will be added as sponsor information becomes available.
+              </Text>
+              <Text style={styles.placeholderBody}>
+                Thank you to all businesses and organizations supporting Walkerton Home Coming 2026.
+              </Text>
+            </View>
+          )}
+
+          <View style={styles.bottomPadding} />
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -149,19 +166,42 @@ export default function SponsorsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: '#050505',
   },
   content: {
+    paddingHorizontal: 14,
+    paddingTop: 12,
     paddingBottom: 220,
   },
+  page: { width: '100%', maxWidth: 1080, alignSelf: 'center' },
+  introCard: {
+    borderRadius: 22,
+    backgroundColor: '#0F1012',
+    paddingHorizontal: 22,
+    paddingVertical: 24,
+    marginBottom: 18,
+    shadowColor: '#000000',
+    shadowOpacity: 0.18,
+    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 10 },
+    elevation: 5,
+  },
+  eyebrow: { color: colors.primary, fontSize: 12, fontWeight: '800', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 6 },
+  pageTitle: { color: '#FFFFFF', fontSize: 24, lineHeight: 28, fontWeight: '900' },
+  pageSubtitle: { color: '#C8CDD4', fontSize: 14, lineHeight: 21, marginTop: 8, maxWidth: 640 },
   filterWrap: {
-    backgroundColor: '#000',
-    borderBottomWidth: 1,
-    borderBottomColor: '#1F2937',
+    borderRadius: 22,
+    backgroundColor: '#0F1012',
+    marginBottom: 18,
+    shadowColor: '#000000',
+    shadowOpacity: 0.18,
+    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 10 },
+    elevation: 5,
   },
   filterScroll: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: 18,
+    paddingVertical: 14,
   },
   filterPill: {
     paddingHorizontal: 14,
@@ -185,13 +225,16 @@ const styles = StyleSheet.create({
     color: '#000',
   },
   placeholderCard: {
-    marginHorizontal: 20,
-    marginTop: 6,
-    borderRadius: 18,
-    backgroundColor: '#111',
+    borderRadius: 22,
+    backgroundColor: '#0F1012',
     borderWidth: 1,
     borderColor: '#1F2937',
-    padding: 18,
+    padding: 24,
+    shadowColor: '#000000',
+    shadowOpacity: 0.18,
+    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 10 },
+    elevation: 5,
   },
   placeholderTitle: {
     fontSize: 24,
@@ -205,58 +248,61 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   section: {
-    padding: 20,
-    paddingBottom: 8,
+    borderRadius: 22,
+    backgroundColor: '#0F1012',
+    padding: 24,
+    marginBottom: 18,
+    shadowColor: '#000000',
+    shadowOpacity: 0.18,
+    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 10 },
+    elevation: 5,
   },
+  sectionHeader: { marginBottom: 18 },
+  sectionEyebrow: { color: '#98A2AF', fontSize: 11, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 4 },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: 24,
+    lineHeight: 28,
     fontWeight: '900',
     color: '#fff',
-    marginBottom: 12,
   },
   sponsorCard: {
-    borderRadius: 18,
-    backgroundColor: '#111',
-    marginBottom: 12,
+    borderRadius: 20,
+    backgroundColor: '#15171B',
+    marginBottom: 16,
     borderWidth: 1,
-    padding: 14,
+    borderColor: '#1F2937',
+    padding: 20,
+    shadowColor: '#000000',
+    shadowOpacity: 0.12,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 3,
   },
   cardTopRow: {
-    flexDirection: 'row',
-    gap: 14,
     alignItems: 'flex-start',
-  },
-  logoPlaceholder: {
-    width: 84,
-    height: 84,
-    borderRadius: 16,
-    backgroundColor: '#1A1A1A',
-    borderWidth: 1,
-    borderColor: '#2B2B2B',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  logoPlaceholderText: {
-    color: '#8B95A1',
-    fontWeight: '800',
-    fontSize: 10,
-    textAlign: 'center',
-    paddingHorizontal: 8,
   },
   cardCopy: {
     flex: 1,
   },
+  nameRow: {
+    flexDirection: 'row',
+    gap: 12,
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+  },
   sponsorName: {
-    fontSize: 18,
+    fontSize: 22,
     fontWeight: '900',
     color: '#fff',
+    flex: 1,
+    lineHeight: 28,
   },
   tierBadge: {
-    alignSelf: 'flex-start',
     borderRadius: 999,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    marginTop: 8,
+    paddingHorizontal: 11,
+    paddingVertical: 7,
+    flexShrink: 0,
   },
   tierBadgeText: {
     color: '#000',
@@ -264,21 +310,39 @@ const styles = StyleSheet.create({
     fontSize: 11,
     textTransform: 'uppercase',
   },
+  dividerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginTop: 14,
+  },
+  dividerAccent: {
+    width: 36,
+    height: 4,
+    borderRadius: 999,
+  },
+  tierMeta: {
+    color: '#98A2AF',
+    fontSize: 12,
+    fontWeight: '800',
+    textTransform: 'uppercase',
+    letterSpacing: 0.8,
+  },
   sponsorTagline: {
     color: '#D1D5DB',
-    marginTop: 10,
-    lineHeight: 19,
+    marginTop: 16,
+    lineHeight: 21,
+    fontWeight: '700',
   },
   sponsorDescription: {
     color: '#B7BDC7',
-    marginTop: 8,
-    lineHeight: 19,
+    marginTop: 10,
+    lineHeight: 21,
   },
   visitButton: {
-    marginTop: 14,
-    backgroundColor: GOLD,
+    marginTop: 16,
     borderRadius: 12,
-    paddingVertical: 12,
+    paddingVertical: 13,
     paddingHorizontal: 14,
     flexDirection: 'row',
     alignItems: 'center',
@@ -293,8 +357,7 @@ const styles = StyleSheet.create({
     color: '#B7BDC7',
     fontSize: 13,
     lineHeight: 20,
-    marginHorizontal: 20,
-    marginTop: 8,
+    marginTop: 10,
   },
   bottomPadding: {
     height: 160,

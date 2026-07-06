@@ -53,6 +53,19 @@ interface PWAInstallPromptProps {
   onDismiss?: () => void;
 }
 
+function isEmbeddedInIframe() {
+  if (typeof window === 'undefined') {
+    return false;
+  }
+
+  try {
+    return window.self !== window.top;
+  } catch (error) {
+    // Cross-origin frame access throws; treat that as embedded.
+    return true;
+  }
+}
+
 export default function PWAInstallPrompt({ onDismiss }: PWAInstallPromptProps) {
   const [visible, setVisible] = useState(false);
   const [isIOS, setIsIOS] = useState(false);
@@ -64,6 +77,11 @@ export default function PWAInstallPrompt({ onDismiss }: PWAInstallPromptProps) {
     if (Platform.OS !== 'web') return;
 
     const init = async () => {
+      if (isEmbeddedInIframe()) {
+        console.log('[PWA] Embedded in iframe, suppressing install prompt');
+        return;
+      }
+
       // Check dismiss status
       try {
         const dismissedAt = await AsyncStorage.getItem(DISMISS_KEY);

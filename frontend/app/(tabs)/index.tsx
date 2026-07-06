@@ -9,15 +9,13 @@ import {
   Pressable,
   Animated,
   Platform,
-  Image,
   useWindowDimensions,
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { eventConfig } from '../../src/data/eventConfig';
 import { colors } from '../../src/theme/colors';
-
-const HERO_IMAGE = require('../../assets/images/logo.jpg');
+import HomecomingHero from '../../src/components/HomecomingHero';
 
 type HomeEvent = {
   id: string;
@@ -134,10 +132,9 @@ function ActionCard({
 
 export default function HomeScreen() {
   const router = useRouter();
-  const { width, height } = useWindowDimensions();
+  const { width } = useWindowDimensions();
   const isWide = width >= 960;
   const contentMaxWidth = isWide ? 1080 : 760;
-  const heroHeight = Math.max(138, Math.min(Math.round(height * 0.2), isWide ? 220 : 190));
   const days = getDaysUntil('2026-07-30');
   const dynamicEvents = useMemo(() => getCurrentOrNextEvents(), []);
 
@@ -173,11 +170,7 @@ export default function HomeScreen() {
       showsVerticalScrollIndicator={false}
     >
       <View style={[styles.page, { maxWidth: contentMaxWidth }]}>
-        <View style={[styles.heroCard, { height: heroHeight }]}>
-          <View style={styles.heroImageFrame}>
-            <Image source={HERO_IMAGE} style={styles.heroImage} resizeMode="contain" />
-          </View>
-        </View>
+        <HomecomingHero title="Home" />
 
         <View style={styles.detailsCard}>
           <View style={styles.detailsRow}>
@@ -272,31 +265,6 @@ const styles = StyleSheet.create({
   },
   page: {
     width: '100%',
-    alignSelf: 'center',
-  },
-  heroCard: {
-    width: '100%',
-    borderRadius: 22,
-    overflow: 'hidden',
-    backgroundColor: '#FFFFFF',
-    marginBottom: 10,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    shadowColor: '#000000',
-    shadowOpacity: 0.12,
-    shadowRadius: 14,
-    shadowOffset: { width: 0, height: 8 },
-    elevation: 4,
-  },
-  heroImageFrame: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#FFFFFF',
-  },
-  heroImage: {
-    width: '94%',
-    height: '92%',
     alignSelf: 'center',
   },
   detailsCard: {
