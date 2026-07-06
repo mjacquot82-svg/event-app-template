@@ -1,20 +1,5 @@
 // © 2026 1001538341 ONTARIO INC. All Rights Reserved.
 
-const normalizeBasePath = (value) => {
-  if (!value) {
-    return "";
-  }
-
-  const trimmed = value.trim();
-  if (!trimmed || trimmed === "/") {
-    return "";
-  }
-
-  return `/${trimmed.replace(/^\/+/, "").replace(/\/+$/, "")}`;
-};
-
-const baseUrl = normalizeBasePath(process.env.APP_BASE_PATH);
-
 export default {
   expo: {
     name: "Walkerton Home Coming 2026",
@@ -85,7 +70,6 @@ export default {
       // ]
     ],
     experiments: {
-      baseUrl,
       typedRoutes: true
     },
     extra: {
