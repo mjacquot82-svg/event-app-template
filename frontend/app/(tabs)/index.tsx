@@ -14,30 +14,11 @@ import {
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { eventConfig } from '../../src/data/eventConfig';
+import { productionHomeEvents, type ProductionHomeEvent } from '../../src/data/productionSchedule';
 import { colors } from '../../src/theme/colors';
 import HomecomingHero from '../../src/components/HomecomingHero';
 
-type HomeEvent = {
-  id: string;
-  date: string;
-  time: string;
-  title: string;
-  category: 'Music' | 'Kids' | 'Parade' | 'Food' | 'Community' | 'Merch';
-};
-
-const homeEvents: HomeEvent[] = [
-  { id: 'thu-open', date: '2026-07-30', time: '5:00 PM', title: 'Welcome Home Kickoff', category: 'Community' },
-  { id: 'fri-kids', date: '2026-07-31', time: '11:00 AM', title: 'Kids Remix Zone Opens', category: 'Kids' },
-  { id: 'fri-food', date: '2026-07-31', time: '4:00 PM', title: 'Food Truck Friday', category: 'Food' },
-  { id: 'fri-music', date: '2026-07-31', time: '9:00 PM', title: 'Friday Night Mingle Concert', category: 'Music' },
-  { id: 'sat-parade', date: '2026-08-01', time: '10:30 AM', title: 'Homecoming Parade', category: 'Parade' },
-  { id: 'sat-market', date: '2026-08-01', time: '1:00 PM', title: 'Local Market & Community Showcase', category: 'Community' },
-  { id: 'sat-remix', date: '2026-08-01', time: '9:00 PM', title: 'Saturday Night Remix Party', category: 'Music' },
-  { id: 'sun-brunch', date: '2026-08-02', time: '10:00 AM', title: 'Community Brunch', category: 'Food' },
-  { id: 'mon-finale', date: '2026-08-03', time: '7:30 PM', title: 'Finale Night & Fireworks', category: 'Music' },
-];
-
-const categoryColors: Record<HomeEvent['category'], string> = {
+const categoryColors: Record<ProductionHomeEvent['category'], string> = {
   Music: '#F6008F',
   Kids: '#45DDF0',
   Parade: '#FFD23F',
@@ -55,13 +36,13 @@ function getDaysUntil(dateString: string) {
 function getCurrentOrNextEvents() {
   const today = new Date();
   const todayKey = today.toISOString().slice(0, 10);
-  const todayEvents = homeEvents.filter((event) => event.date === todayKey);
+  const todayEvents = productionHomeEvents.filter((event) => event.date === todayKey);
   if (todayEvents.length > 0) return { title: 'Happening Today', events: todayEvents.slice(0, 3) };
 
-  const next = homeEvents.find((event) => new Date(`${event.date}T23:59:59`) >= today);
-  if (!next) return { title: 'Weekend Highlights', events: homeEvents.slice(-3) };
+  const next = productionHomeEvents.find((event) => new Date(`${event.date}T23:59:59`) >= today);
+  if (!next) return { title: 'Weekend Highlights', events: productionHomeEvents.slice(-3) };
 
-  const nextEvents = homeEvents.filter((event) => event.date === next.date).slice(0, 3);
+  const nextEvents = productionHomeEvents.filter((event) => event.date === next.date).slice(0, 3);
   const label = new Date(`${next.date}T12:00:00`).toLocaleDateString('en-US', {
     weekday: 'long',
     month: 'short',

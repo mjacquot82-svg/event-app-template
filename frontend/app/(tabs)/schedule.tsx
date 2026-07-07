@@ -5,87 +5,9 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal } from 'rea
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 import PageBannerHeader from '../../src/components/PageBannerHeader';
+import { productionSchedule, type ProductionScheduleEvent } from '../../src/data/productionSchedule';
 
-type DemoEvent = {
-  id: string;
-  day: string;
-  date: string;
-  time: string;
-  title: string;
-  location: string;
-  category: 'Music' | 'Family' | 'Food' | 'Sports & Games' | 'Community Events';
-  description: string;
-  sponsor?: string;
-};
-
-const schedule: DemoEvent[] = [
-  { id: 'thu-roller-skating', day: 'Thursday', date: 'July 30', time: '7:00pm–9:00pm', title: 'Roller Skating', location: "Lang's Home Energy Event Arena", category: 'Community Events', description: "Roller skating at Lang's Home Energy Event Arena." },
-  { id: 'thu-preteen-dance', day: 'Thursday', date: 'July 30', time: '6:30pm–8:00pm', title: 'Preteen Dance (Ages 6–12)', location: "Auditorium - Lang's Home Energy Event Arena", category: 'Family', description: "Preteen dance for ages 6–12 in the auditorium at Lang's Home Energy Event Arena." },
-  { id: 'thu-paint-sip', day: 'Thursday', date: 'July 30', time: '6:30pm–8:00pm', title: 'Paint & Sip (19+)', location: "Auditorium - Lang's Home Energy Event Arena", category: 'Community Events', description: "Paint & Sip for ages 19+ in the auditorium at Lang's Home Energy Event Arena." },
-  { id: 'thu-teen-dance', day: 'Thursday', date: 'July 30', time: '8:30pm–10:00pm', title: 'Teen Dance (Ages 13–18)', location: "Auditorium - Lang's Home Energy Event Arena", category: 'Family', description: "Teen dance for ages 13–18 in the auditorium at Lang's Home Energy Event Arena." },
-  { id: 'fri-golf-tournament', day: 'Friday', date: 'July 31', time: '10:00am–5:00pm', title: 'Golf Tournament', location: 'Walkerton Golf & Curling Club', category: 'Sports & Games', description: 'Golf tournament at Walkerton Golf & Curling Club.' },
-  { id: 'fri-aquafit', day: 'Friday', date: 'July 31', time: '11:30am–12:30pm', title: 'Aquafit', location: 'Walkerton Centennial Pool', category: 'Sports & Games', description: 'Aquafit session at Walkerton Centennial Pool.' },
-  { id: 'fri-ticket-pickup', day: 'Friday', date: 'July 31', time: '4:00pm–6:00pm', title: 'Ticket Pickup', location: 'CMR Insurance Welcome Building', category: 'Community Events', description: 'Ticket pickup at the CMR Insurance Welcome Building.' },
-  { id: 'fri-opening-ceremonies', day: 'Friday', date: 'July 31', time: '4:00pm', title: 'Opening Ceremonies', location: 'Kisses | Lifeology Entertainment Tent', category: 'Community Events', description: 'Opening ceremonies at the Kisses | Lifeology Entertainment Tent.' },
-  { id: 'fri-kids-self-guided', day: 'Friday', date: 'July 31', time: '7:00pm–7:00pm', title: 'Kids Events - Self Guided', location: "Brown's Pharmacy Children's Tent", category: 'Family', description: "Self-guided kids events at Brown's Pharmacy Children's Tent." },
-  { id: 'fri-kids-tye-dye', day: 'Friday', date: 'July 31', time: '4:00pm–7:00pm', title: 'Kids Tye Dye Shirt Booth', location: "Brown's Pharmacy Children's Tent", category: 'Family', description: "Kids Tye Dye Shirt Booth at Brown's Pharmacy Children's Tent." },
-  { id: 'fri-youth-dodgeball', day: 'Friday', date: 'July 31', time: '6:00pm–8:00pm', title: 'Youth Dodgeball', location: "Lang's Home Energy Event Arena", category: 'Family', description: "Youth dodgeball at Lang's Home Energy Event Arena." },
-  { id: 'fri-music-blake-lisa', day: 'Friday', date: 'July 31', time: '3:00pm–7:00pm', title: 'Music by Blake Wilson & Lisa McEwen', location: 'Kisses | Lifeology Entertainment Tent', category: 'Music', description: 'Music by Blake Wilson & Lisa McEwen at the Kisses | Lifeology Entertainment Tent.' },
-  { id: 'fri-chicken-dinner', day: 'Friday', date: 'July 31', time: '5:00pm', title: 'Chicken Dinner', location: 'Price Schonstrom Food Palace', category: 'Food', description: 'Chicken Dinner at the Price Schonstrom Food Palace.' },
-  { id: 'fri-dance-pages-big-shiny-90s', day: 'Friday', date: 'July 31', time: '9:00pm–1:00am', title: 'Dance (19+) - The Pages Opening for Big Shiny 90s', location: 'RMP Welding Bandshell', category: 'Music', description: '19+ dance featuring The Pages opening for Big Shiny 90s at the RMP Welding Bandshell.' },
-  { id: 'sat-grab-go-breakfast', day: 'Saturday', date: 'August 1', time: 'Time TBA', title: 'Grab & Go Breakfast', location: 'Location TBA', category: 'Food', description: 'Grab & Go Breakfast on Saturday, August 1.' },
-  { id: 'sat-craft-vendor-market', day: 'Saturday', date: 'August 1', time: 'Time TBA', title: 'Craft & Vendor Market', location: 'Downtown Walkerton', category: 'Community Events', description: 'Craft & Vendor Market in Downtown Walkerton.' },
-  { id: 'sat-pickleball-tournament', day: 'Saturday', date: 'August 1', time: 'Time TBA', title: 'Pickleball Tournament', location: 'Location TBA', category: 'Sports & Games', description: 'Pickleball Tournament on Saturday, August 1.' },
-  { id: 'sat-car-show', day: 'Saturday', date: 'August 1', time: 'Time TBA', title: 'Car Show', location: 'Location TBA', category: 'Community Events', description: 'Car Show on Saturday, August 1.' },
-  { id: 'sat-volleyball-tournament', day: 'Saturday', date: 'August 1', time: 'Time TBA', title: 'Volleyball Tournament', location: 'Location TBA', category: 'Sports & Games', description: 'Volleyball Tournament on Saturday, August 1.' },
-  { id: 'sat-bruce-power-funfest', day: 'Saturday', date: 'August 1', time: 'Time TBA', title: 'Bruce Power Funfest', location: 'Location TBA', category: 'Family', description: 'Bruce Power Funfest on Saturday, August 1.' },
-  { id: 'sat-music-whiskey-pines', day: 'Saturday', date: 'August 1', time: 'Time TBA', title: 'Music by Whiskey Pines', location: 'Main Stage', category: 'Music', description: 'Music by Whiskey Pines on Saturday, August 1.' },
-  { id: 'sat-tug-of-war', day: 'Saturday', date: 'August 1', time: 'Time TBA', title: 'Tug of War', location: 'Location TBA', category: 'Sports & Games', description: 'Tug of War on Saturday, August 1.' },
-  { id: 'sat-beard-growing-competition', day: 'Saturday', date: 'August 1', time: 'Time TBA', title: 'Beard Growing Competition', location: 'Location TBA', category: 'Community Events', description: 'Beard Growing Competition on Saturday, August 1.' },
-  { id: 'sat-music-skeleton-crew', day: 'Saturday', date: 'August 1', time: 'Time TBA', title: 'Music by Skeleton Crew', location: 'Main Stage', category: 'Music', description: 'Music by Skeleton Crew on Saturday, August 1.' },
-  { id: 'sat-teen-paint-craft', day: 'Saturday', date: 'August 1', time: 'Time TBA', title: 'Teen Paint & Craft', location: 'Location TBA', category: 'Family', description: 'Teen Paint & Craft on Saturday, August 1.' },
-  { id: 'sat-colour-run', day: 'Saturday', date: 'August 1', time: 'Time TBA', title: 'Colour Run', location: 'Location TBA', category: 'Sports & Games', description: 'Colour Run on Saturday, August 1.' },
-  { id: 'sat-glow-party', day: 'Saturday', date: 'August 1', time: 'Time TBA', title: 'Glow Party', location: 'Location TBA', category: 'Family', description: 'Glow Party on Saturday, August 1.' },
-  { id: 'sat-roast-beef-dinner', day: 'Saturday', date: 'August 1', time: 'Time TBA', title: 'Roast Beef Dinner', location: 'Location TBA', category: 'Food', description: 'Roast Beef Dinner on Saturday, August 1.' },
-  { id: 'sat-music-tommy-youngsteen', day: 'Saturday', date: 'August 1', time: 'Time TBA', title: 'Music by Tommy Youngsteen', location: 'Main Stage', category: 'Music', description: 'Music by Tommy Youngsteen on Saturday, August 1.' },
-  { id: 'sun-hot-breakfast', day: 'Sunday', date: 'August 2', time: 'Time TBA', title: 'Hot Breakfast', location: 'Location TBA', category: 'Food', description: 'Hot Breakfast on Sunday, August 2.' },
-  { id: 'sun-chair-yoga', day: 'Sunday', date: 'August 2', time: 'Time TBA', title: 'Chair Yoga', location: 'Location TBA', category: 'Community Events', description: 'Chair Yoga on Sunday, August 2.' },
-  { id: 'sun-survivor-walkerton', day: 'Sunday', date: 'August 2', time: 'Time TBA', title: 'Survivor Walkerton', location: 'Location TBA', category: 'Sports & Games', description: 'Survivor Walkerton on Sunday, August 2.' },
-  { id: 'sun-road-hockey-tournament', day: 'Sunday', date: 'August 2', time: 'Time TBA', title: 'Road Hockey Tournament', location: 'Location TBA', category: 'Sports & Games', description: 'Road Hockey Tournament on Sunday, August 2.' },
-  { id: 'sun-school-open-houses', day: 'Sunday', date: 'August 2', time: 'Time TBA', title: 'School Open Houses', location: 'Location TBA', category: 'Community Events', description: 'School Open Houses on Sunday, August 2.' },
-  { id: 'sun-cornhole-tournament', day: 'Sunday', date: 'August 2', time: 'Time TBA', title: 'Cornhole Tournament', location: 'Location TBA', category: 'Sports & Games', description: 'Cornhole Tournament on Sunday, August 2.' },
-  { id: 'sun-basketball-tournament', day: 'Sunday', date: 'August 2', time: 'Time TBA', title: '3-on-3 Basketball Tournament', location: 'Location TBA', category: 'Sports & Games', description: '3-on-3 Basketball Tournament on Sunday, August 2.' },
-  { id: 'sun-baby-races', day: 'Sunday', date: 'August 2', time: 'Time TBA', title: 'Baby Races', location: 'Location TBA', category: 'Family', description: 'Baby Races on Sunday, August 2.' },
-  { id: 'sun-caesar-sunday', day: 'Sunday', date: 'August 2', time: 'Time TBA', title: 'Caesar Sunday', location: 'Location TBA', category: 'Food', description: 'Caesar Sunday on Sunday, August 2.' },
-  { id: 'sun-painting-with-cara', day: 'Sunday', date: 'August 2', time: 'Time TBA', title: 'Painting With Cara', location: 'Location TBA', category: 'Community Events', description: 'Painting With Cara on Sunday, August 2.' },
-  { id: 'sun-escape-room', day: 'Sunday', date: 'August 2', time: 'Time TBA', title: 'Escape Room', location: 'Location TBA', category: 'Community Events', description: 'Escape Room on Sunday, August 2.' },
-  { id: 'sun-free-swim', day: 'Sunday', date: 'August 2', time: 'Time TBA', title: 'Free Swim', location: 'Location TBA', category: 'Family', description: 'Free Swim on Sunday, August 2.' },
-  { id: 'sun-face-painting', day: 'Sunday', date: 'August 2', time: 'Time TBA', title: 'Face Painting', location: 'Location TBA', category: 'Family', description: 'Face Painting on Sunday, August 2.' },
-  { id: 'sun-dueling-pianos', day: 'Sunday', date: 'August 2', time: 'Time TBA', title: 'Dueling Pianos', location: 'Location TBA', category: 'Music', description: 'Dueling Pianos on Sunday, August 2.' },
-  { id: 'sun-dog-show', day: 'Sunday', date: 'August 2', time: 'Time TBA', title: 'Dog Show', location: 'Location TBA', category: 'Community Events', description: 'Dog Show on Sunday, August 2.' },
-  { id: 'sun-foam-party', day: 'Sunday', date: 'August 2', time: 'Time TBA', title: 'Foam Party', location: 'Location TBA', category: 'Family', description: 'Foam Party on Sunday, August 2.' },
-  { id: 'sun-cozy-coupe-drift', day: 'Sunday', date: 'August 2', time: 'Time TBA', title: 'Cozy Coupe Drift', location: 'Location TBA', category: 'Family', description: 'Cozy Coupe Drift on Sunday, August 2.' },
-  { id: 'sun-bed-races', day: 'Sunday', date: 'August 2', time: 'Time TBA', title: 'Bed Races', location: 'Location TBA', category: 'Sports & Games', description: 'Bed Races on Sunday, August 2.' },
-  { id: 'sun-music-weekend-never-ends', day: 'Sunday', date: 'August 2', time: 'Time TBA', title: 'Music by Weekend Never Ends', location: 'Location TBA', category: 'Music', description: 'Music by Weekend Never Ends on Sunday, August 2.' },
-  { id: 'sun-trivia-night', day: 'Sunday', date: 'August 2', time: 'Time TBA', title: 'Trivia Night', location: 'Location TBA', category: 'Community Events', description: 'Trivia Night on Sunday, August 2.' },
-  { id: 'sun-pork-dinner', day: 'Sunday', date: 'August 2', time: 'Time TBA', title: 'Pork Dinner', location: 'Location TBA', category: 'Food', description: 'Pork Dinner on Sunday, August 2.' },
-  { id: 'sun-little-rock-dance', day: 'Sunday', date: 'August 2', time: 'Time TBA', title: 'Little Rock Dance', location: 'Location TBA', category: 'Music', description: 'Little Rock Dance on Sunday, August 2.' },
-  { id: 'mon-grab-go-breakfast', day: 'Monday', date: 'August 3', time: 'Time TBA', title: 'Grab & Go Breakfast', location: 'Location TBA', category: 'Food', description: 'Grab & Go Breakfast on Monday, August 3.' },
-  { id: 'mon-yoga-sound-bath', day: 'Monday', date: 'August 3', time: 'Time TBA', title: 'Yoga Sound Bath', location: 'Location TBA', category: 'Community Events', description: 'Yoga Sound Bath on Monday, August 3.' },
-  { id: 'mon-painting-with-cara', day: 'Monday', date: 'August 3', time: 'Time TBA', title: 'Painting With Cara', location: 'Location TBA', category: 'Community Events', description: 'Painting With Cara on Monday, August 3.' },
-  { id: 'mon-parade', day: 'Monday', date: 'August 3', time: 'Time TBA', title: 'Parade', location: 'Parade Route', category: 'Community Events', description: 'Parade on Monday, August 3.' },
-  { id: 'mon-music-greg-mclean', day: 'Monday', date: 'August 3', time: 'Time TBA', title: 'Music by Greg McLean', location: 'Main Stage', category: 'Music', description: 'Music by Greg McLean on Monday, August 3.' },
-  { id: 'mon-music-andrew-mcveety', day: 'Monday', date: 'August 3', time: 'Time TBA', title: 'Music by Andrew McVeety', location: 'Main Stage', category: 'Music', description: 'Music by Andrew McVeety on Monday, August 3.' },
-  { id: 'mon-kids-inflatables', day: 'Monday', date: 'August 3', time: 'Time TBA', title: 'Kids Inflatables', location: 'Location TBA', category: 'Family', description: 'Kids Inflatables on Monday, August 3.' },
-  { id: 'mon-bike-strider-parade', day: 'Monday', date: 'August 3', time: 'Time TBA', title: 'Bike / Strider Parade', location: 'Location TBA', category: 'Family', description: 'Bike / Strider Parade on Monday, August 3.' },
-  { id: 'mon-face-painting', day: 'Monday', date: 'August 3', time: 'Time TBA', title: 'Face Painting', location: 'Location TBA', category: 'Family', description: 'Face Painting on Monday, August 3.' },
-  { id: 'mon-chuckles-the-clown', day: 'Monday', date: 'August 3', time: 'Time TBA', title: 'Chuckles the Clown', location: 'Location TBA', category: 'Family', description: 'Chuckles the Clown on Monday, August 3.' },
-  { id: 'mon-music-born-in-the-eighties', day: 'Monday', date: 'August 3', time: 'Time TBA', title: 'Music by Born in the Eighties', location: 'Main Stage', category: 'Music', description: 'Music by Born in the Eighties on Monday, August 3.' },
-  { id: 'mon-pulled-pork-dinner', day: 'Monday', date: 'August 3', time: 'Time TBA', title: 'Pulled Pork Dinner', location: 'Location TBA', category: 'Food', description: 'Pulled Pork Dinner on Monday, August 3.' },
-  { id: 'mon-fireworks', day: 'Monday', date: 'August 3', time: 'Time TBA', title: 'Fireworks', location: 'Location TBA', category: 'Community Events', description: 'Fireworks on Monday, August 3.' },
-];
-
-const categoryColors: Record<DemoEvent['category'], string> = {
+const categoryColors: Record<ProductionScheduleEvent['category'], string> = {
   Music: '#F6008F',
   Family: '#45DDF0',
   Food: '#74D65E',
@@ -95,16 +17,22 @@ const categoryColors: Record<DemoEvent['category'], string> = {
 
 export default function ScheduleScreen() {
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
-  const [selectedEvent, setSelectedEvent] = useState<DemoEvent | null>(null);
-  const categories = ['All', ...Array.from(new Set(schedule.map((event) => event.category)))];
-  const filteredEvents = selectedCategory === 'All' ? schedule : schedule.filter((event) => event.category === selectedCategory);
+  const [selectedDay, setSelectedDay] = useState<string>('All Days');
+  const [selectedEvent, setSelectedEvent] = useState<ProductionScheduleEvent | null>(null);
+  const categories = ['All', ...Array.from(new Set(productionSchedule.map((event) => event.category)))];
+  const days = ['All Days', 'Thursday', 'Friday', 'Saturday', 'Sunday', 'Monday'];
+  const filteredEvents = productionSchedule.filter((event) => {
+    const matchesCategory = selectedCategory === 'All' || event.category === selectedCategory;
+    const matchesDay = selectedDay === 'All Days' || event.day === selectedDay;
+    return matchesCategory && matchesDay;
+  });
 
   const grouped = useMemo(() => filteredEvents.reduce((acc, event) => {
     const key = `${event.day}, ${event.date}`;
     if (!acc[key]) acc[key] = [];
     acc[key].push(event);
     return acc;
-  }, {} as Record<string, DemoEvent[]>), [filteredEvents]);
+  }, {} as Record<string, ProductionScheduleEvent[]>), [filteredEvents]);
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -119,7 +47,7 @@ export default function ScheduleScreen() {
           <View style={styles.introCard}>
             <Text style={styles.eyebrow}>Schedule</Text>
             <Text style={styles.pageTitle}>Weekend Schedule</Text>
-            <Text style={styles.pageSubtitle}>{schedule.length} events across the full Homecoming weekend.</Text>
+            <Text style={styles.pageSubtitle}>{productionSchedule.length} events across the full Homecoming weekend.</Text>
           </View>
 
           <View style={styles.filterWrap}>
@@ -133,6 +61,17 @@ export default function ScheduleScreen() {
                 );
               })}
             </ScrollView>
+            <View style={styles.filterDivider} />
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterScroll}>
+              {days.map((day) => {
+                const active = day === selectedDay;
+                return (
+                  <TouchableOpacity key={day} style={[styles.filterPill, active && styles.filterPillActive]} onPress={() => setSelectedDay(day)}>
+                    <Text style={[styles.filterText, active && styles.filterTextActive]}>{day}</Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </ScrollView>
           </View>
 
           <View style={styles.content}>
@@ -140,7 +79,7 @@ export default function ScheduleScreen() {
               <Feather name="calendar" size={20} color="#000" />
               <View style={{ flex: 1 }}>
                 <Text style={styles.ticketTitle}>Plan the weekend your way</Text>
-                <Text style={styles.ticketText}>Filter by music, family activities, food, sports and games, and community events.</Text>
+                <Text style={styles.ticketText}>Filter by music, family activities, food, sports and games, community events, and day.</Text>
               </View>
             </View>
 
@@ -215,6 +154,7 @@ const styles = StyleSheet.create({
   pageSubtitle: { color: '#C8CDD4', fontSize: 14, lineHeight: 21, marginTop: 8, maxWidth: 640 },
   filterWrap: { backgroundColor: '#0F1012', borderRadius: 22, marginBottom: 14, shadowColor: '#000000', shadowOpacity: 0.18, shadowRadius: 16, shadowOffset: { width: 0, height: 10 }, elevation: 5 },
   filterScroll: { paddingHorizontal: 16, paddingVertical: 16 },
+  filterDivider: { height: 1, backgroundColor: '#252525', marginHorizontal: 16 },
   filterPill: { paddingHorizontal: 14, paddingVertical: 9, borderRadius: 999, backgroundColor: '#15171B', marginRight: 8, borderWidth: 1, borderColor: '#252525' },
   filterPillActive: { backgroundColor: '#74D65E', borderColor: '#74D65E' },
   filterText: { fontSize: 13, color: '#D1D5DB', fontWeight: '800' },
