@@ -32,7 +32,7 @@ export default {
     },
     web: {
       bundler: "metro",
-      favicon: "./assets/images/whc-logo.png",
+      favicon: "./assets/images/magnet.jpeg",
       output: "single",
       build: {
         babel: {

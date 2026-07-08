@@ -3,9 +3,9 @@
   "short_name": "Walkerton Home Coming 2026",
   "icons": [
     {
-      "src": "/v2-icon.png",
-      "sizes": "2048x2048",
-      "type": "image/png",
+      "src": "/magnet.jpeg",
+      "sizes": "2000x2000",
+      "type": "image/jpeg",
       "purpose": "any maskable"
     }
   ],
