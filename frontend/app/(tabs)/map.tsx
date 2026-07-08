@@ -7,6 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import MapComponent from '../../src/components/MapComponent';
 import { colors } from '../../src/theme/colors';
 import PageBannerHeader from '../../src/components/PageBannerHeader';
+import BrandFooter from '../../src/components/BrandFooter';
 
 export default function MapScreen() {
   // Get location parameter from navigation
@@ -36,6 +37,8 @@ export default function MapScreen() {
               scrollable={false}
             />
           </View>
+
+          <BrandFooter />
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -50,7 +53,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingHorizontal: 14,
     paddingTop: 12,
-    paddingBottom: 28,
+    paddingBottom: 12,
   },
   page: { width: '100%', maxWidth: 1080, alignSelf: 'center' },
   introCard: {

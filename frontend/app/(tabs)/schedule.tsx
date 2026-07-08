@@ -5,6 +5,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal } from 'rea
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 import PageBannerHeader from '../../src/components/PageBannerHeader';
+import BrandFooter from '../../src/components/BrandFooter';
 import { productionSchedule, type ProductionScheduleEvent } from '../../src/data/productionSchedule';
 
 const categoryColors: Record<ProductionScheduleEvent['category'], string> = {
@@ -106,8 +107,9 @@ export default function ScheduleScreen() {
                 ))}
               </View>
             ))}
-            <View style={styles.bottomPadding} />
           </View>
+
+          <BrandFooter />
         </View>
       </ScrollView>
 
@@ -135,7 +137,7 @@ export default function ScheduleScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#050505' },
-  scrollContent: { paddingHorizontal: 14, paddingTop: 12, paddingBottom: 160 },
+  scrollContent: { paddingHorizontal: 14, paddingTop: 12, paddingBottom: 12 },
   page: { width: '100%', maxWidth: 1080, alignSelf: 'center' },
   introCard: {
     borderRadius: 22,
@@ -176,7 +178,6 @@ const styles = StyleSheet.create({
   locationText: { color: '#B7BDC7', fontSize: 12, fontWeight: '600' },
   eventDescription: { color: '#D1D5DB', fontSize: 13, lineHeight: 18, marginTop: 7 },
   sponsorLine: { color: '#16BFD6', fontSize: 12, fontWeight: '900', marginTop: 8 },
-  bottomPadding: { height: 160 },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.65)', justifyContent: 'flex-end' },
   modalCard: { backgroundColor: '#111214', borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 20, minHeight: 320, borderTopWidth: 2, borderColor: '#74D65E' },
   modalHeader: { flexDirection: 'row', justifyContent: 'space-between', gap: 12 },

@@ -16,6 +16,7 @@ import { useRouter } from 'expo-router';
 import { eventConfig } from '../../src/data/eventConfig';
 import { productionHomeEvents, type ProductionHomeEvent } from '../../src/data/productionSchedule';
 import { colors } from '../../src/theme/colors';
+import BrandFooter from '../../src/components/BrandFooter';
 import HomecomingHero from '../../src/components/HomecomingHero';
 
 const categoryColors: Record<ProductionHomeEvent['category'], string> = {
@@ -229,6 +230,8 @@ export default function HomeScreen() {
             </View>
           ) : null}
         </View>
+
+        <BrandFooter />
       </View>
     </ScrollView>
   );
@@ -242,7 +245,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingHorizontal: 14,
     paddingTop: 12,
-    paddingBottom: 120,
+    paddingBottom: 12,
   },
   page: {
     width: '100%',

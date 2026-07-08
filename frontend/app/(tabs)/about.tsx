@@ -6,6 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 import { eventConfig } from '../../src/data/eventConfig';
 import PageBannerHeader from '../../src/components/PageBannerHeader';
+import BrandFooter from '../../src/components/BrandFooter';
 
 const BLUE = '#16BFD6';
 
@@ -18,10 +19,6 @@ export default function AboutScreen() {
       default: `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`,
     });
     Linking.openURL(url as string);
-  };
-
-  const openFooterWebsite = () => {
-    Linking.openURL(eventConfig.footer.websiteUrl);
   };
 
   return (
@@ -70,13 +67,7 @@ export default function AboutScreen() {
             <Text style={styles.description}>{eventConfig.about.secondaryText}</Text>
           </View>
 
-          <View style={styles.footer}>
-            <Text style={styles.footerText}>{eventConfig.footer.builtByLabel}</Text>
-            <Text style={styles.footerCompany}>{eventConfig.footer.companyName}</Text>
-            <TouchableOpacity onPress={openFooterWebsite} activeOpacity={0.8} style={styles.footerLinkWrap}>
-              <Text style={styles.footerLink}>{eventConfig.footer.websiteLabel}</Text>
-            </TouchableOpacity>
-          </View>
+          <BrandFooter />
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -86,7 +77,7 @@ export default function AboutScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#050505' },
   scrollView: { flex: 1, backgroundColor: '#050505' },
-  scrollContent: { paddingHorizontal: 14, paddingTop: 12, paddingBottom: 220 },
+  scrollContent: { paddingHorizontal: 14, paddingTop: 12, paddingBottom: 12 },
   page: { width: '100%', maxWidth: 760, alignSelf: 'center' },
   introCard: {
     borderRadius: 22,
@@ -121,9 +112,4 @@ const styles = StyleSheet.create({
   directionsButton: { marginTop: 14, backgroundColor: BLUE, padding: 14, borderRadius: 16, alignItems: 'center' },
   directionsButtonText: { color: '#000', fontWeight: '900' },
   description: { fontSize: 14, lineHeight: 20, color: '#D1D5DB' },
-  footer: { alignItems: 'center', padding: 20 },
-  footerText: { fontSize: 10, lineHeight: 14, color: '#8B95A1', textAlign: 'center' },
-  footerCompany: { fontSize: 12, lineHeight: 16, fontWeight: '700', color: '#AEB6C0', textAlign: 'center', marginTop: 4 },
-  footerLinkWrap: { marginTop: 4 },
-  footerLink: { fontSize: 10, lineHeight: 14, color: BLUE, textAlign: 'center' },
 });
