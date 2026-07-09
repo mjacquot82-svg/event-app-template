@@ -14,10 +14,10 @@ const eventSetup = {
   isDemo: true,
 
   basic: {
-    appName: 'Walkerton Home Coming 2026',
-    name: 'Walkerton Home Coming 2026: Mingle & Remix',
+    appName: 'Walkerton Homecoming 2026',
+    name: 'Walkerton Homecoming 2026: Mingle & Remix',
     shortName: 'Mingle & Remix',
-    subtitle: 'Walkerton Home Coming 2026',
+    subtitle: 'Walkerton Homecoming 2026',
     year: 2026,
     tagline: 'Come home. Mingle. Remix the memories.',
     dates: 'July 30 - August 3, 2026',

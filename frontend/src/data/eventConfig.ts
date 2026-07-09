@@ -15,11 +15,11 @@ export type EventHomeAction = {
 };
 
 export const eventConfig = {
-  appName: 'Walkerton Home Coming 2026',
+  appName: 'Walkerton Homecoming 2026',
   event: {
-    name: 'Walkerton Home Coming 2026: Mingle & Remix',
+    name: 'Walkerton Homecoming 2026: Mingle & Remix',
     shortName: 'Mingle & Remix',
-    subtitle: 'Walkerton Home Coming 2026',
+    subtitle: 'Walkerton Homecoming 2026',
     year: 2026,
     tagline: 'Come home. Mingle. Remix the memories.',
     dates: 'July 30 - August 3, 2026',
@@ -90,7 +90,7 @@ export const eventConfig = {
     secondaryCardTitle: 'Back to Walkerton',
     secondaryCardIcon: 'music',
     secondaryText:
-      'Walkerton Home Coming 2026 celebrates the feeling of coming home: old friends, new memories, downtown energy, community pride, local music, family activities, and a weekend built around reconnecting.',
+      'Walkerton Homecoming 2026 celebrates the feeling of coming home: old friends, new memories, downtown energy, community pride, local music, family activities, and a weekend built around reconnecting.',
   },
   footer: {
     builtByLabel: 'Built by',

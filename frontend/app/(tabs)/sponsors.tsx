@@ -112,7 +112,7 @@ export default function SponsorsScreen() {
             <Text style={styles.eyebrow}>Supporters</Text>
             <Text style={styles.pageTitle}>Local sponsors powering the weekend</Text>
             <Text style={styles.pageSubtitle}>
-              Browse our sponsor tiers and discover the businesses backing Home Coming across the community.
+              Browse our sponsor tiers and discover the businesses backing Homecoming across the community.
             </Text>
           </View>
 
@@ -141,7 +141,7 @@ export default function SponsorsScreen() {
               <SponsorSection title="Silver Sponsors" sponsors={filteredByTier.silver} />
               <SponsorSection title="Bronze Sponsors" sponsors={filteredByTier.bronze} />
               <Text style={styles.footerNote}>
-                Thank you to every business and organization helping bring Walkerton Home Coming 2026 to life.
+                Thank you to every business and organization helping bring Walkerton Homecoming 2026 to life.
               </Text>
             </>
           ) : (
@@ -151,7 +151,7 @@ export default function SponsorsScreen() {
                 Official sponsor listings will be added as sponsor information becomes available.
               </Text>
               <Text style={styles.placeholderBody}>
-                Thank you to all businesses and organizations supporting Walkerton Home Coming 2026.
+                Thank you to all businesses and organizations supporting Walkerton Homecoming 2026.
               </Text>
             </View>
           )}

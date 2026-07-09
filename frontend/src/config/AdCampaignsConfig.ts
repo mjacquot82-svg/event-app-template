@@ -39,7 +39,7 @@ const adCampaignsConfig: AdCampaignsConfig = {
     name: 'Community Sponsor Spotlight',
     imageUrl: null,
     targetUrl: 'https://www.walkertonhomecoming2026.ca/sponsors',
-    placeholderText: 'Support local businesses powering Home Coming weekend',
+    placeholderText: 'Support local businesses powering Homecoming weekend',
     width: 1800,
     height: 250,
     enabled: true,

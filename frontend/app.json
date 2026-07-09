@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Walkerton Home Coming 2026",
+    "name": "Walkerton Homecoming 2026",
     "slug": "walkerton-home-coming-2026",
     "version": "1.0.0",
     "icon": "./assets/images/whc-logo.png",
@@ -13,7 +13,7 @@
     "web": {
       "favicon": "./assets/images/whc-logo.png",
       "backgroundColor": "#000000",
-      "description": "Official App for Walkerton Home Coming 2026"
+      "description": "Official App for Walkerton Homecoming 2026"
     }
   }
 }

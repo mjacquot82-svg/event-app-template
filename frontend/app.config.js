@@ -2,7 +2,7 @@
 
 export default {
   expo: {
-    name: "Walkerton Home Coming 2026",
+    name: "Walkerton Homecoming 2026",
     slug: "walkerton-home-coming-2026",
     version: "1.0.0",
     orientation: "portrait",
@@ -14,8 +14,8 @@ export default {
     ios: {
       supportsTablet: true,
       infoPlist: {
-        NSLocationWhenInUseUsageDescription: "Navigate to event locations at Walkerton Home Coming 2026",
-        NSLocationAlwaysAndWhenInUseUsageDescription: "Track your path through Walkerton Home Coming 2026"
+        NSLocationWhenInUseUsageDescription: "Navigate to event locations at Walkerton Homecoming 2026",
+        NSLocationAlwaysAndWhenInUseUsageDescription: "Track your path through Walkerton Homecoming 2026"
       }
     },
     android: {
@@ -55,8 +55,8 @@ export default {
       [
         "expo-location",
         {
-          locationAlwaysAndWhenInUsePermission: "Navigate to event locations at Walkerton Home Coming 2026",
-          locationWhenInUsePermission: "Navigate to event locations at Walkerton Home Coming 2026"
+          locationAlwaysAndWhenInUsePermission: "Navigate to event locations at Walkerton Homecoming 2026",
+          locationWhenInUsePermission: "Navigate to event locations at Walkerton Homecoming 2026"
         }
       ]
       // Note: @rnmapbox/maps requires a development build, not Expo Go
