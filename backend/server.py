@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter, HTTPException
+from fastapi import FastAPI, APIRouter, HTTPException, Query
 from fastapi.responses import PlainTextResponse, FileResponse
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
@@ -17,6 +17,23 @@ import asyncio
 import hashlib
 import json
 
+try:
+    from backend.analytics import (
+        AnalyticsLaunchPayload,
+        MongoAnalyticsRepository,
+        fetch_stats,
+        record_launch,
+        serialize_stats,
+    )
+except ModuleNotFoundError:
+    from analytics import (
+        AnalyticsLaunchPayload,
+        MongoAnalyticsRepository,
+        fetch_stats,
+        record_launch,
+        serialize_stats,
+    )
+
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -30,6 +47,7 @@ if not mongo_url:
 db_name = os.environ.get('DB_NAME', 'ipm2026')
 client = AsyncIOMotorClient(mongo_url)
 db = client[db_name]
+analytics_repository = MongoAnalyticsRepository(db)
 
 # Google Sheet URLs (public CSV export)
 EVENTS_SHEET_ID = "1tnfBd7Ffg5S4hyk5c5CpB-VGkJcSnLpdsKGbNJIiQCs"
@@ -138,6 +156,26 @@ class SOSReportCreate(BaseModel):
 
 class SOSResolveRequest(BaseModel):
     pin: str
+
+
+class AnalyticsLaunchRequest(BaseModel):
+    deviceId: str = Field(min_length=1, max_length=128)
+    appId: str = Field(min_length=1, max_length=128)
+    appVersion: str = Field(min_length=1, max_length=64)
+    installed: bool
+    timestamp: datetime = Field(default_factory=datetime.utcnow)
+
+
+class AnalyticsStatsResponse(BaseModel):
+    appId: str
+    totalLaunches: int
+    uniqueDevices: int
+    launchesToday: int
+
+
+class AnalyticsLaunchAcceptedResponse(BaseModel):
+    status: str
+    stats: AnalyticsStatsResponse
 
 # Public response - hides reporter info for privacy
 class SOSReportResponse(BaseModel):
@@ -399,6 +437,43 @@ async def update_starred_events(data: StarredEventsUpdate):
     except Exception as e:
         logger.error(f"Error updating starred events: {e}")
         raise HTTPException(status_code=500, detail="Failed to update starred events")
+
+
+@api_router.post(
+    "/analytics/launch",
+    response_model=AnalyticsLaunchAcceptedResponse,
+)
+async def track_analytics_launch(data: AnalyticsLaunchRequest):
+    """Track anonymous app launches for a specific appId."""
+    try:
+        stats_snapshot = await record_launch(
+            analytics_repository,
+            AnalyticsLaunchPayload(
+                device_id=data.deviceId,
+                app_id=data.appId,
+                app_version=data.appVersion,
+                installed=data.installed,
+                timestamp=data.timestamp,
+            ),
+        )
+        return AnalyticsLaunchAcceptedResponse(
+            status="success",
+            stats=AnalyticsStatsResponse(**serialize_stats(stats_snapshot)),
+        )
+    except Exception as e:
+        logger.error(f"Error tracking analytics launch: {e}")
+        raise HTTPException(status_code=500, detail="Failed to track analytics launch")
+
+
+@api_router.get("/analytics/stats", response_model=AnalyticsStatsResponse)
+async def get_analytics_stats(appId: str = Query(..., min_length=1, max_length=128)):
+    """Return anonymous launch analytics for a specific appId."""
+    try:
+        stats_snapshot = await fetch_stats(analytics_repository, app_id=appId)
+        return AnalyticsStatsResponse(**serialize_stats(stats_snapshot))
+    except Exception as e:
+        logger.error(f"Error fetching analytics stats: {e}")
+        raise HTTPException(status_code=500, detail="Failed to fetch analytics stats")
 
 # ============== SOS MISSING PERSON ENDPOINTS ==============
 
@@ -948,10 +1023,10 @@ async def cron_scheduler():
 @app.on_event("startup")
 async def startup_event():
     """Start the cron job when the server starts"""
+    await analytics_repository.ensure_indexes()
     logger.info("Starting cron scheduler for event change detection...")
     asyncio.create_task(cron_scheduler())
 
 @app.on_event("shutdown")
 async def shutdown_db_client():
     client.close()
-
