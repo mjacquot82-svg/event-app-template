@@ -8,6 +8,7 @@ JDS Analytics v1 adds anonymous launch tracking for JDS Studio apps without coll
 - It persists `jds_device_id` in `localStorage`.
 - It detects installed PWA mode from browser display mode signals.
 - It posts launch events to `/api/analytics/launch` with `appId`, `appVersion`, `deviceId`, `installed`, and a client timestamp.
+- The launch payload does not need to change across JDS apps; reuse it and set the app-specific `appId`.
 
 ### Integrate into another JDS app
 
@@ -40,6 +41,14 @@ The only required application-specific identifier is `appId`.
   - `totalLaunches`
   - `uniqueDevices`
   - `launchesToday`
+  - `installedDevices`
+  - `browserOnlyDevices`
+
+Installed-device behavior:
+
+- Each device record stores whether it has ever launched in installed PWA mode.
+- Once a device reports `installed=true`, it remains counted as installed for future stats.
+- `browserOnlyDevices` is calculated as unique devices that have never reported installed PWA usage.
 
 MongoDB collections:
 

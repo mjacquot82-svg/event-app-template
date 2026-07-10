@@ -171,6 +171,8 @@ class AnalyticsStatsResponse(BaseModel):
     totalLaunches: int
     uniqueDevices: int
     launchesToday: int
+    installedDevices: int
+    browserOnlyDevices: int
 
 
 class AnalyticsLaunchAcceptedResponse(BaseModel):

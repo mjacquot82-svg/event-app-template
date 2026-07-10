@@ -27,6 +27,8 @@ class AnalyticsStatsSnapshot:
     total_launches: int
     unique_devices: int
     launches_today: int
+    installed_devices: int
+    browser_only_devices: int
 
 
 class AnalyticsRepository(Protocol):
@@ -41,16 +43,17 @@ class AnalyticsRepository(Protocol):
         installed: bool,
         client_timestamp: datetime,
         received_at: datetime,
-    ) -> bool: ...
+    ) -> tuple[bool, bool]: ...
 
     async def increment_app_stats(
         self,
         *,
         app_id: str,
         unique_device_increment: int,
+        installed_device_increment: int,
         app_version: str,
         received_at: datetime,
-    ) -> tuple[int, int]: ...
+    ) -> tuple[int, int, int]: ...
 
     async def increment_daily_launches(
         self,
@@ -60,7 +63,7 @@ class AnalyticsRepository(Protocol):
         received_at: datetime,
     ) -> int: ...
 
-    async def get_app_totals(self, *, app_id: str) -> tuple[int, int]: ...
+    async def get_app_totals(self, *, app_id: str) -> tuple[int, int, int]: ...
 
     async def get_daily_launches(self, *, app_id: str, date_key: str) -> int: ...
 
@@ -95,8 +98,13 @@ class MongoAnalyticsRepository:
         installed: bool,
         client_timestamp: datetime,
         received_at: datetime,
-    ) -> bool:
-        existing = await self._db.analytics_devices.find_one_and_update(
+    ) -> tuple[bool, bool]:
+        existing = await self._db.analytics_devices.find_one(
+            {"appId": app_id, "deviceId": device_id}
+        )
+        was_installed = bool(existing and existing.get("installed"))
+        installed_ever = was_installed or installed
+        await self._db.analytics_devices.update_one(
             {"appId": app_id, "deviceId": device_id},
             {
                 "$setOnInsert": {
@@ -107,7 +115,7 @@ class MongoAnalyticsRepository:
                 },
                 "$set": {
                     "appVersion": app_version,
-                    "installed": installed,
+                    "installed": installed_ever,
                     "clientTimestamp": client_timestamp,
                     "lastSeen": received_at,
                     "updatedAt": received_at,
@@ -115,18 +123,18 @@ class MongoAnalyticsRepository:
                 "$inc": {"launchCount": 1},
             },
             upsert=True,
-            return_document=ReturnDocument.BEFORE,
         )
-        return existing is None
+        return existing is None, installed and not was_installed
 
     async def increment_app_stats(
         self,
         *,
         app_id: str,
         unique_device_increment: int,
+        installed_device_increment: int,
         app_version: str,
         received_at: datetime,
-    ) -> tuple[int, int]:
+    ) -> tuple[int, int, int]:
         stats_doc = await self._db.analytics_app_stats.find_one_and_update(
             {"appId": app_id},
             {
@@ -142,12 +150,17 @@ class MongoAnalyticsRepository:
                 "$inc": {
                     "totalLaunches": 1,
                     "uniqueDevices": unique_device_increment,
+                    "installedDevices": installed_device_increment,
                 },
             },
             upsert=True,
             return_document=ReturnDocument.AFTER,
         )
-        return stats_doc["totalLaunches"], stats_doc["uniqueDevices"]
+        return (
+            stats_doc["totalLaunches"],
+            stats_doc["uniqueDevices"],
+            stats_doc.get("installedDevices", 0),
+        )
 
     async def increment_daily_launches(
         self,
@@ -174,11 +187,15 @@ class MongoAnalyticsRepository:
         )
         return daily_doc["launchCount"]
 
-    async def get_app_totals(self, *, app_id: str) -> tuple[int, int]:
+    async def get_app_totals(self, *, app_id: str) -> tuple[int, int, int]:
         stats_doc = await self._db.analytics_app_stats.find_one({"appId": app_id})
         if not stats_doc:
-            return 0, 0
-        return stats_doc.get("totalLaunches", 0), stats_doc.get("uniqueDevices", 0)
+            return 0, 0, 0
+        return (
+            stats_doc.get("totalLaunches", 0),
+            stats_doc.get("uniqueDevices", 0),
+            stats_doc.get("installedDevices", 0),
+        )
 
     async def get_daily_launches(self, *, app_id: str, date_key: str) -> int:
         daily_doc = await self._db.analytics_daily_stats.find_one(
@@ -200,7 +217,7 @@ async def record_launch(
     received_at: Optional[datetime] = None,
 ) -> AnalyticsStatsSnapshot:
     now = received_at or datetime.utcnow()
-    is_new_device = await repository.upsert_device_launch(
+    is_new_device, newly_installed_device = await repository.upsert_device_launch(
         app_id=launch.app_id,
         device_id=launch.device_id,
         app_version=launch.app_version,
@@ -208,9 +225,10 @@ async def record_launch(
         client_timestamp=launch.timestamp,
         received_at=now,
     )
-    total_launches, unique_devices = await repository.increment_app_stats(
+    total_launches, unique_devices, installed_devices = await repository.increment_app_stats(
         app_id=launch.app_id,
         unique_device_increment=1 if is_new_device else 0,
+        installed_device_increment=1 if newly_installed_device else 0,
         app_version=launch.app_version,
         received_at=now,
     )
@@ -224,6 +242,8 @@ async def record_launch(
         total_launches=total_launches,
         unique_devices=unique_devices,
         launches_today=launches_today,
+        installed_devices=installed_devices,
+        browser_only_devices=max(unique_devices - installed_devices, 0),
     )
 
 
@@ -234,7 +254,9 @@ async def fetch_stats(
     now: Optional[datetime] = None,
 ) -> AnalyticsStatsSnapshot:
     current_time = now or datetime.utcnow()
-    total_launches, unique_devices = await repository.get_app_totals(app_id=app_id)
+    total_launches, unique_devices, installed_devices = await repository.get_app_totals(
+        app_id=app_id
+    )
     launches_today = await repository.get_daily_launches(
         app_id=app_id,
         date_key=build_date_key(current_time),
@@ -244,6 +266,8 @@ async def fetch_stats(
         total_launches=total_launches,
         unique_devices=unique_devices,
         launches_today=launches_today,
+        installed_devices=installed_devices,
+        browser_only_devices=max(unique_devices - installed_devices, 0),
     )
 
 
@@ -253,4 +277,6 @@ def serialize_stats(snapshot: AnalyticsStatsSnapshot) -> dict[str, int | str]:
         "totalLaunches": snapshot.total_launches,
         "uniqueDevices": snapshot.unique_devices,
         "launchesToday": snapshot.launches_today,
+        "installedDevices": snapshot.installed_devices,
+        "browserOnlyDevices": snapshot.browser_only_devices,
     }
