@@ -26,7 +26,7 @@ function InfoRow({ day, hours }: { day: string; hours: string }) {
 }
 
 export default function VisitorInfoScreen() {
-  const { selectedMap, openMap, closeMap } = useRouteBackedMapViewer({
+  const { selectedMap, openMap, closeMap, debugState, setDebugMessage } = useRouteBackedMapViewer({
     maps: eventMaps,
     onMapOpen: (map) => trackMapOpen(getAnalyticsConfig(), { id: map.id, title: map.title }),
   });
@@ -97,6 +97,8 @@ export default function VisitorInfoScreen() {
           title={selectedMap.title}
           description={selectedMap.description}
           onClose={closeMap}
+          debugState={debugState}
+          onDebugMessage={setDebugMessage}
         />
       ) : null}
     </SafeAreaView>

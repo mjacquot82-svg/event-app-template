@@ -19,6 +19,13 @@ type MapImageViewerProps = {
   description: string;
   visible: boolean;
   onClose: () => void;
+  debugState?: {
+    message: string;
+    platform: string;
+    selectedMapId: string | null;
+    nativeSelectedMapId: string | null;
+  };
+  onDebugMessage?: (message: string) => void;
 };
 
 export default function MapImageViewer({
@@ -27,12 +34,25 @@ export default function MapImageViewer({
   description,
   visible,
   onClose,
+  debugState,
+  onDebugMessage,
 }: MapImageViewerProps) {
   const { width, height } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const imageWidth = Math.min(width - 32, 1080);
   const imageHeight = Math.max(height - 220, 320);
   const topInset = Math.max(insets.top, 0) + 12;
+  const handleClosePress = () => {
+    onDebugMessage?.('X press received');
+    onDebugMessage?.('Calling onClose');
+    onClose();
+  };
+
+  const handleSecondaryClosePress = () => {
+    onDebugMessage?.('Secondary close press received');
+    onDebugMessage?.('Calling onClose');
+    onClose();
+  };
 
   return (
     <Modal
@@ -74,7 +94,7 @@ export default function MapImageViewer({
           accessibilityLabel={`Close ${title}`}
           accessibilityHint="Closes the map viewer"
           hitSlop={8}
-          onPress={onClose}
+          onPress={handleClosePress}
           style={({ pressed }) => [
             styles.closeButton,
             { top: topInset, right: 16 },
@@ -82,6 +102,25 @@ export default function MapImageViewer({
           ]}
         >
           <Feather name="x" size={22} color={colors.textPrimary} />
+        </Pressable>
+
+        <View style={styles.debugPanel} pointerEvents="box-none">
+          <Text style={styles.debugTitle}>TEMP DEBUG</Text>
+          <Text style={styles.debugText}>message: {debugState?.message ?? 'none'}</Text>
+          <Text style={styles.debugText}>platform: {debugState?.platform ?? 'unknown'}</Text>
+          <Text style={styles.debugText}>selectedMapId: {debugState?.selectedMapId ?? 'null'}</Text>
+          <Text style={styles.debugText}>
+            nativeSelectedMapId: {debugState?.nativeSelectedMapId ?? 'null'}
+          </Text>
+        </View>
+
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={`Close ${title} using debug close button`}
+          onPress={handleSecondaryClosePress}
+          style={({ pressed }) => [styles.secondaryCloseButton, pressed && styles.secondaryCloseButtonPressed]}
+        >
+          <Text style={styles.secondaryCloseButtonText}>Close Map</Text>
         </Pressable>
       </View>
     </Modal>
@@ -154,5 +193,53 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: 12,
+  },
+  debugPanel: {
+    position: 'absolute',
+    left: 16,
+    right: 72,
+    bottom: 76,
+    borderRadius: 12,
+    backgroundColor: 'rgba(8, 10, 14, 0.92)',
+    borderWidth: 1,
+    borderColor: colors.border,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    zIndex: 25,
+    elevation: 25,
+  },
+  debugTitle: {
+    color: '#F4D35E',
+    fontSize: 11,
+    fontWeight: '900',
+    marginBottom: 6,
+  },
+  debugText: {
+    color: colors.textSecondary,
+    fontSize: 11,
+    lineHeight: 16,
+  },
+  secondaryCloseButton: {
+    position: 'absolute',
+    left: 16,
+    right: 16,
+    bottom: 16,
+    minHeight: 44,
+    borderRadius: 14,
+    backgroundColor: '#15171B',
+    borderWidth: 1,
+    borderColor: colors.border,
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 25,
+    elevation: 25,
+  },
+  secondaryCloseButtonPressed: {
+    opacity: 0.82,
+  },
+  secondaryCloseButtonText: {
+    color: colors.textPrimary,
+    fontSize: 14,
+    fontWeight: '900',
   },
 });

@@ -8,6 +8,13 @@ type UseRouteBackedMapViewerOptions = {
   onMapOpen?: (map: EventMapDefinition) => void | Promise<void>;
 };
 
+type MapViewerDebugState = {
+  message: string;
+  platform: string;
+  selectedMapId: MapAnalyticsKey | null;
+  nativeSelectedMapId: MapAnalyticsKey | null;
+};
+
 function getMapParamValue(mapParam: string | string[] | undefined): string | null {
   if (Array.isArray(mapParam)) {
     return mapParam[0] ?? null;
@@ -34,6 +41,7 @@ export function useRouteBackedMapViewer({
   const params = useLocalSearchParams<{ map?: string | string[] }>();
   const openedFromHereRef = useRef(false);
   const [nativeSelectedMapId, setNativeSelectedMapId] = useState<MapAnalyticsKey | null>(null);
+  const [debugMessage, setDebugMessage] = useState('Viewer ready');
   const mapParam = getMapParamValue(params.map);
   const isWeb = Platform.OS === 'web';
 
@@ -49,6 +57,16 @@ export function useRouteBackedMapViewer({
   const selectedMap = useMemo(
     () => maps.find((map) => map.id === selectedMapId) ?? null,
     [maps, selectedMapId]
+  );
+
+  const debugState = useMemo<MapViewerDebugState>(
+    () => ({
+      message: debugMessage,
+      platform: Platform.OS,
+      selectedMapId,
+      nativeSelectedMapId,
+    }),
+    [debugMessage, nativeSelectedMapId, selectedMapId]
   );
 
   useEffect(() => {
@@ -77,11 +95,15 @@ export function useRouteBackedMapViewer({
   };
 
   const closeMap = () => {
+    setDebugMessage(`closeMap called | platform=${Platform.OS} | selectedMapId=${selectedMapId ?? 'null'}`);
+
     if (!selectedMapId) {
+      setDebugMessage('closeMap bailed: no selectedMapId');
       return;
     }
 
     if (!isWeb) {
+      setDebugMessage('Clearing native map state');
       setNativeSelectedMapId(null);
       return;
     }
@@ -101,6 +123,8 @@ export function useRouteBackedMapViewer({
     selectedMapId,
     openMap,
     closeMap,
+    debugState,
+    setDebugMessage,
   };
 }
 
