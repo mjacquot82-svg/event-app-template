@@ -36,20 +36,42 @@ export function useRouteBackedMapViewer({
   const [nativeSelectedMapId, setNativeSelectedMapId] = useState<MapAnalyticsKey | null>(null);
   const mapParam = getMapParamValue(params.map);
   const isWeb = Platform.OS === 'web';
+  const matchedRouteMapId = useMemo(
+    () => maps.find((map) => map.id === mapParam)?.id ?? null,
+    [mapParam, maps]
+  );
+  const ignoredRouteMapIdRef = useRef<MapAnalyticsKey | null>(null);
+  const [webSelectedMapId, setWebSelectedMapId] = useState<MapAnalyticsKey | null>(() =>
+    isWeb ? matchedRouteMapId : null
+  );
 
   const selectedMapId = useMemo(() => {
-    if (!isWeb) {
-      return nativeSelectedMapId;
-    }
-
-    const matchedMap = maps.find((map) => map.id === mapParam);
-    return matchedMap?.id ?? null;
-  }, [isWeb, mapParam, maps, nativeSelectedMapId]);
+    return isWeb ? webSelectedMapId : nativeSelectedMapId;
+  }, [isWeb, nativeSelectedMapId, webSelectedMapId]);
 
   const selectedMap = useMemo(
     () => maps.find((map) => map.id === selectedMapId) ?? null,
     [maps, selectedMapId]
   );
+
+  useEffect(() => {
+    if (!isWeb) {
+      return;
+    }
+
+    if (!matchedRouteMapId) {
+      ignoredRouteMapIdRef.current = null;
+      setWebSelectedMapId(null);
+      return;
+    }
+
+    if (ignoredRouteMapIdRef.current === matchedRouteMapId) {
+      return;
+    }
+
+    ignoredRouteMapIdRef.current = null;
+    setWebSelectedMapId((current) => (current === matchedRouteMapId ? current : matchedRouteMapId));
+  }, [isWeb, matchedRouteMapId]);
 
   useEffect(() => {
     if (!selectedMapId) {
@@ -63,6 +85,9 @@ export function useRouteBackedMapViewer({
     }
 
     if (isWeb) {
+      ignoredRouteMapIdRef.current = null;
+      setWebSelectedMapId(map.id);
+
       if (selectedMapId) {
         router.replace(buildViewerHref(pathname, map.id));
       } else {
@@ -88,6 +113,8 @@ export function useRouteBackedMapViewer({
 
     if (openedFromHereRef.current) {
       openedFromHereRef.current = false;
+      ignoredRouteMapIdRef.current = matchedRouteMapId === selectedMapId ? selectedMapId : null;
+      setWebSelectedMapId(null);
 
       try {
         router.back();
@@ -99,6 +126,8 @@ export function useRouteBackedMapViewer({
     }
 
     openedFromHereRef.current = false;
+    ignoredRouteMapIdRef.current = matchedRouteMapId === selectedMapId ? selectedMapId : null;
+    setWebSelectedMapId(null);
     router.replace(buildViewerHref(pathname, null));
   };
 
