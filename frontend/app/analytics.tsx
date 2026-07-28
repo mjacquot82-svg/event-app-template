@@ -9,6 +9,7 @@ import {
   View,
   useWindowDimensions,
 } from 'react-native';
+import { Feather } from '@expo/vector-icons';
 import themeColors from '../src/theme/colors';
 import appConfig from '../src/data/eventConfig';
 import { parseJsonResponse } from '../src/utils/fetchJson';
@@ -73,6 +74,26 @@ type ListSectionProps = {
   emptyLabel: string;
 };
 
+type DashboardSectionKey =
+  | 'overview'
+  | 'live'
+  | 'visitor'
+  | 'navigation'
+  | 'schedule'
+  | 'maps'
+  | 'sponsors'
+  | 'jds'
+  | 'external'
+  | 'system';
+
+type DashboardSectionProps = {
+  title: string;
+  subtitle: string;
+  expanded: boolean;
+  onToggle: () => void;
+  children: React.ReactNode;
+};
+
 function MetricCard({ label, value, accentColor }: MetricCardProps) {
   return (
     <View style={styles.metricCard}>
@@ -109,6 +130,47 @@ function ListSection({ title, subtitle, items, emptyLabel }: ListSectionProps) {
           ))}
         </View>
       )}
+    </View>
+  );
+}
+
+function DashboardSection({
+  title,
+  subtitle,
+  expanded,
+  onToggle,
+  children,
+}: DashboardSectionProps) {
+  return (
+    <View style={styles.sectionCard}>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityState={{ expanded }}
+        onPress={onToggle}
+        style={({ pressed }) => [
+          styles.sectionHeaderButton,
+          pressed && styles.sectionHeaderButtonPressed,
+        ]}
+      >
+        <View style={styles.sectionHeaderCopy}>
+          <Text style={styles.sectionTitle}>{title}</Text>
+          <Text style={styles.sectionSubtitleCompact}>{subtitle}</Text>
+        </View>
+        <View style={styles.sectionHeaderIcon}>
+          <Feather
+            name={expanded ? 'chevron-up' : 'chevron-down'}
+            size={18}
+            color={themeColors.textPrimary}
+          />
+        </View>
+      </Pressable>
+
+      {expanded ? (
+        <View style={styles.sectionBody}>
+          <Text style={styles.sectionSubtitle}>{subtitle}</Text>
+          {children}
+        </View>
+      ) : null}
     </View>
   );
 }
@@ -153,6 +215,18 @@ export default function AnalyticsDashboardScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [lastSuccessfulRefresh, setLastSuccessfulRefresh] = useState<Date | null>(null);
+  const [expandedSections, setExpandedSections] = useState<Record<DashboardSectionKey, boolean>>({
+    overview: true,
+    live: true,
+    visitor: false,
+    navigation: false,
+    schedule: false,
+    maps: false,
+    sponsors: false,
+    jds: false,
+    external: false,
+    system: false,
+  });
 
   const isCompact = width < 720;
 
@@ -302,6 +376,21 @@ export default function AnalyticsDashboardScreen() {
     },
   ];
 
+  const jdsMarketingMetrics = [
+    {
+      label: 'JDS Website Clicks',
+      value: stats?.jdsWebsiteClicks ?? 0,
+      accentColor: themeColors.primary,
+    },
+  ];
+
+  const toggleSection = (section: DashboardSectionKey) => {
+    setExpandedSections((current) => ({
+      ...current,
+      [section]: !current[section],
+    }));
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView
@@ -359,10 +448,12 @@ export default function AnalyticsDashboardScreen() {
                 </View>
               ) : null}
 
-              <View style={styles.sectionCard}>
-                <Text style={styles.sectionTitle}>Application Summary</Text>
-                <Text style={styles.sectionSubtitle}>Session and visitor activity across the application.</Text>
-
+              <DashboardSection
+                title="Dashboard Overview"
+                subtitle="High-level session and visitor activity across the application."
+                expanded={expandedSections.overview}
+                onToggle={() => toggleSection('overview')}
+              >
                 <View style={[styles.metricsGrid, !isCompact && styles.metricsGridWide]}>
                   {applicationSummaryMetrics.map((metric) => (
                     <View
@@ -377,32 +468,14 @@ export default function AnalyticsDashboardScreen() {
                     </View>
                   ))}
                 </View>
-              </View>
+              </DashboardSection>
 
-              <View style={styles.sectionCard}>
-                <Text style={styles.sectionTitle}>Launch Overview</Text>
-                <Text style={styles.sectionSubtitle}>Existing launch data remains available for compatibility.</Text>
-
-                <View style={[styles.metricsGrid, !isCompact && styles.metricsGridWide]}>
-                  {launchMetrics.map((metric) => (
-                    <View
-                      key={metric.label}
-                      style={[styles.metricColumn, !isCompact && styles.metricColumnWide]}
-                    >
-                      <MetricCard
-                        label={metric.label}
-                        value={metric.value}
-                        accentColor={metric.accentColor}
-                      />
-                    </View>
-                  ))}
-                </View>
-              </View>
-
-              <View style={styles.sectionCard}>
-                <Text style={styles.sectionTitle}>Live Activity</Text>
-                <Text style={styles.sectionSubtitle}>Operational visibility using the existing dashboard refresh cycle.</Text>
-
+              <DashboardSection
+                title="Live Activity"
+                subtitle="Operational visibility using the existing dashboard refresh cycle."
+                expanded={expandedSections.live}
+                onToggle={() => toggleSection('live')}
+              >
                 <View style={[styles.metricsGrid, !isCompact && styles.metricsGridWide]}>
                   {liveActivityMetrics.map((metric) => (
                     <View
@@ -429,12 +502,85 @@ export default function AnalyticsDashboardScreen() {
                     Last quick action opened: {stats?.liveActivity?.lastQuickActionOpened || 'No data yet'}
                   </Text>
                 </View>
-              </View>
+              </DashboardSection>
 
-              <View style={styles.sectionCard}>
-                <Text style={styles.sectionTitle}>Maps</Text>
-                <Text style={styles.sectionSubtitle}>Total opens recorded for each map.</Text>
+              <DashboardSection
+                title="Visitor Analytics"
+                subtitle="Traffic and audience trends across sessions and devices."
+                expanded={expandedSections.visitor}
+                onToggle={() => toggleSection('visitor')}
+              >
+                <View style={[styles.metricsGrid, !isCompact && styles.metricsGridWide]}>
+                  {launchMetrics.map((metric) => (
+                    <View
+                      key={metric.label}
+                      style={[styles.metricColumn, !isCompact && styles.metricColumnWide]}
+                    >
+                      <MetricCard
+                        label={metric.label}
+                        value={metric.value}
+                        accentColor={metric.accentColor}
+                      />
+                    </View>
+                  ))}
+                </View>
 
+                <ListSection
+                  title="Traffic by Day"
+                  subtitle="Usage volume grouped by calendar day."
+                  items={stats?.trafficByDay ?? []}
+                  emptyLabel="No daily traffic data available yet."
+                />
+
+                <ListSection
+                  title="Traffic by Hour"
+                  subtitle="Usage volume grouped by hour of day."
+                  items={stats?.trafficByHour ?? []}
+                  emptyLabel="No hourly traffic data available yet."
+                />
+              </DashboardSection>
+
+              <DashboardSection
+                title="Navigation Analytics"
+                subtitle="How visitors move through core pages and quick-entry actions."
+                expanded={expandedSections.navigation}
+                onToggle={() => toggleSection('navigation')}
+              >
+                <ListSection
+                  title="Most Visited Pages"
+                  subtitle="Which core pages visitors opened most often."
+                  items={stats?.mostVisitedPages ?? []}
+                  emptyLabel="No page-view data available yet."
+                />
+
+                <ListSection
+                  title="Most Used Quick Actions"
+                  subtitle="Quick actions visitors opened from the home experience."
+                  items={stats?.mostUsedQuickActions ?? []}
+                  emptyLabel="No quick-action data available yet."
+                />
+              </DashboardSection>
+
+              <DashboardSection
+                title="Schedule Analytics"
+                subtitle="Schedule detail engagement and event interest."
+                expanded={expandedSections.schedule}
+                onToggle={() => toggleSection('schedule')}
+              >
+                <ListSection
+                  title="Most Viewed Schedule Events"
+                  subtitle="Event detail views from the schedule."
+                  items={stats?.mostViewedScheduleEvents ?? []}
+                  emptyLabel="No schedule event views available yet."
+                />
+              </DashboardSection>
+
+              <DashboardSection
+                title="Map Analytics"
+                subtitle="Map usage totals and ranking across the app."
+                expanded={expandedSections.maps}
+                onToggle={() => toggleSection('maps')}
+              >
                 <View style={[styles.metricsGrid, !isCompact && styles.metricsGridWide]}>
                   {mapMetrics.map((metric) => (
                     <View
@@ -449,47 +595,21 @@ export default function AnalyticsDashboardScreen() {
                     </View>
                   ))}
                 </View>
-              </View>
 
-              <ListSection
-                title="Most Visited Pages"
-                subtitle="Which core pages visitors opened most often."
-                items={stats?.mostVisitedPages ?? []}
-                emptyLabel="No page-view data available yet."
-              />
+                <ListSection
+                  title="Most Viewed Maps"
+                  subtitle="Top map opens across the app."
+                  items={stats?.mostViewedMaps ?? []}
+                  emptyLabel="No map analytics available yet."
+                />
+              </DashboardSection>
 
-              <ListSection
-                title="Most Used Quick Actions"
-                subtitle="Quick actions visitors opened from the home experience."
-                items={stats?.mostUsedQuickActions ?? []}
-                emptyLabel="No quick-action data available yet."
-              />
-
-              <ListSection
-                title="Most Viewed Maps"
-                subtitle="Top map opens across the app."
-                items={stats?.mostViewedMaps ?? []}
-                emptyLabel="No map analytics available yet."
-              />
-
-              <ListSection
-                title="Most Viewed Schedule Events"
-                subtitle="Event detail views from the schedule."
-                items={stats?.mostViewedScheduleEvents ?? []}
-                emptyLabel="No schedule event views available yet."
-              />
-
-              <ListSection
-                title="Most Clicked External Links"
-                subtitle="Outbound destinations visitors tapped most often."
-                items={stats?.mostClickedExternalLinks ?? []}
-                emptyLabel="No external link activity available yet."
-              />
-
-              <View style={styles.sectionCard}>
-                <Text style={styles.sectionTitle}>Sponsors</Text>
-                <Text style={styles.sectionSubtitle}>Sponsor page and sponsor selection engagement.</Text>
-
+              <DashboardSection
+                title="Sponsor Analytics"
+                subtitle="Sponsor page traffic and sponsor selection engagement."
+                expanded={expandedSections.sponsors}
+                onToggle={() => toggleSection('sponsors')}
+              >
                 <View style={[styles.metricsGrid, !isCompact && styles.metricsGridWide]}>
                   {sponsorMetrics.map((metric) => (
                     <View
@@ -504,28 +624,87 @@ export default function AnalyticsDashboardScreen() {
                     </View>
                   ))}
                 </View>
-              </View>
 
-              <ListSection
-                title="Most Viewed Sponsors"
-                subtitle="Sponsors selected from the Sponsors page."
-                items={stats?.mostViewedSponsors ?? []}
-                emptyLabel="No sponsor selections available yet."
-              />
+                <ListSection
+                  title="Most Viewed Sponsors"
+                  subtitle="Sponsors selected from the Sponsors page."
+                  items={stats?.mostViewedSponsors ?? []}
+                  emptyLabel="No sponsor selections available yet."
+                />
+              </DashboardSection>
 
-              <ListSection
-                title="Traffic by Day"
-                subtitle="Usage volume grouped by calendar day."
-                items={stats?.trafficByDay ?? []}
-                emptyLabel="No daily traffic data available yet."
-              />
+              <DashboardSection
+                title="JDS Marketing"
+                subtitle="Business-case metrics tied to JDS Studio traffic generation."
+                expanded={expandedSections.jds}
+                onToggle={() => toggleSection('jds')}
+              >
+                <View style={[styles.metricsGrid, !isCompact && styles.metricsGridWide]}>
+                  {jdsMarketingMetrics.map((metric) => (
+                    <View
+                      key={metric.label}
+                      style={[styles.metricColumn, !isCompact && styles.metricColumnWide]}
+                    >
+                      <MetricCard
+                        label={metric.label}
+                        value={metric.value}
+                        accentColor={metric.accentColor}
+                      />
+                    </View>
+                  ))}
+                </View>
+              </DashboardSection>
 
-              <ListSection
-                title="Traffic by Hour"
-                subtitle="Usage volume grouped by hour of day."
-                items={stats?.trafficByHour ?? []}
-                emptyLabel="No hourly traffic data available yet."
-              />
+              <DashboardSection
+                title="External Links"
+                subtitle="Outbound destination activity across links opened from the app."
+                expanded={expandedSections.external}
+                onToggle={() => toggleSection('external')}
+              >
+                <ListSection
+                  title="Most Clicked External Links"
+                  subtitle="Outbound destinations visitors tapped most often."
+                  items={stats?.mostClickedExternalLinks ?? []}
+                  emptyLabel="No external link activity available yet."
+                />
+              </DashboardSection>
+
+              <DashboardSection
+                title="System Information"
+                subtitle="Application metadata and compatibility-oriented launch context."
+                expanded={expandedSections.system}
+                onToggle={() => toggleSection('system')}
+              >
+                <View style={[styles.statusRow, isCompact && styles.statusRowCompact, styles.systemStatusRow]}>
+                  <View style={styles.statusBlock}>
+                    <Text style={styles.statusLabel}>App ID</Text>
+                    <Text style={styles.statusValue}>{ANALYTICS_APP_ID}</Text>
+                  </View>
+                  <View style={styles.statusBlock}>
+                    <Text style={styles.statusLabel}>Last Successful Refresh</Text>
+                    <Text style={styles.statusValue}>
+                      {lastSuccessfulRefresh
+                        ? lastSuccessfulRefresh.toLocaleString()
+                        : 'Waiting for first refresh'}
+                    </Text>
+                  </View>
+                </View>
+
+                <View style={[styles.metricsGrid, !isCompact && styles.metricsGridWide]}>
+                  {launchMetrics.map((metric) => (
+                    <View
+                      key={`${metric.label}-system`}
+                      style={[styles.metricColumn, !isCompact && styles.metricColumnWide]}
+                    >
+                      <MetricCard
+                        label={metric.label}
+                        value={metric.value}
+                        accentColor={metric.accentColor}
+                      />
+                    </View>
+                  ))}
+                </View>
+              </DashboardSection>
             </>
           )}
         </View>
@@ -669,11 +848,41 @@ const styles = StyleSheet.create({
     borderColor: themeColors.border,
     marginBottom: 18,
   },
+  sectionHeaderButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 16,
+  },
+  sectionHeaderButtonPressed: {
+    opacity: 0.9,
+  },
+  sectionHeaderCopy: {
+    flex: 1,
+  },
+  sectionHeaderIcon: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: themeColors.backgroundElevated,
+    borderWidth: 1,
+    borderColor: themeColors.border,
+  },
+  sectionBody: {
+    marginTop: 16,
+  },
   sectionTitle: {
     color: themeColors.textPrimary,
     fontSize: 20,
     fontWeight: '800',
     marginBottom: 6,
+  },
+  sectionSubtitleCompact: {
+    color: themeColors.textSecondary,
+    fontSize: 14,
+    lineHeight: 20,
   },
   sectionSubtitle: {
     color: themeColors.textSecondary,
@@ -794,5 +1003,8 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 21,
     marginBottom: 8,
+  },
+  systemStatusRow: {
+    marginBottom: 18,
   },
 });
