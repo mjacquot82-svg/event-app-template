@@ -28,7 +28,7 @@ function getLabel(routeName: string): string {
   switch (routeName) {
     case 'index': return 'Home';
     case 'schedule': return 'Schedule';
-    case 'map': return 'Map';
+    case 'map': return 'Maps';
     case 'about': return 'About';
     default: return routeName;
   }
@@ -81,7 +81,7 @@ export default function TabLayout() {
       <View style={styles.contentArea}>
         <Tabs tabBar={() => <EmptyTabBar />} screenOptions={{ headerShown: false }} sceneContainerStyle={styles.scene}>
           <Tabs.Screen name="index" options={{ title: 'Home' }} />
-          <Tabs.Screen name="map" options={{ title: 'Map' }} />
+          <Tabs.Screen name="map" options={{ title: 'Maps' }} />
           <Tabs.Screen name="schedule" options={{ title: 'Schedule' }} />
           <Tabs.Screen name="visitor-info" options={{ title: 'Getting Around', href: null }} />
           <Tabs.Screen name="leaderboard" options={{ title: 'Highlights', href: null }} />

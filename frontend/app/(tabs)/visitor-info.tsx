@@ -9,9 +9,7 @@ import { colors } from '../../src/theme/colors';
 
 const CYAN = '#16BFD6';
 const LIME = '#74D65E';
-const YELLOW = '#FFD23F';
-const PINK = '#F6008F';
-const BUS_ROUTE_ASSET = require('../../assets/images/Bus Route.png');
+const BUS_ROUTE_ASSET = require('../../assets/images/bus-shuttle.jpg');
 const BUS_ROUTE_ASPECT_RATIO = 1199 / 1312;
 
 function InfoRow({ day, hours }: { day: string; hours: string }) {
@@ -23,7 +21,7 @@ function InfoRow({ day, hours }: { day: string; hours: string }) {
   );
 }
 
-function ZoomableImageCard({ title, asset }: { title: string; asset: any }) {
+function ShuttleRouteCard() {
   const { width: windowWidth } = useWindowDimensions();
   const imageWidth = Math.min(windowWidth - 64, 760);
   const imageHeight = imageWidth / BUS_ROUTE_ASPECT_RATIO;
@@ -36,11 +34,11 @@ function ZoomableImageCard({ title, asset }: { title: string; asset: any }) {
         </View>
         <View style={styles.cardHeaderCopy}>
           <Text style={styles.cardEyebrow}>Shuttle route</Text>
-          <Text style={styles.cardTitle}>{title}</Text>
+          <Text style={styles.cardTitle}>Bus Route</Text>
         </View>
       </View>
       <Image
-        source={asset}
+        source={BUS_ROUTE_ASSET}
         style={[styles.routeImage, { width: imageWidth, height: imageHeight }]}
         resizeMode="contain"
       />
@@ -56,15 +54,13 @@ export default function VisitorInfoScreen() {
           <HomecomingHero
             eyebrow="Getting Around"
             title="Getting Around"
-            subtitle="Shuttles, parade route, and food service details for Homecoming weekend."
+            subtitle="Shuttle information for Homecoming weekend."
           />
 
           <View style={styles.introCard}>
             <Text style={styles.eyebrow}>Weekend logistics</Text>
             <Text style={styles.pageTitle}>Travel details in one place</Text>
-            <Text style={styles.pageSubtitle}>
-              Check shuttle windows, parade flow, and food service timing before you head out.
-            </Text>
+            <Text style={styles.pageSubtitle}>Check shuttle windows before you head out.</Text>
           </View>
 
           <View style={styles.sectionCard}>
@@ -91,45 +87,8 @@ export default function VisitorInfoScreen() {
               <InfoRow day="Saturday" hours="10:30am–11:30pm" />
               <InfoRow day="Sunday" hours="2pm–11:30pm" />
             </View>
-
-            <ZoomableImageCard title="Bus Route" asset={BUS_ROUTE_ASSET} />
-          </View>
-
-          <View style={styles.sectionCard}>
-            <View style={styles.sectionHeader}>
-              <View style={[styles.sectionIconWrap, { backgroundColor: PINK }]}>
-                <Feather name="flag" size={18} color="#FFFFFF" />
-              </View>
-              <View style={styles.sectionHeaderCopy}>
-                <Text style={styles.sectionEyebrow}>Route</Text>
-                <Text style={styles.sectionTitle}>Parade Route</Text>
-              </View>
-            </View>
-
-            <View style={styles.infoCard}>
-              <Text style={styles.routeText}>Wallace Street</Text>
-              <Text style={styles.routeText}>McGivern Street</Text>
-              <Text style={styles.routeText}>Victoria Street</Text>
-              <Text style={styles.routeText}>Durham Street</Text>
-              <Text style={[styles.routeText, styles.routeTextLast]}>Arena</Text>
-            </View>
-          </View>
-
-          <View style={styles.sectionCard}>
-            <View style={styles.sectionHeader}>
-              <View style={[styles.sectionIconWrap, { backgroundColor: YELLOW }]}>
-                <Feather name="coffee" size={18} color="#111111" />
-              </View>
-              <View style={styles.sectionHeaderCopy}>
-                <Text style={styles.sectionEyebrow}>Dining</Text>
-                <Text style={styles.sectionTitle}>Food Truck Alley</Text>
-              </View>
-            </View>
-
-            <View style={styles.infoCard}>
-              <InfoRow day="Friday" hours="4pm–1am" />
-              <InfoRow day="Saturday–Monday" hours="11am–1am" />
-            </View>
+            
+            <ShuttleRouteCard />
           </View>
 
           <View style={styles.noteCard}>
@@ -206,8 +165,6 @@ const styles = StyleSheet.create({
   infoRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#252B34' },
   infoDay: { color: '#D1D5DB', fontWeight: '800', fontSize: 14 },
   infoHours: { color: '#FFFFFF', fontWeight: '900', fontSize: 14, textAlign: 'right' },
-  routeText: { color: '#E5E7EB', fontSize: 15, fontWeight: '800', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#252B34' },
-  routeTextLast: { borderBottomWidth: 0, paddingBottom: 0 },
   imageCard: {
     borderRadius: 20,
     backgroundColor: '#15171B',

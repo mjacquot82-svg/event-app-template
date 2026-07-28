@@ -27,7 +27,7 @@ function getIconName(routeName: string): keyof typeof Feather.glyphMap {
 function getLabel(routeName: string): string {
   switch (routeName) {
     case 'index': return 'Home';
-    case 'map': return 'Map';
+    case 'map': return 'Maps';
     case 'schedule': return 'Schedule';
     case 'leaderboard': return 'Leaderboard';
     case 'about': return 'About';
@@ -111,7 +111,7 @@ export default function TabLayout() {
           sceneContainerStyle={styles.scene}
         >
           <Tabs.Screen name="index" options={{ title: 'Home', href: '/' }} />
-          <Tabs.Screen name="map" options={{ title: 'Map' }} />
+          <Tabs.Screen name="map" options={{ title: 'Maps' }} />
           <Tabs.Screen name="schedule" options={{ title: 'Schedule' }} />
           <Tabs.Screen name="leaderboard" options={{ title: 'Leaderboard' }} />
           <Tabs.Screen name="about" options={{ title: 'About' }} />

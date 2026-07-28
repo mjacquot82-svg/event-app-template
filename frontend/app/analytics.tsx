@@ -12,6 +12,7 @@ import {
 import themeColors from '../src/theme/colors';
 import appConfig from '../src/data/eventConfig';
 import { parseJsonResponse } from '../src/utils/fetchJson';
+import { eventMaps, type MapAnalyticsKey } from '../src/data/maps';
 
 const API_BASE_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 const ANALYTICS_APP_ID = 'walkerton-homecoming';
@@ -24,6 +25,7 @@ type AnalyticsStatsResponse = {
   installedDevices: number;
   browserOnlyDevices: number;
   launchesToday: number;
+  mapOpens?: Partial<Record<MapAnalyticsKey, number>>;
 };
 
 type MetricCardProps = {
@@ -112,6 +114,11 @@ export default function AnalyticsDashboardScreen() {
       accentColor: themeColors.primaryLight,
     },
   ];
+  const mapMetrics = eventMaps.map((map) => ({
+    label: map.title,
+    value: stats?.mapOpens?.[map.id] ?? 0,
+    accentColor: map.accentColor,
+  }));
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -183,6 +190,26 @@ export default function AnalyticsDashboardScreen() {
                     />
                   </View>
                 ))}
+              </View>
+
+              <View style={styles.sectionCard}>
+                <Text style={styles.sectionTitle}>Maps</Text>
+                <Text style={styles.sectionSubtitle}>Total opens recorded for each map.</Text>
+
+                <View style={[styles.metricsGrid, !isCompact && styles.metricsGridWide]}>
+                  {mapMetrics.map((metric) => (
+                    <View
+                      key={metric.label}
+                      style={[styles.metricColumn, !isCompact && styles.metricColumnWide]}
+                    >
+                      <MetricCard
+                        label={metric.label}
+                        value={metric.value}
+                        accentColor={metric.accentColor}
+                      />
+                    </View>
+                  ))}
+                </View>
               </View>
             </>
           )}
@@ -331,6 +358,27 @@ const styles = StyleSheet.create({
     width: '50%',
     paddingHorizontal: 7,
     marginBottom: 14,
+  },
+  sectionCard: {
+    backgroundColor: themeColors.surface,
+    borderRadius: 24,
+    paddingHorizontal: 20,
+    paddingVertical: 22,
+    borderWidth: 1,
+    borderColor: themeColors.border,
+    marginTop: 18,
+  },
+  sectionTitle: {
+    color: themeColors.textPrimary,
+    fontSize: 22,
+    fontWeight: '800',
+  },
+  sectionSubtitle: {
+    color: themeColors.textSecondary,
+    fontSize: 14,
+    lineHeight: 20,
+    marginTop: 6,
+    marginBottom: 16,
   },
   metricCard: {
     backgroundColor: themeColors.surface,
