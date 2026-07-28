@@ -1,5 +1,6 @@
 import { type Href, useLocalSearchParams, usePathname, useRouter } from 'expo-router';
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { Platform } from 'react-native';
 import type { EventMapDefinition, MapAnalyticsKey } from '../data/maps';
 
 type UseRouteBackedMapViewerOptions = {
@@ -32,12 +33,18 @@ export function useRouteBackedMapViewer({
   const pathname = usePathname();
   const params = useLocalSearchParams<{ map?: string | string[] }>();
   const openedFromHereRef = useRef(false);
+  const [nativeSelectedMapId, setNativeSelectedMapId] = useState<MapAnalyticsKey | null>(null);
   const mapParam = getMapParamValue(params.map);
+  const isWeb = Platform.OS === 'web';
 
   const selectedMapId = useMemo(() => {
+    if (!isWeb) {
+      return nativeSelectedMapId;
+    }
+
     const matchedMap = maps.find((map) => map.id === mapParam);
     return matchedMap?.id ?? null;
-  }, [mapParam, maps]);
+  }, [isWeb, mapParam, maps, nativeSelectedMapId]);
 
   const selectedMap = useMemo(
     () => maps.find((map) => map.id === selectedMapId) ?? null,
@@ -55,11 +62,15 @@ export function useRouteBackedMapViewer({
       return;
     }
 
-    if (selectedMapId) {
-      router.replace(buildViewerHref(pathname, map.id));
+    if (isWeb) {
+      if (selectedMapId) {
+        router.replace(buildViewerHref(pathname, map.id));
+      } else {
+        openedFromHereRef.current = true;
+        router.push(buildViewerHref(pathname, map.id));
+      }
     } else {
-      openedFromHereRef.current = true;
-      router.push(buildViewerHref(pathname, map.id));
+      setNativeSelectedMapId(map.id);
     }
 
     void onMapOpen?.(map);
@@ -67,6 +78,11 @@ export function useRouteBackedMapViewer({
 
   const closeMap = () => {
     if (!selectedMapId) {
+      return;
+    }
+
+    if (!isWeb) {
+      setNativeSelectedMapId(null);
       return;
     }
 
