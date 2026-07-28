@@ -7,7 +7,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   Image,
-  Linking,
   Animated,
   Dimensions,
   Modal,
@@ -15,6 +14,7 @@ import {
 import { Feather } from '@expo/vector-icons';
 import { AdUnit } from '../config/AdCampaignsConfig';
 import colors from '../theme/colors';
+import { openTrackedExternalLink } from '../analytics/trackedLinks';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -49,10 +49,11 @@ const InterstitialAd: React.FC<InterstitialAdProps> = ({ adUnit, visible, onClos
 
   const handleAdPress = async () => {
     try {
-      const canOpen = await Linking.canOpenURL(adUnit.targetUrl);
-      if (canOpen) {
-        await Linking.openURL(adUnit.targetUrl);
-      }
+      await openTrackedExternalLink({
+        url: adUnit.targetUrl,
+        destinationType: 'ad_link',
+        destinationName: adUnit.name,
+      });
       onClose();
     } catch (error) {
       console.error('Error opening ad URL:', error);

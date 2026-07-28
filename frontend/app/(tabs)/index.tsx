@@ -5,10 +5,8 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  Linking,
   Pressable,
   Animated,
-  Platform,
   useWindowDimensions,
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
@@ -18,6 +16,10 @@ import { productionHomeEvents, type ProductionHomeEvent } from '../../src/data/p
 import { colors } from '../../src/theme/colors';
 import BrandFooter from '../../src/components/BrandFooter';
 import HomecomingHero from '../../src/components/HomecomingHero';
+import { getAnalyticsConfig } from '../../src/analytics/analyticsConfig';
+import { trackQuickActionOpen } from '../../src/analytics/jdsAnalytics';
+import { openTrackedExternalLink, type ExternalDestinationType } from '../../src/analytics/trackedLinks';
+import { usePageAnalytics } from '../../src/analytics/usePageAnalytics';
 
 const categoryColors: Record<ProductionHomeEvent['category'], string> = {
   Music: '#F6008F',
@@ -50,15 +52,6 @@ function getCurrentOrNextEvents() {
     day: 'numeric',
   });
   return { title: `Coming Up: ${label}`, events: nextEvents };
-}
-
-function openExternalUrl(url: string) {
-  if (Platform.OS === 'web' && typeof window !== 'undefined') {
-    window.open(url, '_blank', 'noopener,noreferrer');
-    return;
-  }
-
-  Linking.openURL(url);
 }
 
 type ActionItem = {
@@ -113,6 +106,7 @@ function ActionCard({
 }
 
 export default function HomeScreen() {
+  usePageAnalytics('Home');
   const router = useRouter();
   const { width } = useWindowDimensions();
   const isWide = width >= 960;
@@ -144,6 +138,42 @@ export default function HomeScreen() {
   ];
 
   const merchAction = actionsById.merch;
+  const analyticsConfig = getAnalyticsConfig();
+
+  const getActionDestinationType = (action: ActionItem): ExternalDestinationType | undefined => {
+    if (!action.url) {
+      return undefined;
+    }
+
+    switch (action.id) {
+      case 'facebook':
+        return 'facebook';
+      case 'instagram':
+        return 'instagram';
+      default:
+        return 'external_url';
+    }
+  };
+
+  const handleActionPress = (action: ActionItem) => {
+    void trackQuickActionOpen(analyticsConfig, {
+      actionId: action.id,
+      actionName: action.label,
+      destinationType: action.route ? 'internal_route' : action.url ? getActionDestinationType(action) || 'external_url' : undefined,
+    });
+
+    if (action.route) {
+      router.push(action.route);
+    }
+
+    if (action.url) {
+      void openTrackedExternalLink({
+        url: action.url,
+        destinationType: getActionDestinationType(action) || 'external_url',
+        destinationName: action.label,
+      });
+    }
+  };
 
   return (
     <ScrollView
@@ -209,10 +239,7 @@ export default function HomeScreen() {
               <ActionCard
                 key={action.id}
                 action={action}
-                onPress={() => {
-                  if (action.route) router.push(action.route);
-                  if (action.url) openExternalUrl(action.url);
-                }}
+                onPress={() => handleActionPress(action)}
               />
             ))}
           </View>
@@ -222,10 +249,7 @@ export default function HomeScreen() {
               <ActionCard
                 action={merchAction}
                 compact
-                onPress={() => {
-                  if (merchAction.route) router.push(merchAction.route);
-                  if (merchAction.url) openExternalUrl(merchAction.url);
-                }}
+                onPress={() => handleActionPress(merchAction)}
               />
             </View>
           ) : null}

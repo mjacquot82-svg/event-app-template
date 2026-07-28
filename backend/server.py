@@ -7,7 +7,7 @@ import os
 import logging
 from pathlib import Path
 from pydantic import BaseModel, Field
-from typing import List, Optional, Dict
+from typing import Any, List, Optional, Dict
 import uuid
 from datetime import datetime
 import httpx
@@ -20,17 +20,23 @@ import json
 try:
     from backend.analytics import (
         AnalyticsLaunchPayload,
+        AnalyticsEventPayload,
         MongoAnalyticsRepository,
         fetch_stats,
         record_launch,
+        record_event,
+        record_map_open,
         serialize_stats,
     )
 except ModuleNotFoundError:
     from analytics import (
         AnalyticsLaunchPayload,
+        AnalyticsEventPayload,
         MongoAnalyticsRepository,
         fetch_stats,
         record_launch,
+        record_event,
+        record_map_open,
         serialize_stats,
     )
 
@@ -166,6 +172,47 @@ class AnalyticsLaunchRequest(BaseModel):
     timestamp: datetime = Field(default_factory=datetime.utcnow)
 
 
+class AnalyticsEventRequest(BaseModel):
+    deviceId: str = Field(min_length=1, max_length=128)
+    sessionId: str = Field(min_length=1, max_length=128)
+    appId: str = Field(min_length=1, max_length=128)
+    appVersion: str = Field(min_length=1, max_length=64)
+    installed: bool
+    launchMode: str = Field(min_length=1, max_length=64)
+    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    eventName: str = Field(min_length=1, max_length=128)
+    properties: Dict[str, Any] = Field(default_factory=dict)
+
+
+class AnalyticsMapOpenRequest(BaseModel):
+    deviceId: str = Field(min_length=1, max_length=128)
+    sessionId: str = Field(min_length=1, max_length=128)
+    appId: str = Field(min_length=1, max_length=128)
+    appVersion: str = Field(min_length=1, max_length=64)
+    installed: bool = False
+    launchMode: str = "unknown"
+    mapId: str = Field(min_length=1, max_length=128)
+    mapName: str = Field(min_length=1, max_length=128)
+    timestamp: datetime = Field(default_factory=datetime.utcnow)
+
+
+class AnalyticsMetricResponse(BaseModel):
+    label: str
+    value: int
+    type: Optional[str] = None
+
+
+class AnalyticsLiveActivityResponse(BaseModel):
+    lastEventName: Optional[str] = None
+    lastEventAt: Optional[str] = None
+    lastPageViewed: Optional[str] = None
+    lastMapOpened: Optional[str] = None
+    lastQuickActionOpened: Optional[str] = None
+    activeSessions: int = 0
+    eventsReceivedLastMinute: int = 0
+    eventsReceivedLastFiveMinutes: int = 0
+
+
 class AnalyticsStatsResponse(BaseModel):
     appId: str
     totalLaunches: int
@@ -173,11 +220,36 @@ class AnalyticsStatsResponse(BaseModel):
     launchesToday: int
     installedDevices: int
     browserOnlyDevices: int
+    totalSessions: int = 0
+    uniqueVisitors: int = 0
+    returningVisitors: int = 0
+    averageSessionDurationSeconds: float = 0
+    mostVisitedPages: List[AnalyticsMetricResponse] = Field(default_factory=list)
+    mostUsedQuickActions: List[AnalyticsMetricResponse] = Field(default_factory=list)
+    mostViewedMaps: List[AnalyticsMetricResponse] = Field(default_factory=list)
+    mostViewedScheduleEvents: List[AnalyticsMetricResponse] = Field(default_factory=list)
+    mostClickedExternalLinks: List[AnalyticsMetricResponse] = Field(default_factory=list)
+    trafficByDay: List[AnalyticsMetricResponse] = Field(default_factory=list)
+    trafficByHour: List[AnalyticsMetricResponse] = Field(default_factory=list)
+    mapOpens: Dict[str, int] = Field(default_factory=dict)
+    liveActivity: AnalyticsLiveActivityResponse = Field(
+        default_factory=AnalyticsLiveActivityResponse
+    )
+    totalSponsorPageViews: int = 0
+    uniqueVisitorsToSponsors: int = 0
+    averageTimeSpentOnSponsorsPageSeconds: Optional[float] = None
+    mostViewedSponsors: List[AnalyticsMetricResponse] = Field(default_factory=list)
+    jdsWebsiteClicks: int = 0
 
 
 class AnalyticsLaunchAcceptedResponse(BaseModel):
     status: str
     stats: AnalyticsStatsResponse
+
+
+class AnalyticsEventAcceptedResponse(BaseModel):
+    status: str
+    eventName: str
 
 # Public response - hides reporter info for privacy
 class SOSReportResponse(BaseModel):
@@ -465,6 +537,63 @@ async def track_analytics_launch(data: AnalyticsLaunchRequest):
     except Exception as e:
         logger.error(f"Error tracking analytics launch: {e}")
         raise HTTPException(status_code=500, detail="Failed to track analytics launch")
+
+
+@api_router.post(
+    "/analytics/event",
+    response_model=AnalyticsEventAcceptedResponse,
+)
+async def track_analytics_event(data: AnalyticsEventRequest):
+    """Persist an anonymous analytics event for a specific appId."""
+    try:
+        await record_event(
+            analytics_repository,
+            AnalyticsEventPayload(
+                device_id=data.deviceId,
+                session_id=data.sessionId,
+                app_id=data.appId,
+                app_version=data.appVersion,
+                installed=data.installed,
+                launch_mode=data.launchMode,
+                timestamp=data.timestamp,
+                event_name=data.eventName,
+                properties=data.properties,
+            ),
+        )
+        return AnalyticsEventAcceptedResponse(status="success", eventName=data.eventName)
+    except Exception as e:
+        logger.error(f"Error tracking analytics event: {e}")
+        raise HTTPException(status_code=500, detail="Failed to track analytics event")
+
+
+@api_router.post(
+    "/analytics/map-open",
+    response_model=AnalyticsEventAcceptedResponse,
+)
+async def track_analytics_map_open(data: AnalyticsMapOpenRequest):
+    """Persist an anonymous map open using the existing analytics architecture."""
+    try:
+        await record_map_open(
+            analytics_repository,
+            AnalyticsEventPayload(
+                device_id=data.deviceId,
+                session_id=data.sessionId,
+                app_id=data.appId,
+                app_version=data.appVersion,
+                installed=data.installed,
+                launch_mode=data.launchMode,
+                timestamp=data.timestamp,
+                event_name="map_open",
+                properties={
+                    "mapId": data.mapId,
+                    "mapName": data.mapName,
+                },
+            ),
+        )
+        return AnalyticsEventAcceptedResponse(status="success", eventName="map_open")
+    except Exception as e:
+        logger.error(f"Error tracking analytics map open: {e}")
+        raise HTTPException(status_code=500, detail="Failed to track analytics map open")
 
 
 @api_router.get("/analytics/stats", response_model=AnalyticsStatsResponse)

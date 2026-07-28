@@ -1,12 +1,15 @@
 // © 2026 1001538341 ONTARIO INC.
 
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 import PageBannerHeader from '../../src/components/PageBannerHeader';
 import BrandFooter from '../../src/components/BrandFooter';
 import { productionSchedule, type ProductionScheduleEvent } from '../../src/data/productionSchedule';
+import { getAnalyticsConfig } from '../../src/analytics/analyticsConfig';
+import { trackScheduleEventViewed, trackScheduleFilterSelected } from '../../src/analytics/jdsAnalytics';
+import { usePageAnalytics } from '../../src/analytics/usePageAnalytics';
 
 const categoryColors: Record<ProductionScheduleEvent['category'], string> = {
   Music: '#F6008F',
@@ -17,9 +20,13 @@ const categoryColors: Record<ProductionScheduleEvent['category'], string> = {
 };
 
 export default function ScheduleScreen() {
+  usePageAnalytics('Schedule', { openEventName: 'schedule_opened' });
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [selectedDay, setSelectedDay] = useState<string>('All Days');
   const [selectedEvent, setSelectedEvent] = useState<ProductionScheduleEvent | null>(null);
+  const hasTrackedInitialCategory = useRef(false);
+  const hasTrackedInitialDay = useRef(false);
+  const analyticsConfig = getAnalyticsConfig();
   const categories = ['All', ...Array.from(new Set(productionSchedule.map((event) => event.category)))];
   const days = ['All Days', 'Thursday', 'Friday', 'Saturday', 'Sunday', 'Monday'];
   const filteredEvents = productionSchedule.filter((event) => {
@@ -34,6 +41,40 @@ export default function ScheduleScreen() {
     acc[key].push(event);
     return acc;
   }, {} as Record<string, ProductionScheduleEvent[]>), [filteredEvents]);
+
+  useEffect(() => {
+    if (selectedEvent) {
+      void trackScheduleEventViewed(analyticsConfig, {
+        eventId: selectedEvent.id,
+        eventTitle: selectedEvent.title,
+        category: selectedEvent.category,
+      });
+    }
+  }, [analyticsConfig, selectedEvent]);
+
+  useEffect(() => {
+    if (!hasTrackedInitialCategory.current) {
+      hasTrackedInitialCategory.current = true;
+      return;
+    }
+
+    void trackScheduleFilterSelected(analyticsConfig, {
+      filterType: 'category',
+      filterValue: selectedCategory,
+    });
+  }, [analyticsConfig, selectedCategory]);
+
+  useEffect(() => {
+    if (!hasTrackedInitialDay.current) {
+      hasTrackedInitialDay.current = true;
+      return;
+    }
+
+    void trackScheduleFilterSelected(analyticsConfig, {
+      filterType: 'day',
+      filterValue: selectedDay,
+    });
+  }, [analyticsConfig, selectedDay]);
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>

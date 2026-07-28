@@ -1,10 +1,11 @@
 // © 2026 1001538341 ONTARIO INC. All Rights Reserved.
 
 import React from 'react';
-import { Linking, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { eventConfig } from '../data/eventConfig';
 import { colors } from '../theme/colors';
+import { openTrackedExternalLink } from '../analytics/trackedLinks';
 
 const TAB_BAR_HEIGHT = 68;
 
@@ -18,7 +19,13 @@ export default function BrandFooter() {
       <Text style={styles.company}>{eventConfig.footer.companyName}</Text>
       <Pressable
         accessibilityRole="link"
-        onPress={() => Linking.openURL(eventConfig.footer.websiteUrl)}
+        onPress={() =>
+          void openTrackedExternalLink({
+            url: eventConfig.footer.websiteUrl,
+            destinationType: 'jds_website',
+            destinationName: eventConfig.footer.companyName,
+          })
+        }
         style={styles.linkWrap}
       >
         <Text style={styles.link}>{eventConfig.footer.websiteLabel}</Text>

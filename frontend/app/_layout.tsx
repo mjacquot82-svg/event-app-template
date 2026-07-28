@@ -6,11 +6,11 @@ import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Platform } from 'react-native';
-import Constants from 'expo-constants';
 import colors from '../src/theme/colors';
 import { AdProvider } from '../src/context/AdContext';
 import PWAInstallPrompt from '../src/components/PWAInstallPrompt';
 import { trackAppLaunch } from '../src/analytics/jdsAnalytics';
+import { getAnalyticsConfig } from '../src/analytics/analyticsConfig';
 
 // Initialize Webpushr for web platform
 const initWebpushr = () => {
@@ -50,11 +50,7 @@ export default function RootLayout() {
     initWebpushr();
 
     if (Platform.OS === 'web') {
-      void trackAppLaunch({
-        apiBaseUrl: process.env.EXPO_PUBLIC_BACKEND_URL || '',
-        appId: 'walkerton-homecoming',
-        appVersion: Constants.expoConfig?.version ?? 'unknown',
-      });
+      void trackAppLaunch(getAnalyticsConfig());
     }
   }, []);
 

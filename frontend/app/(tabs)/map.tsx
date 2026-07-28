@@ -2,7 +2,6 @@
 
 import React, { useMemo, useState } from 'react';
 import { View, StyleSheet, StatusBar, ScrollView, Text, Image, Pressable } from 'react-native';
-import Constants from 'expo-constants';
 import { Feather } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../../src/theme/colors';
@@ -10,9 +9,12 @@ import PageBannerHeader from '../../src/components/PageBannerHeader';
 import BrandFooter from '../../src/components/BrandFooter';
 import MapImageViewer from '../../src/components/MapImageViewer';
 import { trackMapOpen } from '../../src/analytics/jdsAnalytics';
+import { getAnalyticsConfig } from '../../src/analytics/analyticsConfig';
+import { usePageAnalytics } from '../../src/analytics/usePageAnalytics';
 import { eventMaps, type EventMapDefinition } from '../../src/data/maps';
 
 export default function MapScreen() {
+  usePageAnalytics('Maps');
   const [selectedMapId, setSelectedMapId] = useState<EventMapDefinition['id'] | null>(null);
   const selectedMap = useMemo(
     () => eventMaps.find((map) => map.id === selectedMapId) ?? null,
@@ -21,15 +23,7 @@ export default function MapScreen() {
 
   const openMap = (map: EventMapDefinition) => {
     setSelectedMapId(map.id);
-
-    void trackMapOpen(
-      {
-        apiBaseUrl: process.env.EXPO_PUBLIC_BACKEND_URL || '',
-        appId: 'walkerton-homecoming',
-        appVersion: Constants.expoConfig?.version ?? 'unknown',
-      },
-      { id: map.id, title: map.title }
-    );
+    void trackMapOpen(getAnalyticsConfig(), { id: map.id, title: map.title });
   };
 
   return (

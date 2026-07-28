@@ -1,12 +1,16 @@
 // © 2026 1001538341 ONTARIO INC.
 
 import React, { useMemo, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Pressable, Linking, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Pressable, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 import { Sponsor, sponsorsByTier } from '../../src/data/sponsors';
 import HomecomingHero from '../../src/components/HomecomingHero';
 import { colors } from '../../src/theme/colors';
+import { getAnalyticsConfig } from '../../src/analytics/analyticsConfig';
+import { trackSponsorSelected } from '../../src/analytics/jdsAnalytics';
+import { openTrackedExternalLink } from '../../src/analytics/trackedLinks';
+import { usePageAnalytics } from '../../src/analytics/usePageAnalytics';
 
 const FILTER_OPTIONS = ['All', 'Diamond', 'Platinum', 'Gold', 'Silver', 'Bronze'] as const;
 type SponsorFilter = typeof FILTER_OPTIONS[number];
@@ -29,6 +33,8 @@ function tierLabel(tier: Sponsor['tier']) {
 }
 
 function SponsorCard({ sponsor }: { sponsor: Sponsor }) {
+  const analyticsConfig = getAnalyticsConfig();
+
   return (
     <View style={styles.sponsorCard}>
       <View style={styles.cardTopRow}>
@@ -53,7 +59,21 @@ function SponsorCard({ sponsor }: { sponsor: Sponsor }) {
       </View>
 
       {sponsor.url ? (
-        <Pressable style={[styles.visitButton, { backgroundColor: sponsor.color }]} onPress={() => Linking.openURL(sponsor.url)}>
+        <Pressable
+          style={[styles.visitButton, { backgroundColor: sponsor.color }]}
+          onPress={() => {
+            void trackSponsorSelected(analyticsConfig, {
+              sponsorId: sponsor.id,
+              sponsorName: sponsor.name,
+              tier: sponsor.tier,
+            });
+            void openTrackedExternalLink({
+              url: sponsor.url,
+              destinationType: 'sponsor_website',
+              destinationName: sponsor.name,
+            });
+          }}
+        >
           <Feather name="external-link" size={16} color="#000" />
           <Text style={styles.visitButtonText}>Visit Website</Text>
         </Pressable>
@@ -79,6 +99,7 @@ function SponsorSection({ title, sponsors }: { title: string; sponsors: Sponsor[
 }
 
 export default function SponsorsScreen() {
+  usePageAnalytics('Sponsors', { openEventName: 'sponsors_page_viewed' });
   const [selectedTier, setSelectedTier] = useState<SponsorFilter>('All');
   const hasSponsors =
     sponsorsByTier.diamond.length > 0 ||

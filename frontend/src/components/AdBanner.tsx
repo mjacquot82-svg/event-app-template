@@ -7,10 +7,10 @@ import {
   StyleSheet,
   TouchableOpacity,
   Image,
-  Linking,
 } from 'react-native';
 import { AdUnit } from '../config/AdCampaignsConfig';
 import colors from '../theme/colors';
+import { openTrackedExternalLink } from '../analytics/trackedLinks';
 
 interface AdBannerProps {
   adUnit: AdUnit;
@@ -24,8 +24,11 @@ const AdBanner: React.FC<AdBannerProps> = ({ adUnit, position, pointerEvents = '
   const handlePress = async () => {
     if (!adUnit.targetUrl) return;
     try {
-      const canOpen = await Linking.canOpenURL(adUnit.targetUrl);
-      if (canOpen) await Linking.openURL(adUnit.targetUrl);
+      await openTrackedExternalLink({
+        url: adUnit.targetUrl,
+        destinationType: 'ad_link',
+        destinationName: adUnit.name,
+      });
     } catch (error) {
       console.error('Error opening sponsor URL:', error);
     }

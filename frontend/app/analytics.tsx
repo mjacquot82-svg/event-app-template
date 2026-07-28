@@ -13,10 +13,16 @@ import themeColors from '../src/theme/colors';
 import appConfig from '../src/data/eventConfig';
 import { parseJsonResponse } from '../src/utils/fetchJson';
 import { eventMaps, type MapAnalyticsKey } from '../src/data/maps';
+import { getAnalyticsConfig } from '../src/analytics/analyticsConfig';
 
-const API_BASE_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
-const ANALYTICS_APP_ID = 'walkerton-homecoming';
+const { apiBaseUrl: API_BASE_URL, appId: ANALYTICS_APP_ID } = getAnalyticsConfig();
 const REFRESH_INTERVAL_MS = 30_000;
+
+type AnalyticsListMetric = {
+  label: string;
+  value: number;
+  type?: string;
+};
 
 type AnalyticsStatsResponse = {
   appId: string;
@@ -26,22 +32,118 @@ type AnalyticsStatsResponse = {
   browserOnlyDevices: number;
   launchesToday: number;
   mapOpens?: Partial<Record<MapAnalyticsKey, number>>;
+  totalSessions?: number;
+  uniqueVisitors?: number;
+  returningVisitors?: number;
+  averageSessionDurationSeconds?: number;
+  mostVisitedPages?: AnalyticsListMetric[];
+  mostUsedQuickActions?: AnalyticsListMetric[];
+  mostViewedMaps?: AnalyticsListMetric[];
+  mostViewedScheduleEvents?: AnalyticsListMetric[];
+  mostClickedExternalLinks?: AnalyticsListMetric[];
+  trafficByDay?: AnalyticsListMetric[];
+  trafficByHour?: AnalyticsListMetric[];
+  liveActivity?: {
+    lastEventName?: string | null;
+    lastEventAt?: string | null;
+    lastPageViewed?: string | null;
+    lastMapOpened?: string | null;
+    lastQuickActionOpened?: string | null;
+    activeSessions?: number;
+    eventsReceivedLastMinute?: number;
+    eventsReceivedLastFiveMinutes?: number;
+  };
+  totalSponsorPageViews?: number;
+  uniqueVisitorsToSponsors?: number;
+  averageTimeSpentOnSponsorsPageSeconds?: number | null;
+  mostViewedSponsors?: AnalyticsListMetric[];
+  jdsWebsiteClicks?: number;
 };
 
 type MetricCardProps = {
   label: string;
-  value: number;
+  value: number | string;
   accentColor: string;
+};
+
+type ListSectionProps = {
+  title: string;
+  subtitle: string;
+  items: AnalyticsListMetric[];
+  emptyLabel: string;
 };
 
 function MetricCard({ label, value, accentColor }: MetricCardProps) {
   return (
     <View style={styles.metricCard}>
       <View style={[styles.metricAccent, { backgroundColor: accentColor }]} />
-      <Text style={styles.metricValue}>{value.toLocaleString()}</Text>
+      <Text style={styles.metricValue}>{typeof value === 'number' ? value.toLocaleString() : value}</Text>
       <Text style={styles.metricLabel}>{label}</Text>
     </View>
   );
+}
+
+function ListSection({ title, subtitle, items, emptyLabel }: ListSectionProps) {
+  return (
+    <View style={styles.sectionCard}>
+      <Text style={styles.sectionTitle}>{title}</Text>
+      <Text style={styles.sectionSubtitle}>{subtitle}</Text>
+
+      {items.length === 0 ? (
+        <View style={styles.emptyState}>
+          <Text style={styles.emptyStateText}>{emptyLabel}</Text>
+        </View>
+      ) : (
+        <View style={styles.listContainer}>
+          {items.map((item, index) => (
+            <View
+              key={`${title}-${item.label}-${item.type || 'default'}-${index}`}
+              style={[styles.listRow, index < items.length - 1 && styles.listRowBorder]}
+            >
+              <View style={styles.listRowText}>
+                <Text style={styles.listRowLabel}>{item.label}</Text>
+                {item.type ? <Text style={styles.listRowMeta}>{item.type}</Text> : null}
+              </View>
+              <Text style={styles.listRowValue}>{item.value.toLocaleString()}</Text>
+            </View>
+          ))}
+        </View>
+      )}
+    </View>
+  );
+}
+
+function formatDuration(seconds?: number): string {
+  if (!seconds || seconds <= 0) {
+    return '0m';
+  }
+
+  const roundedSeconds = Math.round(seconds);
+  const minutes = Math.floor(roundedSeconds / 60);
+  const remainingSeconds = roundedSeconds % 60;
+
+  if (minutes === 0) {
+    return `${remainingSeconds}s`;
+  }
+
+  if (remainingSeconds === 0) {
+    return `${minutes}m`;
+  }
+
+  return `${minutes}m ${remainingSeconds}s`;
+}
+
+function formatTimestamp(value?: string | null): string {
+  if (!value) {
+    return 'No data yet';
+  }
+
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) {
+    return value;
+  }
+
+  return parsed.toLocaleString();
 }
 
 export default function AnalyticsDashboardScreen() {
@@ -87,12 +189,30 @@ export default function AnalyticsDashboardScreen() {
     return () => clearInterval(interval);
   }, []);
 
-  const metrics = [
+  const applicationSummaryMetrics = [
     {
-      label: 'Unique Devices',
-      value: stats?.uniqueDevices ?? 0,
+      label: 'Total Sessions',
+      value: stats?.totalSessions ?? stats?.totalLaunches ?? 0,
+      accentColor: themeColors.accent,
+    },
+    {
+      label: 'Unique Visitors',
+      value: stats?.uniqueVisitors ?? stats?.uniqueDevices ?? 0,
       accentColor: themeColors.primary,
     },
+    {
+      label: 'Returning Visitors',
+      value: stats?.returningVisitors ?? 0,
+      accentColor: themeColors.utility,
+    },
+    {
+      label: 'Average Session Duration',
+      value: formatDuration(stats?.averageSessionDurationSeconds),
+      accentColor: themeColors.warning,
+    },
+  ];
+
+  const launchMetrics = [
     {
       label: 'Installed Devices',
       value: stats?.installedDevices ?? 0,
@@ -114,11 +234,73 @@ export default function AnalyticsDashboardScreen() {
       accentColor: themeColors.primaryLight,
     },
   ];
+
   const mapMetrics = eventMaps.map((map) => ({
     label: map.title,
-    value: stats?.mapOpens?.[map.id] ?? 0,
+    value:
+      stats?.mostViewedMaps?.find((metric) => metric.label === map.title)?.value ??
+      stats?.mapOpens?.[map.id] ??
+      0,
     accentColor: map.accentColor,
   }));
+
+  const liveActivityMetrics = [
+    {
+      label: 'Last Analytics Event',
+      value: stats?.liveActivity?.lastEventName || 'No data yet',
+      accentColor: themeColors.primary,
+    },
+    {
+      label: 'Last Event Received',
+      value: formatTimestamp(stats?.liveActivity?.lastEventAt),
+      accentColor: themeColors.utility,
+    },
+    {
+      label: 'Active Sessions',
+      value: stats?.liveActivity?.activeSessions ?? 0,
+      accentColor: themeColors.accent,
+    },
+    {
+      label: 'Events Last Minute',
+      value: stats?.liveActivity?.eventsReceivedLastMinute ?? 0,
+      accentColor: themeColors.warning,
+    },
+    {
+      label: 'Events Last Five Minutes',
+      value: stats?.liveActivity?.eventsReceivedLastFiveMinutes ?? 0,
+      accentColor: themeColors.primaryLight,
+    },
+    {
+      label: 'JDS Website Clicks',
+      value: stats?.jdsWebsiteClicks ?? 0,
+      accentColor: themeColors.primary,
+    },
+  ];
+
+  const sponsorMetrics = [
+    {
+      label: 'Total Sponsor Page Views',
+      value: stats?.totalSponsorPageViews ?? 0,
+      accentColor: themeColors.primary,
+    },
+    {
+      label: 'Unique Visitors to Sponsors',
+      value: stats?.uniqueVisitorsToSponsors ?? 0,
+      accentColor: themeColors.utility,
+    },
+    {
+      label: 'Average Sponsor Page Duration',
+      value: stats?.averageTimeSpentOnSponsorsPageSeconds
+        ? formatDuration(stats.averageTimeSpentOnSponsorsPageSeconds)
+        : 'Not available',
+      accentColor: themeColors.warning,
+    },
+    {
+      label: 'JDS Website Clicks',
+      value: stats?.jdsWebsiteClicks ?? 0,
+      accentColor: themeColors.accent,
+    },
+  ];
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -130,7 +312,7 @@ export default function AnalyticsDashboardScreen() {
           <View style={styles.heroCard}>
             <Text style={styles.eyebrow}>JDS Analytics</Text>
             <Text style={styles.title}>{appConfig.appName}</Text>
-            <Text style={styles.subtitle}>Anonymous launch metrics for one application.</Text>
+            <Text style={styles.subtitle}>Anonymous engagement metrics for one application.</Text>
 
             <View style={[styles.statusRow, isCompact && styles.statusRowCompact]}>
               <View style={styles.statusBlock}>
@@ -177,19 +359,76 @@ export default function AnalyticsDashboardScreen() {
                 </View>
               ) : null}
 
-              <View style={[styles.metricsGrid, !isCompact && styles.metricsGridWide]}>
-                {metrics.map((metric) => (
-                  <View
-                    key={metric.label}
-                    style={[styles.metricColumn, !isCompact && styles.metricColumnWide]}
-                  >
-                    <MetricCard
-                      label={metric.label}
-                      value={metric.value}
-                      accentColor={metric.accentColor}
-                    />
-                  </View>
-                ))}
+              <View style={styles.sectionCard}>
+                <Text style={styles.sectionTitle}>Application Summary</Text>
+                <Text style={styles.sectionSubtitle}>Session and visitor activity across the application.</Text>
+
+                <View style={[styles.metricsGrid, !isCompact && styles.metricsGridWide]}>
+                  {applicationSummaryMetrics.map((metric) => (
+                    <View
+                      key={metric.label}
+                      style={[styles.metricColumn, !isCompact && styles.metricColumnWide]}
+                    >
+                      <MetricCard
+                        label={metric.label}
+                        value={metric.value}
+                        accentColor={metric.accentColor}
+                      />
+                    </View>
+                  ))}
+                </View>
+              </View>
+
+              <View style={styles.sectionCard}>
+                <Text style={styles.sectionTitle}>Launch Overview</Text>
+                <Text style={styles.sectionSubtitle}>Existing launch data remains available for compatibility.</Text>
+
+                <View style={[styles.metricsGrid, !isCompact && styles.metricsGridWide]}>
+                  {launchMetrics.map((metric) => (
+                    <View
+                      key={metric.label}
+                      style={[styles.metricColumn, !isCompact && styles.metricColumnWide]}
+                    >
+                      <MetricCard
+                        label={metric.label}
+                        value={metric.value}
+                        accentColor={metric.accentColor}
+                      />
+                    </View>
+                  ))}
+                </View>
+              </View>
+
+              <View style={styles.sectionCard}>
+                <Text style={styles.sectionTitle}>Live Activity</Text>
+                <Text style={styles.sectionSubtitle}>Operational visibility using the existing dashboard refresh cycle.</Text>
+
+                <View style={[styles.metricsGrid, !isCompact && styles.metricsGridWide]}>
+                  {liveActivityMetrics.map((metric) => (
+                    <View
+                      key={metric.label}
+                      style={[styles.metricColumn, !isCompact && styles.metricColumnWide]}
+                    >
+                      <MetricCard
+                        label={metric.label}
+                        value={metric.value}
+                        accentColor={metric.accentColor}
+                      />
+                    </View>
+                  ))}
+                </View>
+
+                <View style={styles.liveSummaryBlock}>
+                  <Text style={styles.liveSummaryText}>
+                    Last page viewed: {stats?.liveActivity?.lastPageViewed || 'No data yet'}
+                  </Text>
+                  <Text style={styles.liveSummaryText}>
+                    Last map opened: {stats?.liveActivity?.lastMapOpened || 'No data yet'}
+                  </Text>
+                  <Text style={styles.liveSummaryText}>
+                    Last quick action opened: {stats?.liveActivity?.lastQuickActionOpened || 'No data yet'}
+                  </Text>
+                </View>
               </View>
 
               <View style={styles.sectionCard}>
@@ -211,6 +450,82 @@ export default function AnalyticsDashboardScreen() {
                   ))}
                 </View>
               </View>
+
+              <ListSection
+                title="Most Visited Pages"
+                subtitle="Which core pages visitors opened most often."
+                items={stats?.mostVisitedPages ?? []}
+                emptyLabel="No page-view data available yet."
+              />
+
+              <ListSection
+                title="Most Used Quick Actions"
+                subtitle="Quick actions visitors opened from the home experience."
+                items={stats?.mostUsedQuickActions ?? []}
+                emptyLabel="No quick-action data available yet."
+              />
+
+              <ListSection
+                title="Most Viewed Maps"
+                subtitle="Top map opens across the app."
+                items={stats?.mostViewedMaps ?? []}
+                emptyLabel="No map analytics available yet."
+              />
+
+              <ListSection
+                title="Most Viewed Schedule Events"
+                subtitle="Event detail views from the schedule."
+                items={stats?.mostViewedScheduleEvents ?? []}
+                emptyLabel="No schedule event views available yet."
+              />
+
+              <ListSection
+                title="Most Clicked External Links"
+                subtitle="Outbound destinations visitors tapped most often."
+                items={stats?.mostClickedExternalLinks ?? []}
+                emptyLabel="No external link activity available yet."
+              />
+
+              <View style={styles.sectionCard}>
+                <Text style={styles.sectionTitle}>Sponsors</Text>
+                <Text style={styles.sectionSubtitle}>Sponsor page and sponsor selection engagement.</Text>
+
+                <View style={[styles.metricsGrid, !isCompact && styles.metricsGridWide]}>
+                  {sponsorMetrics.map((metric) => (
+                    <View
+                      key={metric.label}
+                      style={[styles.metricColumn, !isCompact && styles.metricColumnWide]}
+                    >
+                      <MetricCard
+                        label={metric.label}
+                        value={metric.value}
+                        accentColor={metric.accentColor}
+                      />
+                    </View>
+                  ))}
+                </View>
+              </View>
+
+              <ListSection
+                title="Most Viewed Sponsors"
+                subtitle="Sponsors selected from the Sponsors page."
+                items={stats?.mostViewedSponsors ?? []}
+                emptyLabel="No sponsor selections available yet."
+              />
+
+              <ListSection
+                title="Traffic by Day"
+                subtitle="Usage volume grouped by calendar day."
+                items={stats?.trafficByDay ?? []}
+                emptyLabel="No daily traffic data available yet."
+              />
+
+              <ListSection
+                title="Traffic by Hour"
+                subtitle="Usage volume grouped by hour of day."
+                items={stats?.trafficByHour ?? []}
+                emptyLabel="No hourly traffic data available yet."
+              />
             </>
           )}
         </View>
@@ -258,7 +573,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     color: themeColors.textSecondary,
-    fontSize: 16,
+    fontSize: 15,
     lineHeight: 22,
     marginBottom: 18,
   },
@@ -272,92 +587,78 @@ const styles = StyleSheet.create({
   },
   statusBlock: {
     flex: 1,
-    backgroundColor: themeColors.surfaceElevated,
+    backgroundColor: themeColors.backgroundElevated,
     borderRadius: 18,
     paddingHorizontal: 16,
     paddingVertical: 14,
+    borderWidth: 1,
+    borderColor: themeColors.border,
   },
   statusLabel: {
     color: themeColors.textMuted,
     fontSize: 12,
     fontWeight: '700',
-    textTransform: 'uppercase',
-    letterSpacing: 0.8,
     marginBottom: 6,
+    textTransform: 'uppercase',
+    letterSpacing: 0.7,
   },
   statusValue: {
     color: themeColors.textPrimary,
-    fontSize: 15,
-    fontWeight: '600',
+    fontSize: 14,
+    fontWeight: '700',
   },
   refreshButton: {
     alignSelf: 'flex-start',
     backgroundColor: themeColors.primary,
     borderRadius: 999,
     paddingHorizontal: 18,
-    paddingVertical: 12,
+    paddingVertical: 11,
   },
   refreshButtonPressed: {
-    opacity: 0.88,
+    opacity: 0.9,
   },
   refreshButtonDisabled: {
-    opacity: 0.7,
+    opacity: 0.6,
   },
   refreshButtonText: {
-    color: '#001014',
-    fontSize: 15,
+    color: themeColors.buttonText,
+    fontSize: 14,
     fontWeight: '800',
   },
   loadingCard: {
     backgroundColor: themeColors.surface,
     borderRadius: 24,
-    paddingVertical: 48,
-    paddingHorizontal: 24,
-    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 28,
     borderWidth: 1,
     borderColor: themeColors.border,
+    alignItems: 'center',
+    gap: 14,
   },
   loadingText: {
-    marginTop: 14,
     color: themeColors.textSecondary,
     fontSize: 15,
+    fontWeight: '600',
   },
   alertCard: {
-    backgroundColor: 'rgba(246, 0, 143, 0.12)',
+    backgroundColor: themeColors.surface,
+    borderRadius: 20,
+    paddingHorizontal: 18,
+    paddingVertical: 16,
     borderWidth: 1,
-    borderColor: 'rgba(246, 0, 143, 0.35)',
-    borderRadius: 18,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    marginBottom: 16,
+    borderColor: themeColors.warning,
+    marginBottom: 18,
   },
   alertTitle: {
     color: themeColors.textPrimary,
     fontSize: 16,
-    fontWeight: '700',
-    marginBottom: 4,
+    fontWeight: '800',
+    marginBottom: 6,
   },
   alertText: {
     color: themeColors.textSecondary,
     fontSize: 14,
     lineHeight: 20,
-  },
-  metricsGrid: {
-    flexDirection: 'column',
-    gap: 14,
-  },
-  metricsGridWide: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginHorizontal: -7,
-  },
-  metricColumn: {
-    width: '100%',
-  },
-  metricColumnWide: {
-    width: '50%',
-    paddingHorizontal: 7,
-    marginBottom: 14,
   },
   sectionCard: {
     backgroundColor: themeColors.surface,
@@ -366,46 +667,132 @@ const styles = StyleSheet.create({
     paddingVertical: 22,
     borderWidth: 1,
     borderColor: themeColors.border,
-    marginTop: 18,
+    marginBottom: 18,
   },
   sectionTitle: {
     color: themeColors.textPrimary,
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: '800',
+    marginBottom: 6,
   },
   sectionSubtitle: {
     color: themeColors.textSecondary,
     fontSize: 14,
     lineHeight: 20,
-    marginTop: 6,
-    marginBottom: 16,
+    marginBottom: 18,
+  },
+  metricsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginHorizontal: -6,
+  },
+  metricsGridWide: {
+    marginHorizontal: -8,
+  },
+  metricColumn: {
+    width: '100%',
+    paddingHorizontal: 6,
+    marginBottom: 12,
+  },
+  metricColumnWide: {
+    width: '50%',
+    paddingHorizontal: 8,
   },
   metricCard: {
-    backgroundColor: themeColors.surface,
-    borderRadius: 22,
+    backgroundColor: themeColors.backgroundElevated,
+    borderRadius: 20,
     borderWidth: 1,
     borderColor: themeColors.border,
     paddingHorizontal: 18,
     paddingVertical: 18,
-    minHeight: 146,
-    justifyContent: 'space-between',
+    minHeight: 124,
+    justifyContent: 'flex-end',
+    overflow: 'hidden',
   },
   metricAccent: {
-    width: 42,
-    height: 6,
-    borderRadius: 999,
-    marginBottom: 18,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 5,
   },
   metricValue: {
     color: themeColors.textPrimary,
-    fontSize: 36,
+    fontSize: 28,
     fontWeight: '800',
-    marginBottom: 10,
+    marginBottom: 8,
   },
   metricLabel: {
     color: themeColors.textSecondary,
-    fontSize: 16,
+    fontSize: 14,
+    lineHeight: 20,
     fontWeight: '600',
-    lineHeight: 22,
+  },
+  listContainer: {
+    backgroundColor: themeColors.backgroundElevated,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: themeColors.border,
+    overflow: 'hidden',
+  },
+  listRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 16,
+    paddingHorizontal: 18,
+    paddingVertical: 16,
+  },
+  listRowBorder: {
+    borderBottomWidth: 1,
+    borderBottomColor: themeColors.border,
+  },
+  listRowText: {
+    flex: 1,
+  },
+  listRowLabel: {
+    color: themeColors.textPrimary,
+    fontSize: 15,
+    fontWeight: '700',
+  },
+  listRowMeta: {
+    color: themeColors.textMuted,
+    fontSize: 12,
+    fontWeight: '600',
+    marginTop: 4,
+    textTransform: 'uppercase',
+    letterSpacing: 0.4,
+  },
+  listRowValue: {
+    color: themeColors.primary,
+    fontSize: 16,
+    fontWeight: '800',
+  },
+  emptyState: {
+    backgroundColor: themeColors.backgroundElevated,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: themeColors.border,
+    paddingHorizontal: 18,
+    paddingVertical: 18,
+  },
+  emptyStateText: {
+    color: themeColors.textMuted,
+    fontSize: 14,
+    lineHeight: 20,
+  },
+  liveSummaryBlock: {
+    backgroundColor: themeColors.backgroundElevated,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: themeColors.border,
+    paddingHorizontal: 18,
+    paddingVertical: 18,
+  },
+  liveSummaryText: {
+    color: themeColors.textSecondary,
+    fontSize: 14,
+    lineHeight: 21,
+    marginBottom: 8,
   },
 });

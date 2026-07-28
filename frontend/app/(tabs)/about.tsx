@@ -1,16 +1,20 @@
 // © 2026 1001538341 ONTARIO INC.
 
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, Linking, TouchableOpacity, Platform } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 import { eventConfig } from '../../src/data/eventConfig';
 import PageBannerHeader from '../../src/components/PageBannerHeader';
 import BrandFooter from '../../src/components/BrandFooter';
+import { usePageAnalytics } from '../../src/analytics/usePageAnalytics';
+import { openTrackedExternalLink } from '../../src/analytics/trackedLinks';
 
 const BLUE = '#16BFD6';
 
 export default function AboutScreen() {
+  usePageAnalytics('About');
+
   const openMaps = () => {
     const { lat, lng } = eventConfig.event.coordinates;
     const url = Platform.select({
@@ -18,7 +22,11 @@ export default function AboutScreen() {
       android: `geo:${lat},${lng}?q=${lat},${lng}`,
       default: `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`,
     });
-    Linking.openURL(url as string);
+    void openTrackedExternalLink({
+      url: url as string,
+      destinationType: 'directions',
+      destinationName: 'Walkerton Homecoming Directions',
+    });
   };
 
   return (
