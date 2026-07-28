@@ -16,7 +16,7 @@ import { useRouteBackedMapViewer } from '../../src/hooks/useRouteBackedMapViewer
 
 export default function MapScreen() {
   usePageAnalytics('Maps');
-  const { selectedMap, openMap, closeMap, debugState, setDebugMessage } = useRouteBackedMapViewer({
+  const { selectedMap, openMap, closeMap } = useRouteBackedMapViewer({
     maps: eventMaps,
     onMapOpen: (map) => trackMapOpen(getAnalyticsConfig(), { id: map.id, title: map.title }),
   });
@@ -75,8 +75,6 @@ export default function MapScreen() {
           title={selectedMap.title}
           description={selectedMap.description}
           onClose={closeMap}
-          debugState={debugState}
-          onDebugMessage={setDebugMessage}
         />
       ) : null}
     </SafeAreaView>
