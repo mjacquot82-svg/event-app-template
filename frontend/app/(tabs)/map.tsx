@@ -1,6 +1,6 @@
 // © 2026 1001538341 ONTARIO INC. All Rights Reserved.
 
-import React, { useMemo, useState } from 'react';
+import React from 'react';
 import { View, StyleSheet, StatusBar, ScrollView, Text, Image, Pressable } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -11,20 +11,15 @@ import MapImageViewer from '../../src/components/MapImageViewer';
 import { trackMapOpen } from '../../src/analytics/jdsAnalytics';
 import { getAnalyticsConfig } from '../../src/analytics/analyticsConfig';
 import { usePageAnalytics } from '../../src/analytics/usePageAnalytics';
-import { eventMaps, type EventMapDefinition } from '../../src/data/maps';
+import { eventMaps } from '../../src/data/maps';
+import { useRouteBackedMapViewer } from '../../src/hooks/useRouteBackedMapViewer';
 
 export default function MapScreen() {
   usePageAnalytics('Maps');
-  const [selectedMapId, setSelectedMapId] = useState<EventMapDefinition['id'] | null>(null);
-  const selectedMap = useMemo(
-    () => eventMaps.find((map) => map.id === selectedMapId) ?? null,
-    [selectedMapId]
-  );
-
-  const openMap = (map: EventMapDefinition) => {
-    setSelectedMapId(map.id);
-    void trackMapOpen(getAnalyticsConfig(), { id: map.id, title: map.title });
-  };
+  const { selectedMap, openMap, closeMap } = useRouteBackedMapViewer({
+    maps: eventMaps,
+    onMapOpen: (map) => trackMapOpen(getAnalyticsConfig(), { id: map.id, title: map.title }),
+  });
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -79,7 +74,7 @@ export default function MapScreen() {
           asset={selectedMap.asset}
           title={selectedMap.title}
           description={selectedMap.description}
-          onClose={() => setSelectedMapId(null)}
+          onClose={closeMap}
         />
       ) : null}
     </SafeAreaView>

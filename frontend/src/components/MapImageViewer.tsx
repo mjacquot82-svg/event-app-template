@@ -10,6 +10,7 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import colors from '../theme/colors';
 
 type MapImageViewerProps = {
@@ -28,8 +29,10 @@ export default function MapImageViewer({
   onClose,
 }: MapImageViewerProps) {
   const { width, height } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
   const imageWidth = Math.min(width - 32, 1080);
   const imageHeight = Math.max(height - 220, 320);
+  const topInset = Math.max(insets.top, 0) + 12;
 
   return (
     <Modal
@@ -38,23 +41,15 @@ export default function MapImageViewer({
       transparent
       onRequestClose={onClose}
       presentationStyle="overFullScreen"
+      statusBarTranslucent
     >
       <View style={styles.overlay}>
-        <View style={styles.header}>
+        <View style={[styles.header, { paddingTop: topInset, paddingRight: 64 }]}>
           <View style={styles.headerCopy}>
             <Text style={styles.eyebrow}>Maps</Text>
             <Text style={styles.title}>{title}</Text>
             <Text style={styles.description}>{description}</Text>
           </View>
-
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel={`Close ${title}`}
-            onPress={onClose}
-            style={({ pressed }) => [styles.closeButton, pressed && styles.closeButtonPressed]}
-          >
-            <Feather name="x" size={22} color={colors.textPrimary} />
-          </Pressable>
         </View>
 
         <ScrollView
@@ -73,6 +68,21 @@ export default function MapImageViewer({
             style={{ width: imageWidth, height: imageHeight }}
           />
         </ScrollView>
+
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={`Close ${title}`}
+          accessibilityHint="Closes the map viewer"
+          hitSlop={8}
+          onPress={onClose}
+          style={({ pressed }) => [
+            styles.closeButton,
+            { top: topInset, right: 16 },
+            pressed && styles.closeButtonPressed,
+          ]}
+        >
+          <Feather name="x" size={22} color={colors.textPrimary} />
+        </Pressable>
       </View>
     </Modal>
   );
@@ -82,7 +92,6 @@ const styles = StyleSheet.create({
   overlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.96)',
-    paddingTop: 20,
     paddingHorizontal: 16,
     paddingBottom: 16,
   },
@@ -91,6 +100,8 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     gap: 12,
     marginBottom: 12,
+    zIndex: 2,
+    elevation: 2,
   },
   headerCopy: {
     flex: 1,
@@ -116,14 +127,17 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   closeButton: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
+    position: 'absolute',
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     backgroundColor: '#15171B',
     borderWidth: 1,
     borderColor: colors.border,
     alignItems: 'center',
     justifyContent: 'center',
+    zIndex: 30,
+    elevation: 30,
   },
   closeButtonPressed: {
     opacity: 0.82,

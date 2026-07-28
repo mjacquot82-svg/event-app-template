@@ -1,16 +1,20 @@
 // © 2026 1001538341 ONTARIO INC.
 
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, Image, useWindowDimensions } from 'react-native';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 import HomecomingHero from '../../src/components/HomecomingHero';
+import MapImageViewer from '../../src/components/MapImageViewer';
+import ShuttleRouteCard from '../../src/components/ShuttleRouteCard';
+import { getAnalyticsConfig } from '../../src/analytics/analyticsConfig';
+import { trackMapOpen } from '../../src/analytics/jdsAnalytics';
+import { eventMaps } from '../../src/data/maps';
+import { useRouteBackedMapViewer } from '../../src/hooks/useRouteBackedMapViewer';
 import { colors } from '../../src/theme/colors';
 
 const CYAN = '#16BFD6';
 const LIME = '#74D65E';
-const BUS_ROUTE_ASSET = require('../../assets/images/bus-shuttle.jpg');
-const BUS_ROUTE_ASPECT_RATIO = 1199 / 1312;
 
 function InfoRow({ day, hours }: { day: string; hours: string }) {
   return (
@@ -21,32 +25,13 @@ function InfoRow({ day, hours }: { day: string; hours: string }) {
   );
 }
 
-function ShuttleRouteCard() {
-  const { width: windowWidth } = useWindowDimensions();
-  const imageWidth = Math.min(windowWidth - 64, 760);
-  const imageHeight = imageWidth / BUS_ROUTE_ASPECT_RATIO;
-
-  return (
-    <View style={styles.imageCard}>
-      <View style={styles.cardHeader}>
-        <View style={[styles.sectionIconWrap, { backgroundColor: CYAN }]}>
-          <Feather name="map" size={18} color="#051014" />
-        </View>
-        <View style={styles.cardHeaderCopy}>
-          <Text style={styles.cardEyebrow}>Shuttle route</Text>
-          <Text style={styles.cardTitle}>Bus Route</Text>
-        </View>
-      </View>
-      <Image
-        source={BUS_ROUTE_ASSET}
-        style={[styles.routeImage, { width: imageWidth, height: imageHeight }]}
-        resizeMode="contain"
-      />
-    </View>
-  );
-}
-
 export default function VisitorInfoScreen() {
+  const { selectedMap, openMap, closeMap } = useRouteBackedMapViewer({
+    maps: eventMaps,
+    onMapOpen: (map) => trackMapOpen(getAnalyticsConfig(), { id: map.id, title: map.title }),
+  });
+  const shuttleRouteMap = eventMaps.find((map) => map.id === 'shuttle-route');
+
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
@@ -88,7 +73,7 @@ export default function VisitorInfoScreen() {
               <InfoRow day="Sunday" hours="2pm–11:30pm" />
             </View>
             
-            <ShuttleRouteCard />
+            {shuttleRouteMap ? <ShuttleRouteCard map={shuttleRouteMap} onOpen={openMap} /> : null}
           </View>
 
           <View style={styles.noteCard}>
@@ -104,6 +89,16 @@ export default function VisitorInfoScreen() {
           <View style={styles.bottomPadding} />
         </View>
       </ScrollView>
+
+      {selectedMap ? (
+        <MapImageViewer
+          visible
+          asset={selectedMap.asset}
+          title={selectedMap.title}
+          description={selectedMap.description}
+          onClose={closeMap}
+        />
+      ) : null}
     </SafeAreaView>
   );
 }
@@ -158,21 +153,10 @@ const styles = StyleSheet.create({
     borderColor: '#1F2937',
     marginBottom: 16,
   },
-  cardHeader: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 16 },
-  cardHeaderCopy: { flex: 1 },
-  cardEyebrow: { color: '#98A2AF', fontSize: 11, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 4 },
   cardTitle: { fontSize: 18, fontWeight: '900', color: '#fff' },
   infoRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#252B34' },
   infoDay: { color: '#D1D5DB', fontWeight: '800', fontSize: 14 },
   infoHours: { color: '#FFFFFF', fontWeight: '900', fontSize: 14, textAlign: 'right' },
-  imageCard: {
-    borderRadius: 20,
-    backgroundColor: '#15171B',
-    padding: 20,
-    borderWidth: 1,
-    borderColor: '#1F2937',
-  },
-  routeImage: { alignSelf: 'center' },
   noteCard: {
     marginTop: 2,
     borderRadius: 22,
