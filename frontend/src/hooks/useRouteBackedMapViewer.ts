@@ -33,6 +33,7 @@ export function useRouteBackedMapViewer({
   const pathname = usePathname();
   const params = useLocalSearchParams<{ map?: string | string[] }>();
   const openedFromHereRef = useRef(false);
+  const originPathnameRef = useRef(pathname);
   const [nativeSelectedMapId, setNativeSelectedMapId] = useState<MapAnalyticsKey | null>(null);
   const mapParam = getMapParamValue(params.map);
   const isWeb = Platform.OS === 'web';
@@ -85,6 +86,7 @@ export function useRouteBackedMapViewer({
     }
 
     if (isWeb) {
+      originPathnameRef.current = pathname;
       ignoredRouteMapIdRef.current = null;
       setWebSelectedMapId(map.id);
 
@@ -115,20 +117,14 @@ export function useRouteBackedMapViewer({
       openedFromHereRef.current = false;
       ignoredRouteMapIdRef.current = matchedRouteMapId === selectedMapId ? selectedMapId : null;
       setWebSelectedMapId(null);
-
-      try {
-        router.back();
-        return;
-      } catch {
-        router.replace(buildViewerHref(pathname, null));
-        return;
-      }
+      router.replace(buildViewerHref(originPathnameRef.current, null));
+      return;
     }
 
     openedFromHereRef.current = false;
     ignoredRouteMapIdRef.current = matchedRouteMapId === selectedMapId ? selectedMapId : null;
     setWebSelectedMapId(null);
-    router.replace(buildViewerHref(pathname, null));
+    router.replace(buildViewerHref(originPathnameRef.current, null));
   };
 
   return {
