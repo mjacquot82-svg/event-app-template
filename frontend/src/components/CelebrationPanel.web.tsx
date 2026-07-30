@@ -15,8 +15,8 @@ type Rect = {
 
 const VIEWPORT_MARGIN = 32;
 const OPENING_DELAY_MS = 1000;
-const OPENING_DURATION_MIN_MS = 5000;
-const OPENING_DURATION_MAX_MS = 7000;
+const OPENING_DURATION_MIN_MS = 7000;
+const OPENING_DURATION_MAX_MS = 9000;
 const BURST_STAGGER_MIN_MS = 110;
 const BURST_STAGGER_MAX_MS = 240;
 const NEARLY_SIMULTANEOUS_MIN_MS = 70;
@@ -39,7 +39,6 @@ type ColorPreset = {
 };
 
 type FireworksRuntime = Fireworks & {
-  initExplosion: (x: number, y: number, hue: number) => void;
   sound?: {
     play: () => void;
   };
@@ -196,21 +195,30 @@ export default function CelebrationPanel() {
       intensity: 0,
       rocketsPoint: { min: 50, max: 50 },
       boundaries: {
-        x: 0,
-        y: 0,
+        x: VIEWPORT_MARGIN,
+        y: VIEWPORT_MARGIN,
         width: viewport.width,
         height: viewport.height,
         debug: false,
       },
       mouse: {
         click: false,
-        move: false,
-        max: 0,
+        move: true,
+        max: 1,
+      },
+      delay: {
+        min: 999_999,
+        max: 999_999,
+      },
+      traceLength: 1,
+      traceSpeed: 28,
+      acceleration: 1.18,
+      lineWidth: {
+        explosion: { min: 1, max: 3 },
+        trace: { min: 0.01, max: 0.1 },
       },
     }) as FireworksRuntime;
-
     fireworksRef.current = fireworks;
-    fireworks.start();
 
     const canvas = overlay.querySelector('canvas');
     if (canvas instanceof HTMLCanvasElement) {
@@ -221,6 +229,22 @@ export default function CelebrationPanel() {
       canvas.style.pointerEvents = 'none';
       canvas.style.zIndex = '3';
     }
+
+    fireworks.start();
+
+    const aimAt = (targetX: number, targetY: number) => {
+      if (!(canvas instanceof HTMLCanvasElement) || typeof window === 'undefined') {
+        return;
+      }
+
+      canvas.dispatchEvent(new PointerEvent('pointermove', {
+        bubbles: true,
+        clientX: targetX - window.scrollX,
+        clientY: targetY - window.scrollY,
+        pointerId: 1,
+        pointerType: 'mouse',
+      }));
+    };
 
     const scheduleTimer = (delayMs: number, callback: () => void) => {
       const timerId = window.setTimeout(() => {
@@ -363,16 +387,22 @@ export default function CelebrationPanel() {
     const explodeAt = (targetX: number, targetY: number, shellSize: ShellSize) => {
       const point = moveOutsidePill(targetX, targetY);
       const shell = SHELL_OPTIONS[shellSize];
+      const hue = pickHue();
 
       fireworks.updateOptions({
         explosion: shell.explosion,
         particles: shell.particles,
+        hue: {
+          min: hue,
+          max: hue,
+        },
         lineWidth: {
           explosion: shell.lineWidth,
-          trace: { min: 1, max: 2 },
+          trace: { min: 0.01, max: 0.1 },
         },
       });
-      fireworks.initExplosion(point.x, point.y, pickHue());
+      aimAt(point.x, point.y);
+      fireworks.launch(1);
       fireworks.sound?.play();
     };
 
