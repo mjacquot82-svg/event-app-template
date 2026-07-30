@@ -8,17 +8,17 @@ import { Fireworks } from 'fireworks-js';
 
 const OPENING_DELAY_MS = 1000;
 const OPENING_DURATION_MS = 8000;
+const OVERLAY_READY_TIMEOUT_MS = 4000;
 
 export default function CelebrationPanel() {
   const wrapperRef = useRef<HTMLDivElement | null>(null);
   const overlayRef = useRef<HTMLDivElement | null>(null);
   const fireworksRef = useRef<Fireworks | null>(null);
   const timerRefs = useRef<number[]>([]);
-  const [overlayReady, setOverlayReady] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
   const [pageVisible, setPageVisible] = useState(true);
   const pillShellResponsiveStyle: React.CSSProperties =
-    overlayReady && wrapperRef.current
+    wrapperRef.current
       ? wrapperRef.current.clientWidth >= 1024
         ? { width: '62%' }
         : wrapperRef.current.clientWidth >= 768
@@ -56,33 +56,6 @@ export default function CelebrationPanel() {
   }, []);
 
   useEffect(() => {
-    const measure = () => {
-      const wrapper = wrapperRef.current;
-      if (!wrapper) {
-        setOverlayReady(false);
-        return;
-      }
-
-      setOverlayReady(wrapper.clientWidth > 0 && wrapper.clientHeight > 0);
-    };
-
-    measure();
-
-    if (typeof ResizeObserver !== 'undefined' && wrapperRef.current) {
-      const observer = new ResizeObserver(measure);
-      observer.observe(wrapperRef.current);
-      window.addEventListener('resize', measure);
-      return () => {
-        observer.disconnect();
-        window.removeEventListener('resize', measure);
-      };
-    }
-
-    window.addEventListener('resize', measure);
-    return () => window.removeEventListener('resize', measure);
-  }, []);
-
-  useEffect(() => {
     const clearTimers = () => {
       timerRefs.current.forEach((id) => window.clearTimeout(id));
       timerRefs.current = [];
@@ -96,14 +69,11 @@ export default function CelebrationPanel() {
       }
     };
 
-    if (!overlayReady || reducedMotion || !pageVisible || !overlayRef.current) {
+    if (reducedMotion) {
       clearTimers();
       destroyFireworks();
       return;
     }
-
-    const fireworks = new Fireworks(overlayRef.current);
-    fireworksRef.current = fireworks;
 
     const scheduleTimer = (delayMs: number, callback: () => void) => {
       const timerId = window.setTimeout(() => {
@@ -113,19 +83,77 @@ export default function CelebrationPanel() {
       timerRefs.current.push(timerId);
     };
 
-    scheduleTimer(OPENING_DELAY_MS, () => {
-      fireworks.start();
-      scheduleTimer(OPENING_DURATION_MS, () => {
-        fireworks.stop(true);
-        fireworksRef.current = null;
+    let cancelled = false;
+    let started = false;
+    let animationFrameId = 0;
+    let resizeObserver: ResizeObserver | null = null;
+
+    const beginSequence = () => {
+      if (cancelled || started || !pageVisible) {
+        return;
+      }
+
+      const overlay = overlayRef.current;
+      if (!overlay) {
+        return;
+      }
+
+      started = true;
+      const fireworks = new Fireworks(overlay);
+      fireworksRef.current = fireworks;
+
+      scheduleTimer(OPENING_DELAY_MS, () => {
+        fireworks.start();
+        scheduleTimer(OPENING_DURATION_MS, () => {
+          fireworks.stop(true);
+          fireworksRef.current = null;
+        });
       });
-    });
+    };
+
+    const waitForOverlay = () => {
+      if (cancelled || started) {
+        return;
+      }
+
+      const overlay = overlayRef.current;
+      if (!overlay) {
+        animationFrameId = window.requestAnimationFrame(waitForOverlay);
+        return;
+      }
+
+      if (overlay.clientWidth > 0 && overlay.clientHeight > 0) {
+        beginSequence();
+        return;
+      }
+
+      animationFrameId = window.requestAnimationFrame(waitForOverlay);
+    };
+
+    animationFrameId = window.requestAnimationFrame(waitForOverlay);
+
+    const overlay = overlayRef.current;
+    if (typeof ResizeObserver !== 'undefined' && overlay) {
+      resizeObserver = new ResizeObserver(() => {
+        if (overlay.clientWidth > 0 && overlay.clientHeight > 0) {
+          beginSequence();
+        }
+      });
+      resizeObserver.observe(overlay);
+    }
+
+    scheduleTimer(OVERLAY_READY_TIMEOUT_MS, beginSequence);
 
     return () => {
+      cancelled = true;
+      if (animationFrameId) {
+        window.cancelAnimationFrame(animationFrameId);
+      }
+      resizeObserver?.disconnect();
       clearTimers();
       destroyFireworks();
     };
-  }, [overlayReady, pageVisible, reducedMotion]);
+  }, [pageVisible, reducedMotion]);
 
   return (
     <div ref={wrapperRef} style={wrapperStyle}>
