@@ -44,6 +44,25 @@ type FireworksRuntime = Fireworks & {
   };
 };
 
+type DiagnosticsState = {
+  mounted: boolean;
+  reducedMotion: boolean;
+  pillWidth: number;
+  pillHeight: number;
+  overlayWidth: number;
+  overlayHeight: number;
+  canvasWidth: number;
+  canvasHeight: number;
+  canvasPresent: boolean;
+  instanceCreated: boolean;
+  instanceStarted: boolean;
+  launchAttempts: number;
+  pointerDispatches: number;
+  pageVisible: boolean;
+  cleanupCancelled: boolean;
+  lastRuntimeError: string | null;
+};
+
 function randomInRange(min: number, max: number) {
   return min + Math.random() * (max - min);
 }
@@ -87,6 +106,24 @@ export default function CelebrationPanel() {
   const [viewport, setViewport] = useState({ width: 0, height: 0 });
   const [reducedMotion, setReducedMotion] = useState(false);
   const [pageVisible, setPageVisible] = useState(true);
+  const [diagnostics, setDiagnostics] = useState<DiagnosticsState>({
+    mounted: false,
+    reducedMotion: false,
+    pillWidth: 0,
+    pillHeight: 0,
+    overlayWidth: 0,
+    overlayHeight: 0,
+    canvasWidth: 0,
+    canvasHeight: 0,
+    canvasPresent: false,
+    instanceCreated: false,
+    instanceStarted: false,
+    launchAttempts: 0,
+    pointerDispatches: 0,
+    pageVisible: true,
+    cleanupCancelled: false,
+    lastRuntimeError: null,
+  });
   const pillShellResponsiveStyle: React.CSSProperties =
     viewport.width >= 1024
       ? { width: '62%' }
@@ -100,7 +137,13 @@ export default function CelebrationPanel() {
     }
 
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const updatePreference = () => setReducedMotion(mediaQuery.matches);
+    const updatePreference = () => {
+      setReducedMotion(mediaQuery.matches);
+      setDiagnostics((current) => ({
+        ...current,
+        reducedMotion: mediaQuery.matches,
+      }));
+    };
     updatePreference();
 
     if (typeof mediaQuery.addEventListener === 'function') {
@@ -117,7 +160,14 @@ export default function CelebrationPanel() {
       return;
     }
 
-    const updateVisibility = () => setPageVisible(document.visibilityState !== 'hidden');
+    const updateVisibility = () => {
+      const visible = document.visibilityState !== 'hidden';
+      setPageVisible(visible);
+      setDiagnostics((current) => ({
+        ...current,
+        pageVisible: visible,
+      }));
+    };
     updateVisibility();
     document.addEventListener('visibilitychange', updateVisibility);
     return () => document.removeEventListener('visibilitychange', updateVisibility);
@@ -142,6 +192,11 @@ export default function CelebrationPanel() {
         width: rect.width,
         height: rect.height,
       });
+      setDiagnostics((current) => ({
+        ...current,
+        pillWidth: rect.width,
+        pillHeight: rect.height,
+      }));
     };
 
     measure();
@@ -167,6 +222,13 @@ export default function CelebrationPanel() {
   }, []);
 
   useEffect(() => {
+    setDiagnostics((current) => ({
+      ...current,
+      mounted: true,
+    }));
+  }, []);
+
+  useEffect(() => {
     const clearTimers = () => {
       timerRefs.current.forEach((id) => window.clearTimeout(id));
       timerRefs.current = [];
@@ -183,42 +245,76 @@ export default function CelebrationPanel() {
     if (!pillRect || viewport.width <= 0 || viewport.height <= 0 || reducedMotion || !pageVisible || !overlayRef.current) {
       clearTimers();
       destroyFireworks();
+      setDiagnostics((current) => ({
+        ...current,
+        cleanupCancelled: true,
+      }));
       return;
     }
 
     const overlay = overlayRef.current;
     overlay.style.width = `${viewport.width}px`;
     overlay.style.height = `${viewport.height}px`;
+    overlay.style.border = '2px dashed rgba(56, 189, 248, 0.8)';
+    setDiagnostics((current) => ({
+      ...current,
+      overlayWidth: viewport.width,
+      overlayHeight: viewport.height,
+      cleanupCancelled: false,
+      instanceCreated: false,
+      instanceStarted: false,
+      canvasPresent: false,
+      canvasWidth: 0,
+      canvasHeight: 0,
+      lastRuntimeError: null,
+    }));
 
-    const fireworks = new Fireworks(overlay, {
-      autoresize: false,
-      intensity: 0,
-      rocketsPoint: { min: 50, max: 50 },
-      boundaries: {
-        x: VIEWPORT_MARGIN,
-        y: VIEWPORT_MARGIN,
-        width: viewport.width,
-        height: viewport.height,
-        debug: false,
-      },
-      mouse: {
-        click: false,
-        move: true,
-        max: 1,
-      },
-      delay: {
-        min: 999_999,
-        max: 999_999,
-      },
-      traceLength: 1,
-      traceSpeed: 28,
-      acceleration: 1.18,
-      lineWidth: {
-        explosion: { min: 1, max: 3 },
-        trace: { min: 0.01, max: 0.1 },
-      },
-    }) as FireworksRuntime;
+    let fireworks: FireworksRuntime;
+    try {
+      fireworks = new Fireworks(overlay, {
+        autoresize: false,
+        intensity: 0,
+        rocketsPoint: { min: 50, max: 50 },
+        boundaries: {
+          x: VIEWPORT_MARGIN,
+          y: VIEWPORT_MARGIN,
+          width: viewport.width,
+          height: viewport.height,
+          debug: false,
+        },
+        mouse: {
+          click: false,
+          move: true,
+          max: 1,
+        },
+        delay: {
+          min: 999_999,
+          max: 999_999,
+        },
+        traceLength: 1,
+        traceSpeed: 28,
+        acceleration: 1.18,
+        lineWidth: {
+          explosion: { min: 1, max: 3 },
+          trace: { min: 0.01, max: 0.1 },
+        },
+      }) as FireworksRuntime;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      setDiagnostics((current) => ({
+        ...current,
+        lastRuntimeError: message,
+      }));
+      return () => {
+        clearTimers();
+        destroyFireworks();
+      };
+    }
     fireworksRef.current = fireworks;
+    setDiagnostics((current) => ({
+      ...current,
+      instanceCreated: true,
+    }));
 
     const canvas = overlay.querySelector('canvas');
     if (canvas instanceof HTMLCanvasElement) {
@@ -228,22 +324,57 @@ export default function CelebrationPanel() {
       canvas.style.height = '100%';
       canvas.style.pointerEvents = 'none';
       canvas.style.zIndex = '3';
+      canvas.style.border = '2px solid rgba(248, 250, 252, 0.8)';
+      setDiagnostics((current) => ({
+        ...current,
+        canvasPresent: true,
+        canvasWidth: canvas.width,
+        canvasHeight: canvas.height,
+      }));
     }
 
-    fireworks.start();
+    try {
+      fireworks.start();
+      setDiagnostics((current) => ({
+        ...current,
+        instanceStarted: true,
+      }));
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      setDiagnostics((current) => ({
+        ...current,
+        lastRuntimeError: message,
+      }));
+      return () => {
+        clearTimers();
+        destroyFireworks();
+      };
+    }
 
     const aimAt = (targetX: number, targetY: number) => {
       if (!(canvas instanceof HTMLCanvasElement) || typeof window === 'undefined') {
         return;
       }
 
-      canvas.dispatchEvent(new PointerEvent('pointermove', {
-        bubbles: true,
-        clientX: targetX - window.scrollX,
-        clientY: targetY - window.scrollY,
-        pointerId: 1,
-        pointerType: 'mouse',
-      }));
+      try {
+        canvas.dispatchEvent(new PointerEvent('pointermove', {
+          bubbles: true,
+          clientX: targetX - window.scrollX,
+          clientY: targetY - window.scrollY,
+          pointerId: 1,
+          pointerType: 'mouse',
+        }));
+        setDiagnostics((current) => ({
+          ...current,
+          pointerDispatches: current.pointerDispatches + 1,
+        }));
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        setDiagnostics((current) => ({
+          ...current,
+          lastRuntimeError: message,
+        }));
+      }
     };
 
     const scheduleTimer = (delayMs: number, callback: () => void) => {
@@ -389,21 +520,35 @@ export default function CelebrationPanel() {
       const shell = SHELL_OPTIONS[shellSize];
       const hue = pickHue();
 
-      fireworks.updateOptions({
-        explosion: shell.explosion,
-        particles: shell.particles,
-        hue: {
-          min: hue,
-          max: hue,
-        },
-        lineWidth: {
-          explosion: shell.lineWidth,
-          trace: { min: 0.01, max: 0.1 },
-        },
-      });
-      aimAt(point.x, point.y);
-      fireworks.launch(1);
-      fireworks.sound?.play();
+      try {
+        fireworks.updateOptions({
+          explosion: shell.explosion,
+          particles: shell.particles,
+          hue: {
+            min: hue,
+            max: hue,
+          },
+          lineWidth: {
+            explosion: shell.lineWidth,
+            trace: { min: 0.01, max: 0.1 },
+          },
+        });
+        aimAt(point.x, point.y);
+        fireworks.launch(1);
+        fireworks.sound?.play();
+        setDiagnostics((current) => ({
+          ...current,
+          launchAttempts: current.launchAttempts + 1,
+          canvasWidth: canvas instanceof HTMLCanvasElement ? canvas.width : current.canvasWidth,
+          canvasHeight: canvas instanceof HTMLCanvasElement ? canvas.height : current.canvasHeight,
+        }));
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        setDiagnostics((current) => ({
+          ...current,
+          lastRuntimeError: message,
+        }));
+      }
     };
 
     const sampleSequence = (count: number) => {
@@ -496,6 +641,22 @@ export default function CelebrationPanel() {
             </View>
             <Text style={styles.title}>🎆 Celebrating Walkerton Homecoming 2026</Text>
             <Text style={styles.subtitle}>Enjoy the festivities!</Text>
+            <View style={styles.diagnosticsCard}>
+              <Text style={styles.diagnosticsHeading}>Fireworks diagnostics</Text>
+              <Text style={styles.diagnosticsLine}>web component mounted: {diagnostics.mounted ? 'yes' : 'no'}</Text>
+              <Text style={styles.diagnosticsLine}>prefers-reduced-motion: {diagnostics.reducedMotion ? 'yes' : 'no'}</Text>
+              <Text style={styles.diagnosticsLine}>celebration pill: {Math.round(diagnostics.pillWidth)} × {Math.round(diagnostics.pillHeight)}</Text>
+              <Text style={styles.diagnosticsLine}>fireworks overlay: {Math.round(diagnostics.overlayWidth)} × {Math.round(diagnostics.overlayHeight)}</Text>
+              <Text style={styles.diagnosticsLine}>canvas exists: {diagnostics.canvasPresent ? 'yes' : 'no'}</Text>
+              <Text style={styles.diagnosticsLine}>canvas size: {Math.round(diagnostics.canvasWidth)} × {Math.round(diagnostics.canvasHeight)}</Text>
+              <Text style={styles.diagnosticsLine}>instance created: {diagnostics.instanceCreated ? 'yes' : 'no'}</Text>
+              <Text style={styles.diagnosticsLine}>instance started: {diagnostics.instanceStarted ? 'yes' : 'no'}</Text>
+              <Text style={styles.diagnosticsLine}>launch(1) attempts: {diagnostics.launchAttempts}</Text>
+              <Text style={styles.diagnosticsLine}>PointerEvent dispatches: {diagnostics.pointerDispatches}</Text>
+              <Text style={styles.diagnosticsLine}>visibilityState visible: {diagnostics.pageVisible ? 'yes' : 'no'}</Text>
+              <Text style={styles.diagnosticsLine}>opening cancelled in cleanup: {diagnostics.cleanupCancelled ? 'yes' : 'no'}</Text>
+              <Text style={styles.diagnosticsLine}>last runtime error: {diagnostics.lastRuntimeError ?? 'none'}</Text>
+            </View>
           </View>
         </View>
       </div>
@@ -579,5 +740,28 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     textAlign: 'center',
     marginTop: 8,
+  },
+  diagnosticsCard: {
+    marginTop: 16,
+    width: '100%',
+    maxWidth: 560,
+    borderRadius: 14,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    backgroundColor: 'rgba(6, 9, 14, 0.86)',
+    borderWidth: 1,
+    borderColor: 'rgba(115, 130, 154, 0.35)',
+  },
+  diagnosticsHeading: {
+    color: '#F8FAFC',
+    fontSize: 13,
+    fontWeight: '800',
+    marginBottom: 8,
+  },
+  diagnosticsLine: {
+    color: '#D9E1EA',
+    fontSize: 12,
+    lineHeight: 17,
+    fontWeight: '600',
   },
 });
