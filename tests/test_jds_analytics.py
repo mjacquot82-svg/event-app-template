@@ -1,12 +1,18 @@
 import asyncio
 from datetime import UTC, datetime
+from zoneinfo import ZoneInfo
 
 from backend.analytics import (
     AnalyticsLaunchPayload,
     AnalyticsLiveActivitySnapshot,
+    ANALYTICS_HOURLY_LABELS,
+    ANALYTICS_DISPLAY_TIMEZONE,
+    MongoAnalyticsRepository,
     SponsorAnalyticsSnapshot,
+    build_zero_filled_hourly_metrics,
     build_date_key,
     fetch_stats,
+    get_analytics_day_bounds,
     record_launch,
     serialize_live_activity,
 )
@@ -113,11 +119,53 @@ class InMemoryAnalyticsRepository:
             "mostViewedScheduleEvents": [],
             "mostClickedExternalLinks": [],
             "trafficByDay": [],
+            "todayTrafficByHour": [],
             "trafficByHour": [],
             "mapOpens": {},
             "liveActivity": None,
             "sponsors": SponsorAnalyticsSnapshot(),
         }
+
+
+class FakeAggregateCursor:
+    def __init__(self, rows):
+        self.rows = rows
+
+    async def to_list(self, limit: int):
+        return self.rows[:limit]
+
+
+class FakeEventsCollection:
+    def __init__(self, docs):
+        self.docs = docs
+
+    def aggregate(self, pipeline):
+        match_stage = pipeline[0]["$match"]
+        group_stage = pipeline[1]["$group"]
+        time_zone = group_stage["_id"]["$dateToString"]["timezone"]
+        display_zone = ZoneInfo(time_zone)
+        start = match_stage["timestamp"]["$gte"]
+        end = match_stage["timestamp"]["$lt"]
+        counts: dict[str, int] = {}
+
+        for doc in self.docs:
+            if doc["appId"] != match_stage["appId"]:
+                continue
+            if doc["eventName"] != match_stage["eventName"]:
+                continue
+            if not (start <= doc["timestamp"] < end):
+                continue
+
+            label = doc["timestamp"].astimezone(display_zone).strftime("%H:00")
+            counts[label] = counts.get(label, 0) + 1
+
+        rows = [{"_id": label, "value": value} for label, value in sorted(counts.items())]
+        return FakeAggregateCursor(rows)
+
+
+class FakeEventsDatabase:
+    def __init__(self, docs):
+        self.analytics_events = FakeEventsCollection(docs)
 
 
 def test_repeated_launches_from_same_device_only_increment_unique_once():
@@ -274,3 +322,146 @@ def test_serialize_live_activity_preserves_existing_utc_timezone():
     payload = serialize_live_activity(snapshot)
 
     assert payload["lastEventAt"] == "2026-01-15T17:00:00+00:00"
+
+
+def test_build_zero_filled_hourly_metrics_returns_all_24_hours():
+    metrics = build_zero_filled_hourly_metrics({"08:00": 3, "20:00": 1})
+
+    assert [metric.label for metric in metrics] == list(ANALYTICS_HOURLY_LABELS)
+    assert metrics[8].value == 3
+    assert metrics[20].value == 1
+    assert metrics[0].value == 0
+    assert metrics[23].value == 0
+
+
+def test_get_analytics_day_bounds_follow_dst_transition_lengths():
+    spring_forward_start, spring_forward_end = get_analytics_day_bounds(
+        datetime(2026, 3, 8, 12, 0, 0, tzinfo=UTC)
+    )
+    fall_back_start, fall_back_end = get_analytics_day_bounds(
+        datetime(2026, 11, 1, 12, 0, 0, tzinfo=UTC)
+    )
+
+    assert spring_forward_start == datetime(2026, 3, 8, 5, 0, 0, tzinfo=UTC)
+    assert spring_forward_end == datetime(2026, 3, 9, 4, 0, 0, tzinfo=UTC)
+    assert (spring_forward_end - spring_forward_start).total_seconds() == 23 * 60 * 60
+
+    assert fall_back_start == datetime(2026, 11, 1, 4, 0, 0, tzinfo=UTC)
+    assert fall_back_end == datetime(2026, 11, 2, 5, 0, 0, tzinfo=UTC)
+    assert (fall_back_end - fall_back_start).total_seconds() == 25 * 60 * 60
+
+
+def test_today_hourly_aggregation_uses_america_toronto_day_boundaries():
+    repository = MongoAnalyticsRepository(
+        FakeEventsDatabase(
+            [
+                {
+                    "appId": "walkerton-homecoming",
+                    "eventName": "session_started",
+                    "timestamp": datetime(2026, 7, 31, 3, 30, 0, tzinfo=UTC),
+                },
+                {
+                    "appId": "walkerton-homecoming",
+                    "eventName": "session_started",
+                    "timestamp": datetime(2026, 7, 31, 13, 15, 0, tzinfo=UTC),
+                },
+                {
+                    "appId": "walkerton-homecoming",
+                    "eventName": "session_started",
+                    "timestamp": datetime(2026, 8, 1, 1, 5, 0, tzinfo=UTC),
+                },
+                {
+                    "appId": "walkerton-homecoming",
+                    "eventName": "session_started",
+                    "timestamp": datetime(2026, 8, 1, 4, 5, 0, tzinfo=UTC),
+                },
+                {
+                    "appId": "another-app",
+                    "eventName": "session_started",
+                    "timestamp": datetime(2026, 7, 31, 13, 15, 0, tzinfo=UTC),
+                },
+            ]
+        )
+    )
+
+    metrics = asyncio.run(
+        repository._get_today_hourly_metrics(
+            app_id="walkerton-homecoming",
+            now=datetime(2026, 7, 31, 16, 0, 0, tzinfo=UTC),
+        )
+    )
+    values_by_label = {metric.label: metric.value for metric in metrics}
+
+    assert len(metrics) == 24
+    assert values_by_label["09:00"] == 1
+    assert values_by_label["21:00"] == 1
+    assert values_by_label["23:00"] == 0
+
+
+def test_today_hourly_aggregation_combines_repeated_dst_hour_in_toronto():
+    repository = MongoAnalyticsRepository(
+        FakeEventsDatabase(
+            [
+                {
+                    "appId": "walkerton-homecoming",
+                    "eventName": "session_started",
+                    "timestamp": datetime(2026, 11, 1, 5, 30, 0, tzinfo=UTC),
+                },
+                {
+                    "appId": "walkerton-homecoming",
+                    "eventName": "session_started",
+                    "timestamp": datetime(2026, 11, 1, 6, 30, 0, tzinfo=UTC),
+                },
+                {
+                    "appId": "walkerton-homecoming",
+                    "eventName": "session_started",
+                    "timestamp": datetime(2026, 11, 1, 7, 30, 0, tzinfo=UTC),
+                },
+            ]
+        )
+    )
+
+    metrics = asyncio.run(
+        repository._get_today_hourly_metrics(
+            app_id="walkerton-homecoming",
+            now=datetime(2026, 11, 1, 18, 0, 0, tzinfo=UTC),
+        )
+    )
+    values_by_label = {metric.label: metric.value for metric in metrics}
+
+    assert ANALYTICS_DISPLAY_TIMEZONE == "America/Toronto"
+    assert values_by_label["01:00"] == 2
+    assert values_by_label["02:00"] == 1
+
+
+def test_today_hourly_aggregation_keeps_future_hours_empty():
+    repository = MongoAnalyticsRepository(
+        FakeEventsDatabase(
+            [
+                {
+                    "appId": "walkerton-homecoming",
+                    "eventName": "session_started",
+                    "timestamp": datetime(2026, 7, 31, 16, 15, 0, tzinfo=UTC),
+                },
+                {
+                    "appId": "walkerton-homecoming",
+                    "eventName": "session_started",
+                    "timestamp": datetime(2026, 7, 31, 23, 10, 0, tzinfo=UTC),
+                },
+            ]
+        )
+    )
+
+    metrics = asyncio.run(
+        repository._get_today_hourly_metrics(
+            app_id="walkerton-homecoming",
+            now=datetime(2026, 8, 1, 0, 5, 0, tzinfo=UTC),
+        )
+    )
+    values_by_label = {metric.label: metric.value for metric in metrics}
+
+    assert values_by_label["12:00"] == 1
+    assert values_by_label["19:00"] == 1
+    assert values_by_label["21:00"] == 0
+    assert values_by_label["22:00"] == 0
+    assert values_by_label["23:00"] == 0

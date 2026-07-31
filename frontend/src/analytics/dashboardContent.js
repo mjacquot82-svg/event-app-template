@@ -50,7 +50,8 @@ const APPLICATION_SUMMARY_METRICS = [
   {
     key: 'uniqueDevices',
     label: 'Unique Devices',
-    description: 'Unique persisted browser/app storage IDs, not a confirmed count of people.',
+    description:
+      'Unique persisted browser/app storage IDs, not a confirmed count of people. Best estimate of total app users. Actual people may be slightly lower because one person can use multiple devices or browsers.',
   },
   {
     key: 'returningDevices',
@@ -139,9 +140,14 @@ const LIST_SECTION_COPY = {
     subtitle: 'Recorded session-start events grouped by calendar day.',
     emptyLabel: 'No daily session-start data available yet.',
   },
+  todayTrafficByHour: {
+    title: "Today's Session Starts by Hour",
+    subtitle: "Today's session-start events grouped by local hour in America/Toronto.",
+    emptyLabel: 'No session starts recorded for today yet.',
+  },
   trafficByHour: {
-    title: 'Session Starts by Hour',
-    subtitle: 'Recorded session-start events grouped by hour of day.',
+    title: 'Historical Session Starts by Hour',
+    subtitle: 'All recorded session-start events grouped by local hour in America/Toronto.',
     emptyLabel: 'No hourly session-start data available yet.',
   },
   mostVisitedPages: {

@@ -15,6 +15,10 @@ const {
   ANALYTICS_TIME_ZONE,
   formatAnalyticsTimestamp,
 } = require('../src/analytics/timezone.js');
+const {
+  ALL_HOURLY_LABELS,
+  normalizeHourlyMetrics,
+} = require('../src/analytics/hourlySeries.js');
 
 test('analytics dashboard uses corrected summary and sponsor labels', () => {
   assert.deepEqual(
@@ -34,7 +38,7 @@ test('analytics dashboard uses corrected summary and sponsor labels', () => {
 
   assert.equal(LIST_SECTION_COPY.mostSelectedSponsors.title, 'Most Selected Sponsors');
   assert.equal(LIST_SECTION_COPY.trafficByDay.title, 'Session Starts by Day');
-  assert.equal(LIST_SECTION_COPY.trafficByHour.title, 'Session Starts by Hour');
+  assert.equal(LIST_SECTION_COPY.trafficByHour.title, 'Historical Session Starts by Hour');
 });
 
 test('analytics dashboard descriptions explain current metric definitions', () => {
@@ -85,6 +89,19 @@ test('JDS Website Clicks is not sponsor-scoped in dashboard copy', () => {
   );
 });
 
+test('analytics dashboard exposes operational and historical hourly session sections', () => {
+  assert.equal(LIST_SECTION_COPY.todayTrafficByHour.title, "Today's Session Starts by Hour");
+  assert.equal(
+    LIST_SECTION_COPY.todayTrafficByHour.subtitle,
+    "Today's session-start events grouped by local hour in America/Toronto."
+  );
+  assert.equal(LIST_SECTION_COPY.trafficByHour.title, 'Historical Session Starts by Hour');
+  assert.equal(
+    LIST_SECTION_COPY.trafficByHour.subtitle,
+    'All recorded session-start events grouped by local hour in America/Toronto.'
+  );
+});
+
 test('dashboard section component does not render duplicate expanded subtitles', () => {
   const analyticsScreenPath = path.join(__dirname, '..', 'app', 'analytics.tsx');
   const analyticsScreenSource = fs.readFileSync(analyticsScreenPath, 'utf8');
@@ -96,6 +113,43 @@ test('dashboard section component does not render duplicate expanded subtitles',
     dashboardSectionSource.includes('<Text style={styles.sectionSubtitle}>{subtitle}</Text>'),
     false
   );
+});
+
+test('analytics dashboard renders both today and historical hourly session sections', () => {
+  const analyticsScreenPath = path.join(__dirname, '..', 'app', 'analytics.tsx');
+  const analyticsScreenSource = fs.readFileSync(analyticsScreenPath, 'utf8');
+
+  assert.match(analyticsScreenSource, /LIST_SECTION_COPY\.todayTrafficByHour\.title/);
+  assert.match(analyticsScreenSource, /items=\{todayTrafficByHour\}/);
+  assert.match(analyticsScreenSource, /normalizeHourlyMetrics\(stats\?\.todayTrafficByHour\)/);
+  assert.match(analyticsScreenSource, /LIST_SECTION_COPY\.trafficByHour\.title/);
+});
+
+test('hourly metric normalizer always returns all 24 hours with zero-filled gaps', () => {
+  const metrics = normalizeHourlyMetrics([
+    { label: '08:00', value: 3 },
+    { label: '20:00', value: 1 },
+  ]);
+
+  assert.deepEqual(metrics.map((metric) => metric.label), ALL_HOURLY_LABELS);
+  assert.equal(metrics.length, 24);
+  assert.equal(metrics[8].value, 3);
+  assert.equal(metrics[20].value, 1);
+  assert.equal(metrics[0].value, 0);
+  assert.equal(metrics[23].value, 0);
+});
+
+test('hourly metric normalizer reflects current-day updates when new values arrive', () => {
+  const initialMetrics = normalizeHourlyMetrics([{ label: '09:00', value: 1 }]);
+  const refreshedMetrics = normalizeHourlyMetrics([
+    { label: '09:00', value: 2 },
+    { label: '10:00', value: 1 },
+  ]);
+
+  assert.equal(initialMetrics[9].value, 1);
+  assert.equal(initialMetrics[10].value, 0);
+  assert.equal(refreshedMetrics[9].value, 2);
+  assert.equal(refreshedMetrics[10].value, 1);
 });
 
 test('analytics timestamps are presented in America/Toronto with DST-aware offsets', () => {
