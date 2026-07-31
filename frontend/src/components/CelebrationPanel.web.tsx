@@ -9,6 +9,7 @@ import { Fireworks } from 'fireworks-js';
 const OPENING_DELAY_MS = 1000;
 const OPENING_DURATION_MS = 8000;
 const OVERLAY_READY_TIMEOUT_MS = 4000;
+const FIREWORKS_HUES = [188, 325, 104] as const;
 
 export default function CelebrationPanel() {
   const wrapperRef = useRef<HTMLDivElement | null>(null);
@@ -82,6 +83,7 @@ export default function CelebrationPanel() {
       }, delayMs);
       timerRefs.current.push(timerId);
     };
+    const pickHue = () => FIREWORKS_HUES[Math.floor(Math.random() * FIREWORKS_HUES.length)];
 
     let cancelled = false;
     let started = false;
@@ -99,7 +101,22 @@ export default function CelebrationPanel() {
       }
 
       started = true;
-      const fireworks = new Fireworks(overlay);
+      const fireworks = new Fireworks(overlay, {
+        hue: { min: FIREWORKS_HUES[0], max: FIREWORKS_HUES[0] },
+      });
+      const runtime = fireworks as Fireworks & {
+        createTrace?: () => void;
+      };
+      if (typeof runtime.createTrace === 'function') {
+        const originalCreateTrace = runtime.createTrace.bind(runtime);
+        runtime.createTrace = () => {
+          const hue = pickHue();
+          fireworks.updateOptions({
+            hue: { min: hue, max: hue },
+          });
+          originalCreateTrace();
+        };
+      }
       fireworksRef.current = fireworks;
 
       scheduleTimer(OPENING_DELAY_MS, () => {
