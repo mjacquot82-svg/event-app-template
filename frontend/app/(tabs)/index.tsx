@@ -15,6 +15,7 @@ import { eventConfig } from '../../src/data/eventConfig';
 import { productionHomeEvents, type ProductionHomeEvent } from '../../src/data/productionSchedule';
 import { colors } from '../../src/theme/colors';
 import BrandFooter from '../../src/components/BrandFooter';
+import CelebrationPanel from '../../src/components/CelebrationPanel';
 import HomecomingHero from '../../src/components/HomecomingHero';
 import { getAnalyticsConfig } from '../../src/analytics/analyticsConfig';
 import { trackQuickActionOpen } from '../../src/analytics/jdsAnalytics';
@@ -29,12 +30,6 @@ const categoryColors: Record<ProductionHomeEvent['category'], string> = {
   Community: '#16BFD6',
   Merch: '#FFFFFF',
 };
-
-function getDaysUntil(dateString: string) {
-  const target = new Date(`${dateString}T00:00:00`);
-  const today = new Date();
-  return Math.max(0, Math.ceil((target.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)));
-}
 
 function getCurrentOrNextEvents() {
   const today = new Date();
@@ -111,7 +106,6 @@ export default function HomeScreen() {
   const { width } = useWindowDimensions();
   const isWide = width >= 960;
   const contentMaxWidth = isWide ? 1080 : 760;
-  const days = getDaysUntil('2026-07-30');
   const dynamicEvents = useMemo(() => getCurrentOrNextEvents(), []);
 
   const actionsById = useMemo(
@@ -196,13 +190,7 @@ export default function HomeScreen() {
           <Text style={styles.detailsSummary}>{eventConfig.event.description}</Text>
         </View>
 
-        <View style={styles.countdownCard}>
-          <Text style={styles.countdownEyebrow}>Countdown</Text>
-          <View style={styles.countdownValueRow}>
-            <Text style={styles.countdownNumber}>{days}</Text>
-            <Text style={styles.countdownLabel}>days until homecoming</Text>
-          </View>
-        </View>
+        <CelebrationPanel />
 
         <View style={styles.sectionCard}>
           <View style={styles.sectionHeader}>
@@ -308,45 +296,6 @@ const styles = StyleSheet.create({
     lineHeight: 21,
     textAlign: 'center',
     maxWidth: 760,
-  },
-  countdownCard: {
-    borderRadius: 22,
-    backgroundColor: '#111214',
-    paddingHorizontal: 24,
-    paddingVertical: 24,
-    alignItems: 'center',
-    marginBottom: 14,
-    borderWidth: 1,
-    borderColor: '#1E2229',
-    shadowColor: '#000000',
-    shadowOpacity: 0.18,
-    shadowRadius: 16,
-    shadowOffset: { width: 0, height: 10 },
-    elevation: 5,
-  },
-  countdownEyebrow: {
-    color: colors.primary,
-    fontSize: 12,
-    fontWeight: '800',
-    letterSpacing: 1,
-    textTransform: 'uppercase',
-    marginBottom: 10,
-  },
-  countdownValueRow: {
-    alignItems: 'center',
-  },
-  countdownNumber: {
-    color: colors.utility,
-    fontSize: 48,
-    lineHeight: 52,
-    fontWeight: '900',
-  },
-  countdownLabel: {
-    color: '#EBEEF2',
-    fontSize: 16,
-    fontWeight: '700',
-    marginTop: 4,
-    textAlign: 'center',
   },
   sectionCard: {
     borderRadius: 22,
