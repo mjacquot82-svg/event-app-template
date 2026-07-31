@@ -11,6 +11,10 @@ const {
   LIVE_ACTIVITY_METRICS,
   SPONSOR_METRICS,
 } = require('../src/analytics/dashboardContent.js');
+const {
+  ANALYTICS_TIME_ZONE,
+  formatAnalyticsTimestamp,
+} = require('../src/analytics/timezone.js');
 
 test('analytics dashboard uses corrected summary and sponsor labels', () => {
   assert.deepEqual(
@@ -92,4 +96,18 @@ test('dashboard section component does not render duplicate expanded subtitles',
     dashboardSectionSource.includes('<Text style={styles.sectionSubtitle}>{subtitle}</Text>'),
     false
   );
+});
+
+test('analytics timestamps are presented in America/Toronto with DST-aware offsets', () => {
+  assert.equal(ANALYTICS_TIME_ZONE, 'America/Toronto');
+
+  const winterTimestamp = formatAnalyticsTimestamp('2026-01-15T17:00:00+00:00');
+  assert.match(winterTimestamp, /Jan/);
+  assert.match(winterTimestamp, /12:00:00 p\.m\./i);
+  assert.match(winterTimestamp, /EST/);
+
+  const summerTimestamp = formatAnalyticsTimestamp('2026-07-15T16:00:00+00:00');
+  assert.match(summerTimestamp, /Jul/);
+  assert.match(summerTimestamp, /12:00:00 p\.m\./i);
+  assert.match(summerTimestamp, /EDT/);
 });
