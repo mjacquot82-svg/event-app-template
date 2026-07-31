@@ -230,6 +230,7 @@ class AnalyticsStatsResponse(BaseModel):
     mostViewedScheduleEvents: List[AnalyticsMetricResponse] = Field(default_factory=list)
     mostClickedExternalLinks: List[AnalyticsMetricResponse] = Field(default_factory=list)
     trafficByDay: List[AnalyticsMetricResponse] = Field(default_factory=list)
+    todayTrafficByHour: List[AnalyticsMetricResponse] = Field(default_factory=list)
     trafficByHour: List[AnalyticsMetricResponse] = Field(default_factory=list)
     mapOpens: Dict[str, int] = Field(default_factory=dict)
     liveActivity: AnalyticsLiveActivityResponse = Field(
