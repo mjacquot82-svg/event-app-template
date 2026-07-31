@@ -24,6 +24,7 @@ import {
   SECTION_COPY,
   SPONSOR_METRICS,
 } from '../src/analytics/dashboardContent';
+import { normalizeHourlyMetrics } from '../src/analytics/hourlySeries';
 import { formatAnalyticsTimestamp } from '../src/analytics/timezone';
 
 const { apiBaseUrl: API_BASE_URL, appId: ANALYTICS_APP_ID } = getAnalyticsConfig();
@@ -53,6 +54,7 @@ type AnalyticsStatsResponse = {
   mostViewedScheduleEvents?: AnalyticsListMetric[];
   mostClickedExternalLinks?: AnalyticsListMetric[];
   trafficByDay?: AnalyticsListMetric[];
+  todayTrafficByHour?: AnalyticsListMetric[];
   trafficByHour?: AnalyticsListMetric[];
   liveActivity?: {
     lastEventName?: string | null;
@@ -394,6 +396,7 @@ export default function AnalyticsDashboardScreen() {
       description: JDS_MARKETING_METRICS[0].description,
     },
   ];
+  const todayTrafficByHour = normalizeHourlyMetrics(stats?.todayTrafficByHour);
 
   const toggleSection = (section: DashboardSectionKey) => {
     setExpandedSections((current) => ({
@@ -541,6 +544,13 @@ export default function AnalyticsDashboardScreen() {
                   subtitle={LIST_SECTION_COPY.trafficByDay.subtitle}
                   items={stats?.trafficByDay ?? []}
                   emptyLabel={LIST_SECTION_COPY.trafficByDay.emptyLabel}
+                />
+
+                <ListSection
+                  title={LIST_SECTION_COPY.todayTrafficByHour.title}
+                  subtitle={LIST_SECTION_COPY.todayTrafficByHour.subtitle}
+                  items={todayTrafficByHour}
+                  emptyLabel={LIST_SECTION_COPY.todayTrafficByHour.emptyLabel}
                 />
 
                 <ListSection
