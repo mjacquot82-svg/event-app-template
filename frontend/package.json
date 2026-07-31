@@ -8,7 +8,8 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "lint": "expo lint"
+    "lint": "expo lint",
+    "test:dashboard": "node --test tests/*.test.cjs"
   },
   "dependencies": {
     "@babel/runtime": "^7.20.6",

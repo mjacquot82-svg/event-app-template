@@ -1,7 +1,13 @@
 import asyncio
 from datetime import datetime
 
-from backend.analytics import AnalyticsLaunchPayload, build_date_key, fetch_stats, record_launch
+from backend.analytics import (
+    AnalyticsLaunchPayload,
+    SponsorAnalyticsSnapshot,
+    build_date_key,
+    fetch_stats,
+    record_launch,
+)
 
 
 class InMemoryAnalyticsRepository:
@@ -93,6 +99,23 @@ class InMemoryAnalyticsRepository:
 
     async def get_daily_launches(self, *, app_id: str, date_key: str) -> int:
         return self.daily_totals.get((app_id, date_key), 0)
+
+    async def fetch_event_overview(self, *, app_id: str, now: datetime):
+        return {
+            "totalSessions": 0,
+            "returningVisitors": 0,
+            "averageSessionDurationSeconds": 0,
+            "mostVisitedPages": [],
+            "mostUsedQuickActions": [],
+            "mostViewedMaps": [],
+            "mostViewedScheduleEvents": [],
+            "mostClickedExternalLinks": [],
+            "trafficByDay": [],
+            "trafficByHour": [],
+            "mapOpens": {},
+            "liveActivity": None,
+            "sponsors": SponsorAnalyticsSnapshot(),
+        }
 
 
 def test_repeated_launches_from_same_device_only_increment_unique_once():
