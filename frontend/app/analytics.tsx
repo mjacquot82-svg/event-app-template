@@ -15,6 +15,15 @@ import appConfig from '../src/data/eventConfig';
 import { parseJsonResponse } from '../src/utils/fetchJson';
 import { eventMaps, type MapAnalyticsKey } from '../src/data/maps';
 import { getAnalyticsConfig } from '../src/analytics/analyticsConfig';
+import {
+  APPLICATION_SUMMARY_METRICS,
+  JDS_MARKETING_METRICS,
+  LAUNCH_METRICS,
+  LIST_SECTION_COPY,
+  LIVE_ACTIVITY_METRICS,
+  SECTION_COPY,
+  SPONSOR_METRICS,
+} from '../src/analytics/dashboardContent';
 
 const { apiBaseUrl: API_BASE_URL, appId: ANALYTICS_APP_ID } = getAnalyticsConfig();
 const REFRESH_INTERVAL_MS = 30_000;
@@ -65,6 +74,7 @@ type MetricCardProps = {
   label: string;
   value: number | string;
   accentColor: string;
+  description?: string;
 };
 
 type ListSectionProps = {
@@ -94,12 +104,13 @@ type DashboardSectionProps = {
   children: React.ReactNode;
 };
 
-function MetricCard({ label, value, accentColor }: MetricCardProps) {
+function MetricCard({ label, value, accentColor, description }: MetricCardProps) {
   return (
     <View style={styles.metricCard}>
       <View style={[styles.metricAccent, { backgroundColor: accentColor }]} />
       <Text style={styles.metricValue}>{typeof value === 'number' ? value.toLocaleString() : value}</Text>
       <Text style={styles.metricLabel}>{label}</Text>
+      {description ? <Text style={styles.metricDescription}>{description}</Text> : null}
     </View>
   );
 }
@@ -167,7 +178,6 @@ function DashboardSection({
 
       {expanded ? (
         <View style={styles.sectionBody}>
-          <Text style={styles.sectionSubtitle}>{subtitle}</Text>
           {children}
         </View>
       ) : null}
@@ -265,47 +275,55 @@ export default function AnalyticsDashboardScreen() {
 
   const applicationSummaryMetrics = [
     {
-      label: 'Total Sessions',
+      label: APPLICATION_SUMMARY_METRICS[0].label,
       value: stats?.totalSessions ?? stats?.totalLaunches ?? 0,
       accentColor: themeColors.accent,
+      description: APPLICATION_SUMMARY_METRICS[0].description,
     },
     {
-      label: 'Unique Visitors',
+      label: APPLICATION_SUMMARY_METRICS[1].label,
       value: stats?.uniqueVisitors ?? stats?.uniqueDevices ?? 0,
       accentColor: themeColors.primary,
+      description: APPLICATION_SUMMARY_METRICS[1].description,
     },
     {
-      label: 'Returning Visitors',
+      label: APPLICATION_SUMMARY_METRICS[2].label,
       value: stats?.returningVisitors ?? 0,
       accentColor: themeColors.utility,
+      description: APPLICATION_SUMMARY_METRICS[2].description,
     },
     {
-      label: 'Average Session Duration',
+      label: APPLICATION_SUMMARY_METRICS[3].label,
       value: formatDuration(stats?.averageSessionDurationSeconds),
       accentColor: themeColors.warning,
+      description: APPLICATION_SUMMARY_METRICS[3].description,
     },
   ];
 
   const launchMetrics = [
     {
-      label: 'Installed Devices',
+      label: LAUNCH_METRICS[0].label,
       value: stats?.installedDevices ?? 0,
       accentColor: themeColors.utility,
+      description: LAUNCH_METRICS[0].description,
     },
     {
-      label: 'Browser Only Devices',
+      label: LAUNCH_METRICS[1].label,
       value: stats?.browserOnlyDevices ?? 0,
       accentColor: themeColors.warning,
+      description: LAUNCH_METRICS[1].description,
     },
     {
-      label: 'Total Launches',
+      label: LAUNCH_METRICS[2].label,
       value: stats?.totalLaunches ?? 0,
       accentColor: themeColors.accent,
+      description: LAUNCH_METRICS[2].description,
     },
     {
-      label: 'Launches Today',
+      label: LAUNCH_METRICS[3].label,
       value: stats?.launchesToday ?? 0,
       accentColor: themeColors.primaryLight,
+      description: LAUNCH_METRICS[3].description,
     },
   ];
 
@@ -320,67 +338,72 @@ export default function AnalyticsDashboardScreen() {
 
   const liveActivityMetrics = [
     {
-      label: 'Last Analytics Event',
+      label: LIVE_ACTIVITY_METRICS[0].label,
       value: stats?.liveActivity?.lastEventName || 'No data yet',
       accentColor: themeColors.primary,
+      description: LIVE_ACTIVITY_METRICS[0].description,
     },
     {
-      label: 'Last Event Received',
+      label: LIVE_ACTIVITY_METRICS[1].label,
       value: formatTimestamp(stats?.liveActivity?.lastEventAt),
       accentColor: themeColors.utility,
+      description: LIVE_ACTIVITY_METRICS[1].description,
     },
     {
-      label: 'Active Sessions',
+      label: LIVE_ACTIVITY_METRICS[2].label,
       value: stats?.liveActivity?.activeSessions ?? 0,
       accentColor: themeColors.accent,
+      description: LIVE_ACTIVITY_METRICS[2].description,
     },
     {
-      label: 'Events Last Minute',
+      label: LIVE_ACTIVITY_METRICS[3].label,
       value: stats?.liveActivity?.eventsReceivedLastMinute ?? 0,
       accentColor: themeColors.warning,
+      description: LIVE_ACTIVITY_METRICS[3].description,
     },
     {
-      label: 'Events Last Five Minutes',
+      label: LIVE_ACTIVITY_METRICS[4].label,
       value: stats?.liveActivity?.eventsReceivedLastFiveMinutes ?? 0,
       accentColor: themeColors.primaryLight,
+      description: LIVE_ACTIVITY_METRICS[4].description,
     },
     {
-      label: 'JDS Website Clicks',
+      label: JDS_MARKETING_METRICS[0].label,
       value: stats?.jdsWebsiteClicks ?? 0,
       accentColor: themeColors.primary,
+      description: JDS_MARKETING_METRICS[0].description,
     },
   ];
 
   const sponsorMetrics = [
     {
-      label: 'Total Sponsor Page Views',
+      label: SPONSOR_METRICS[0].label,
       value: stats?.totalSponsorPageViews ?? 0,
       accentColor: themeColors.primary,
+      description: SPONSOR_METRICS[0].description,
     },
     {
-      label: 'Unique Visitors to Sponsors',
+      label: SPONSOR_METRICS[1].label,
       value: stats?.uniqueVisitorsToSponsors ?? 0,
       accentColor: themeColors.utility,
+      description: SPONSOR_METRICS[1].description,
     },
     {
-      label: 'Average Sponsor Page Duration',
+      label: SPONSOR_METRICS[2].label,
       value: stats?.averageTimeSpentOnSponsorsPageSeconds
         ? formatDuration(stats.averageTimeSpentOnSponsorsPageSeconds)
         : 'Not available',
       accentColor: themeColors.warning,
-    },
-    {
-      label: 'JDS Website Clicks',
-      value: stats?.jdsWebsiteClicks ?? 0,
-      accentColor: themeColors.accent,
+      description: SPONSOR_METRICS[2].description,
     },
   ];
 
   const jdsMarketingMetrics = [
     {
-      label: 'JDS Website Clicks',
+      label: JDS_MARKETING_METRICS[0].label,
       value: stats?.jdsWebsiteClicks ?? 0,
       accentColor: themeColors.primary,
+      description: JDS_MARKETING_METRICS[0].description,
     },
   ];
 
@@ -449,8 +472,8 @@ export default function AnalyticsDashboardScreen() {
               ) : null}
 
               <DashboardSection
-                title="Dashboard Overview"
-                subtitle="High-level session and visitor activity across the application."
+                title={SECTION_COPY.overview.title}
+                subtitle={SECTION_COPY.overview.subtitle}
                 expanded={expandedSections.overview}
                 onToggle={() => toggleSection('overview')}
               >
@@ -471,8 +494,8 @@ export default function AnalyticsDashboardScreen() {
               </DashboardSection>
 
               <DashboardSection
-                title="Live Activity"
-                subtitle="Operational visibility using the existing dashboard refresh cycle."
+                title={SECTION_COPY.live.title}
+                subtitle={SECTION_COPY.live.subtitle}
                 expanded={expandedSections.live}
                 onToggle={() => toggleSection('live')}
               >
@@ -505,8 +528,8 @@ export default function AnalyticsDashboardScreen() {
               </DashboardSection>
 
               <DashboardSection
-                title="Visitor Analytics"
-                subtitle="Traffic and audience trends across sessions and devices."
+                title={SECTION_COPY.visitor.title}
+                subtitle={SECTION_COPY.visitor.subtitle}
                 expanded={expandedSections.visitor}
                 onToggle={() => toggleSection('visitor')}
               >
@@ -526,58 +549,58 @@ export default function AnalyticsDashboardScreen() {
                 </View>
 
                 <ListSection
-                  title="Traffic by Day"
-                  subtitle="Usage volume grouped by calendar day."
+                  title={LIST_SECTION_COPY.trafficByDay.title}
+                  subtitle={LIST_SECTION_COPY.trafficByDay.subtitle}
                   items={stats?.trafficByDay ?? []}
-                  emptyLabel="No daily traffic data available yet."
+                  emptyLabel={LIST_SECTION_COPY.trafficByDay.emptyLabel}
                 />
 
                 <ListSection
-                  title="Traffic by Hour"
-                  subtitle="Usage volume grouped by hour of day."
+                  title={LIST_SECTION_COPY.trafficByHour.title}
+                  subtitle={LIST_SECTION_COPY.trafficByHour.subtitle}
                   items={stats?.trafficByHour ?? []}
-                  emptyLabel="No hourly traffic data available yet."
+                  emptyLabel={LIST_SECTION_COPY.trafficByHour.emptyLabel}
                 />
               </DashboardSection>
 
               <DashboardSection
-                title="Navigation Analytics"
-                subtitle="How visitors move through core pages and quick-entry actions."
+                title={SECTION_COPY.navigation.title}
+                subtitle={SECTION_COPY.navigation.subtitle}
                 expanded={expandedSections.navigation}
                 onToggle={() => toggleSection('navigation')}
               >
                 <ListSection
-                  title="Most Visited Pages"
-                  subtitle="Which core pages visitors opened most often."
+                  title={LIST_SECTION_COPY.mostVisitedPages.title}
+                  subtitle={LIST_SECTION_COPY.mostVisitedPages.subtitle}
                   items={stats?.mostVisitedPages ?? []}
-                  emptyLabel="No page-view data available yet."
+                  emptyLabel={LIST_SECTION_COPY.mostVisitedPages.emptyLabel}
                 />
 
                 <ListSection
-                  title="Most Used Quick Actions"
-                  subtitle="Quick actions visitors opened from the home experience."
+                  title={LIST_SECTION_COPY.mostUsedQuickActions.title}
+                  subtitle={LIST_SECTION_COPY.mostUsedQuickActions.subtitle}
                   items={stats?.mostUsedQuickActions ?? []}
-                  emptyLabel="No quick-action data available yet."
+                  emptyLabel={LIST_SECTION_COPY.mostUsedQuickActions.emptyLabel}
                 />
               </DashboardSection>
 
               <DashboardSection
-                title="Schedule Analytics"
-                subtitle="Schedule detail engagement and event interest."
+                title={SECTION_COPY.schedule.title}
+                subtitle={SECTION_COPY.schedule.subtitle}
                 expanded={expandedSections.schedule}
                 onToggle={() => toggleSection('schedule')}
               >
                 <ListSection
-                  title="Most Viewed Schedule Events"
-                  subtitle="Event detail views from the schedule."
+                  title={LIST_SECTION_COPY.mostViewedScheduleEvents.title}
+                  subtitle={LIST_SECTION_COPY.mostViewedScheduleEvents.subtitle}
                   items={stats?.mostViewedScheduleEvents ?? []}
-                  emptyLabel="No schedule event views available yet."
+                  emptyLabel={LIST_SECTION_COPY.mostViewedScheduleEvents.emptyLabel}
                 />
               </DashboardSection>
 
               <DashboardSection
-                title="Map Analytics"
-                subtitle="Map usage totals and ranking across the app."
+                title={SECTION_COPY.maps.title}
+                subtitle={SECTION_COPY.maps.subtitle}
                 expanded={expandedSections.maps}
                 onToggle={() => toggleSection('maps')}
               >
@@ -597,16 +620,16 @@ export default function AnalyticsDashboardScreen() {
                 </View>
 
                 <ListSection
-                  title="Most Viewed Maps"
-                  subtitle="Top map opens across the app."
+                  title={LIST_SECTION_COPY.mostViewedMaps.title}
+                  subtitle={LIST_SECTION_COPY.mostViewedMaps.subtitle}
                   items={stats?.mostViewedMaps ?? []}
-                  emptyLabel="No map analytics available yet."
+                  emptyLabel={LIST_SECTION_COPY.mostViewedMaps.emptyLabel}
                 />
               </DashboardSection>
 
               <DashboardSection
-                title="Sponsor Analytics"
-                subtitle="Sponsor page traffic and sponsor selection engagement."
+                title={SECTION_COPY.sponsors.title}
+                subtitle={SECTION_COPY.sponsors.subtitle}
                 expanded={expandedSections.sponsors}
                 onToggle={() => toggleSection('sponsors')}
               >
@@ -626,16 +649,16 @@ export default function AnalyticsDashboardScreen() {
                 </View>
 
                 <ListSection
-                  title="Most Viewed Sponsors"
-                  subtitle="Sponsors selected from the Sponsors page."
+                  title={LIST_SECTION_COPY.mostSelectedSponsors.title}
+                  subtitle={LIST_SECTION_COPY.mostSelectedSponsors.subtitle}
                   items={stats?.mostViewedSponsors ?? []}
-                  emptyLabel="No sponsor selections available yet."
+                  emptyLabel={LIST_SECTION_COPY.mostSelectedSponsors.emptyLabel}
                 />
               </DashboardSection>
 
               <DashboardSection
-                title="JDS Marketing"
-                subtitle="Business-case metrics tied to JDS Studio traffic generation."
+                title={SECTION_COPY.jds.title}
+                subtitle={SECTION_COPY.jds.subtitle}
                 expanded={expandedSections.jds}
                 onToggle={() => toggleSection('jds')}
               >
@@ -656,22 +679,22 @@ export default function AnalyticsDashboardScreen() {
               </DashboardSection>
 
               <DashboardSection
-                title="External Links"
-                subtitle="Outbound destination activity across links opened from the app."
+                title={SECTION_COPY.external.title}
+                subtitle={SECTION_COPY.external.subtitle}
                 expanded={expandedSections.external}
                 onToggle={() => toggleSection('external')}
               >
                 <ListSection
-                  title="Most Clicked External Links"
-                  subtitle="Outbound destinations visitors tapped most often."
+                  title={LIST_SECTION_COPY.mostClickedExternalLinks.title}
+                  subtitle={LIST_SECTION_COPY.mostClickedExternalLinks.subtitle}
                   items={stats?.mostClickedExternalLinks ?? []}
-                  emptyLabel="No external link activity available yet."
+                  emptyLabel={LIST_SECTION_COPY.mostClickedExternalLinks.emptyLabel}
                 />
               </DashboardSection>
 
               <DashboardSection
-                title="System Information"
-                subtitle="Application metadata and compatibility-oriented launch context."
+                title={SECTION_COPY.system.title}
+                subtitle={SECTION_COPY.system.subtitle}
                 expanded={expandedSections.system}
                 onToggle={() => toggleSection('system')}
               >
@@ -936,6 +959,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 20,
     fontWeight: '600',
+  },
+  metricDescription: {
+    color: themeColors.textMuted,
+    fontSize: 12,
+    lineHeight: 18,
+    marginTop: 8,
   },
   listContainer: {
     backgroundColor: themeColors.backgroundElevated,
