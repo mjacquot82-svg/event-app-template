@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
 from typing import Any, Optional, Protocol
+from zoneinfo import ZoneInfo
 
 try:
     from pymongo import ReturnDocument
@@ -13,6 +14,8 @@ except ModuleNotFoundError:
 
 
 ANALYTICS_DISPLAY_TIMEZONE = "America/Toronto"
+ANALYTICS_DISPLAY_ZONE = ZoneInfo(ANALYTICS_DISPLAY_TIMEZONE)
+ANALYTICS_HOURLY_LABELS = tuple(f"{hour:02d}:00" for hour in range(24))
 
 
 @dataclass
@@ -83,6 +86,7 @@ class AnalyticsStatsSnapshot:
     most_viewed_schedule_events: list[AnalyticsMetric] = field(default_factory=list)
     most_clicked_external_links: list[AnalyticsMetric] = field(default_factory=list)
     traffic_by_day: list[AnalyticsMetric] = field(default_factory=list)
+    today_traffic_by_hour: list[AnalyticsMetric] = field(default_factory=list)
     traffic_by_hour: list[AnalyticsMetric] = field(default_factory=list)
     map_opens: dict[str, int] = field(default_factory=dict)
     live_activity: AnalyticsLiveActivitySnapshot = field(
@@ -391,6 +395,10 @@ class MongoAnalyticsRepository:
             limit=31,
             ascending=True,
         )
+        today_traffic_by_hour = await self._get_today_hourly_metrics(
+            app_id=app_id,
+            now=now,
+        )
         traffic_by_hour = await self._get_ranked_metrics(
             {"appId": app_id, "eventName": "session_started"},
             {
@@ -456,6 +464,7 @@ class MongoAnalyticsRepository:
             "mostViewedScheduleEvents": most_viewed_schedule_events,
             "mostClickedExternalLinks": most_clicked_external_links,
             "trafficByDay": traffic_by_day,
+            "todayTrafficByHour": today_traffic_by_hour,
             "trafficByHour": traffic_by_hour,
             "mapOpens": map_opens,
             "liveActivity": AnalyticsLiveActivitySnapshot(
@@ -546,6 +555,43 @@ class MongoAnalyticsRepository:
     async def _get_latest_event(self, match: dict[str, Any]) -> Optional[dict[str, Any]]:
         return await self._db.analytics_events.find_one(match, sort=[("receivedAt", -1)])
 
+    async def _get_today_hourly_metrics(
+        self,
+        *,
+        app_id: str,
+        now: datetime,
+    ) -> list[AnalyticsMetric]:
+        day_start_utc, next_day_start_utc = get_analytics_day_bounds(now)
+        pipeline = [
+            {
+                "$match": {
+                    "appId": app_id,
+                    "eventName": "session_started",
+                    "timestamp": {
+                        "$gte": day_start_utc,
+                        "$lt": next_day_start_utc,
+                    },
+                }
+            },
+            {
+                "$group": {
+                    "_id": {
+                        "$dateToString": {
+                            "format": "%H:00",
+                            "date": "$timestamp",
+                            "timezone": ANALYTICS_DISPLAY_TIMEZONE,
+                        }
+                    },
+                    "value": {"$sum": 1},
+                }
+            },
+            {"$sort": {"_id": 1}},
+        ]
+        rows = await self._db.analytics_events.aggregate(pipeline).to_list(24)
+        return build_zero_filled_hourly_metrics(
+            {row["_id"]: int(row["value"]) for row in rows if row.get("_id")}
+        )
+
     async def _count_active_sessions(self, app_id: str, cutoff: datetime) -> int:
         pipeline = [
             {"$match": {"appId": app_id, "receivedAt": {"$gte": cutoff}}},
@@ -571,6 +617,27 @@ class MongoAnalyticsRepository:
 
 def build_date_key(value: datetime) -> str:
     return value.strftime("%Y-%m-%d")
+
+
+def ensure_utc_datetime(value: datetime) -> datetime:
+    if value.tzinfo is None:
+        return value.replace(tzinfo=UTC)
+    return value.astimezone(UTC)
+
+
+def get_analytics_day_bounds(now: datetime) -> tuple[datetime, datetime]:
+    current_time_utc = ensure_utc_datetime(now)
+    current_time_local = current_time_utc.astimezone(ANALYTICS_DISPLAY_ZONE)
+    day_start_local = current_time_local.replace(hour=0, minute=0, second=0, microsecond=0)
+    next_day_start_local = day_start_local + timedelta(days=1)
+    return day_start_local.astimezone(UTC), next_day_start_local.astimezone(UTC)
+
+
+def build_zero_filled_hourly_metrics(hour_counts: dict[str, int]) -> list[AnalyticsMetric]:
+    return [
+        AnalyticsMetric(label=label, value=int(hour_counts.get(label, 0)))
+        for label in ANALYTICS_HOURLY_LABELS
+    ]
 
 
 async def record_launch(
@@ -673,6 +740,7 @@ async def fetch_stats(
         most_viewed_schedule_events=event_overview["mostViewedScheduleEvents"],
         most_clicked_external_links=event_overview["mostClickedExternalLinks"],
         traffic_by_day=event_overview["trafficByDay"],
+        today_traffic_by_hour=event_overview["todayTrafficByHour"],
         traffic_by_hour=event_overview["trafficByHour"],
         map_opens=event_overview["mapOpens"],
         live_activity=event_overview["liveActivity"],
@@ -735,6 +803,9 @@ def serialize_stats(snapshot: AnalyticsStatsSnapshot) -> dict[str, Any]:
             serialize_metric(metric) for metric in snapshot.most_clicked_external_links
         ],
         "trafficByDay": [serialize_metric(metric) for metric in snapshot.traffic_by_day],
+        "todayTrafficByHour": [
+            serialize_metric(metric) for metric in snapshot.today_traffic_by_hour
+        ],
         "trafficByHour": [serialize_metric(metric) for metric in snapshot.traffic_by_hour],
         "mapOpens": snapshot.map_opens,
         "liveActivity": serialize_live_activity(snapshot.live_activity),
