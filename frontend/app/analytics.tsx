@@ -24,6 +24,7 @@ import {
   SECTION_COPY,
   SPONSOR_METRICS,
 } from '../src/analytics/dashboardContent';
+import { formatAnalyticsTimestamp } from '../src/analytics/timezone';
 
 const { apiBaseUrl: API_BASE_URL, appId: ANALYTICS_APP_ID } = getAnalyticsConfig();
 const REFRESH_INTERVAL_MS = 30_000;
@@ -205,19 +206,6 @@ function formatDuration(seconds?: number): string {
   return `${minutes}m ${remainingSeconds}s`;
 }
 
-function formatTimestamp(value?: string | null): string {
-  if (!value) {
-    return 'No data yet';
-  }
-
-  const parsed = new Date(value);
-  if (Number.isNaN(parsed.getTime())) {
-    return value;
-  }
-
-  return parsed.toLocaleString();
-}
-
 export default function AnalyticsDashboardScreen() {
   const { width } = useWindowDimensions();
   const [stats, setStats] = useState<AnalyticsStatsResponse | null>(null);
@@ -345,7 +333,7 @@ export default function AnalyticsDashboardScreen() {
     },
     {
       label: LIVE_ACTIVITY_METRICS[1].label,
-      value: formatTimestamp(stats?.liveActivity?.lastEventAt),
+      value: formatAnalyticsTimestamp(stats?.liveActivity?.lastEventAt),
       accentColor: themeColors.utility,
       description: LIVE_ACTIVITY_METRICS[1].description,
     },

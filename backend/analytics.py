@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from typing import Any, Optional, Protocol
 
 try:
@@ -10,6 +10,9 @@ except ModuleNotFoundError:
     class ReturnDocument:
         BEFORE = False
         AFTER = True
+
+
+ANALYTICS_DISPLAY_TIMEZONE = "America/Toronto"
 
 
 @dataclass
@@ -378,13 +381,25 @@ class MongoAnalyticsRepository:
         )
         traffic_by_day = await self._get_ranked_metrics(
             {"appId": app_id, "eventName": "session_started"},
-            {"$dateToString": {"format": "%Y-%m-%d", "date": "$timestamp"}},
+            {
+                "$dateToString": {
+                    "format": "%Y-%m-%d",
+                    "date": "$timestamp",
+                    "timezone": ANALYTICS_DISPLAY_TIMEZONE,
+                }
+            },
             limit=31,
             ascending=True,
         )
         traffic_by_hour = await self._get_ranked_metrics(
             {"appId": app_id, "eventName": "session_started"},
-            {"$dateToString": {"format": "%H:00", "date": "$timestamp"}},
+            {
+                "$dateToString": {
+                    "format": "%H:00",
+                    "date": "$timestamp",
+                    "timezone": ANALYTICS_DISPLAY_TIMEZONE,
+                }
+            },
             limit=24,
             ascending=True,
         )
@@ -682,9 +697,13 @@ def serialize_metric(metric: AnalyticsMetric) -> dict[str, int | str]:
 def serialize_live_activity(
     snapshot: AnalyticsLiveActivitySnapshot,
 ) -> dict[str, int | str | None]:
+    last_event_at = snapshot.last_event_at
+    if last_event_at and last_event_at.tzinfo is None:
+        last_event_at = last_event_at.replace(tzinfo=UTC)
+
     return {
         "lastEventName": snapshot.last_event_name,
-        "lastEventAt": snapshot.last_event_at.isoformat() if snapshot.last_event_at else None,
+        "lastEventAt": last_event_at.isoformat() if last_event_at else None,
         "lastPageViewed": snapshot.last_page_viewed,
         "lastMapOpened": snapshot.last_map_opened,
         "lastQuickActionOpened": snapshot.last_quick_action_opened,

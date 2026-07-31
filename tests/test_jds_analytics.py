@@ -1,12 +1,14 @@
 import asyncio
-from datetime import datetime
+from datetime import UTC, datetime
 
 from backend.analytics import (
     AnalyticsLaunchPayload,
+    AnalyticsLiveActivitySnapshot,
     SponsorAnalyticsSnapshot,
     build_date_key,
     fetch_stats,
     record_launch,
+    serialize_live_activity,
 )
 
 
@@ -250,3 +252,25 @@ def test_device_becomes_installed_once_and_stays_installed():
     assert third_stats.installed_devices == 1
     assert third_stats.browser_only_devices == 0
     assert repository.devices[(app_id, "device-a")]["installed"] is True
+
+
+def test_serialize_live_activity_marks_utc_timestamps_explicitly():
+    snapshot = AnalyticsLiveActivitySnapshot(
+        last_event_name="page_view",
+        last_event_at=datetime(2026, 7, 31, 15, 45, 0),
+    )
+
+    payload = serialize_live_activity(snapshot)
+
+    assert payload["lastEventAt"] == "2026-07-31T15:45:00+00:00"
+
+
+def test_serialize_live_activity_preserves_existing_utc_timezone():
+    snapshot = AnalyticsLiveActivitySnapshot(
+        last_event_name="page_view",
+        last_event_at=datetime(2026, 1, 15, 17, 0, 0, tzinfo=UTC),
+    )
+
+    payload = serialize_live_activity(snapshot)
+
+    assert payload["lastEventAt"] == "2026-01-15T17:00:00+00:00"
