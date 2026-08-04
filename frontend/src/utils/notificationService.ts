@@ -22,7 +22,6 @@ export async function registerForPushNotificationsAsync(): Promise<string | null
 
   // Check if running on a physical device
   if (!Device.isDevice) {
-    console.log('Push notifications require a physical device');
     return null;
   }
 
@@ -37,7 +36,6 @@ export async function registerForPushNotificationsAsync(): Promise<string | null
   }
 
   if (finalStatus !== 'granted') {
-    console.log('Failed to get push notification permission');
     return null;
   }
 
@@ -98,7 +96,6 @@ async function registerTokenWithBackend(token: string): Promise<void> {
       throw new Error('Failed to register push token');
     }
 
-    console.log('Push token registered with backend');
   } catch (error) {
     console.error('Error registering push token with backend:', error);
   }
@@ -108,7 +105,6 @@ export async function syncStarredEventsWithBackend(starredEventIds: string[]): P
   try {
     const token = await AsyncStorage.getItem(PUSH_TOKEN_KEY);
     if (!token) {
-      console.log('No push token available, skipping sync');
       return;
     }
 
@@ -127,7 +123,6 @@ export async function syncStarredEventsWithBackend(starredEventIds: string[]): P
       throw new Error('Failed to sync starred events');
     }
 
-    console.log('Starred events synced with backend');
   } catch (error) {
     console.error('Error syncing starred events:', error);
   }

@@ -35,7 +35,6 @@ if (typeof window !== 'undefined') {
   
   // Capture the beforeinstallprompt event IMMEDIATELY
   window.addEventListener('beforeinstallprompt', (e: Event) => {
-    console.log('🎯 [PWA] beforeinstallprompt event CAPTURED!');
     e.preventDefault(); // Prevent the mini-infobar from appearing
     window.deferredPWAPrompt = e;
     window.pwaPromptCaptured = true;
@@ -43,7 +42,6 @@ if (typeof window !== 'undefined') {
 
   // Listen for successful install
   window.addEventListener('appinstalled', () => {
-    console.log('✅ [PWA] App was installed!');
     window.deferredPWAPrompt = null;
     window.pwaPromptCaptured = false;
   });
@@ -78,7 +76,6 @@ export default function PWAInstallPrompt({ onDismiss }: PWAInstallPromptProps) {
 
     const init = async () => {
       if (isEmbeddedInIframe()) {
-        console.log('[PWA] Embedded in iframe, suppressing install prompt');
         return;
       }
 
@@ -99,7 +96,6 @@ export default function PWAInstallPrompt({ onDismiss }: PWAInstallPromptProps) {
         (window.navigator as any).standalone === true;
       
       if (standalone) {
-        console.log('[PWA] Already installed, not showing prompt');
         return;
       }
 
@@ -110,7 +106,6 @@ export default function PWAInstallPrompt({ onDismiss }: PWAInstallPromptProps) {
 
       // Check if we captured the native prompt
       setHasNativePrompt(!!window.deferredPWAPrompt);
-      console.log('[PWA] Native prompt available:', !!window.deferredPWAPrompt);
 
       // Show our UI after a delay
       setTimeout(() => {
@@ -131,7 +126,6 @@ export default function PWAInstallPrompt({ onDismiss }: PWAInstallPromptProps) {
     // Also check periodically if the prompt becomes available
     const checkInterval = setInterval(() => {
       if (window.deferredPWAPrompt && !hasNativePrompt) {
-        console.log('[PWA] Native prompt became available');
         setHasNativePrompt(true);
       }
     }, 1000);
@@ -140,11 +134,7 @@ export default function PWAInstallPrompt({ onDismiss }: PWAInstallPromptProps) {
   }, []);
 
   const triggerNativeInstall = async () => {
-    console.log('[PWA] Install button clicked');
-    console.log('[PWA] deferredPWAPrompt exists:', !!window.deferredPWAPrompt);
-    
     if (!window.deferredPWAPrompt) {
-      console.log('[PWA] No native prompt available');
       // Fallback - show instructions
       setHasNativePrompt(false);
       return;
@@ -155,20 +145,16 @@ export default function PWAInstallPrompt({ onDismiss }: PWAInstallPromptProps) {
     try {
       // IMPORTANT: prompt() must be called directly from a user gesture
       const promptEvent = window.deferredPWAPrompt;
-      console.log('[PWA] Calling prompt()...');
       
       // Show the native install prompt
       promptEvent.prompt();
       
       // Wait for the user to respond
       const { outcome } = await promptEvent.userChoice;
-      console.log('[PWA] User choice:', outcome);
       
       if (outcome === 'accepted') {
-        console.log('[PWA] User accepted installation');
         handleDismiss();
       } else {
-        console.log('[PWA] User dismissed installation');
         setInstalling(false);
       }
       

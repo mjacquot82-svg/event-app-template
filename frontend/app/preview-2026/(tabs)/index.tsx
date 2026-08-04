@@ -34,6 +34,7 @@ import {
   eventInfo,
 } from '../../../src/data/mockData';
 import { getFavorites, toggleFavorite } from '../../../src/utils/favoritesStorage';
+import { parseJsonResponse } from '../../../src/utils/fetchJson';
 
 // SOS Form initial state
 const initialSOSForm = {
@@ -78,11 +79,10 @@ export default function HomeScreen() {
   const fetchApiEvents = async () => {
     try {
       const API_BASE_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
-      const response = await fetch(`${API_BASE_URL}/api/schedule`);
-      if (response.ok) {
-        const data = await response.json();
-        setApiEvents(data.events || []);
-      }
+      const endpoint = `${API_BASE_URL}/api/schedule`;
+      const response = await fetch(endpoint);
+      const data = await parseJsonResponse<{ events?: any[] }>(response, endpoint);
+      setApiEvents(data.events || []);
     } catch (error) {
       console.error('Error fetching events:', error);
     }
@@ -93,16 +93,15 @@ export default function HomeScreen() {
     setVendorsLoading(true);
     try {
       const API_BASE_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
-      const response = await fetch(`${API_BASE_URL}/api/vendors`);
-      if (response.ok) {
-        const data = await response.json();
-        const vendorList = data.vendors || [];
-        setVendors(vendorList);
-        
-        // Extract unique types for filter
-        const types = ['All', ...new Set(vendorList.map((v: any) => v.type).filter(Boolean))];
-        setVendorTypes(types as string[]);
-      }
+      const endpoint = `${API_BASE_URL}/api/vendors`;
+      const response = await fetch(endpoint);
+      const data = await parseJsonResponse<{ vendors?: any[] }>(response, endpoint);
+      const vendorList = data.vendors || [];
+      setVendors(vendorList);
+
+      // Extract unique types for filter
+      const types = ['All', ...new Set(vendorList.map((v: any) => v.type).filter(Boolean))];
+      setVendorTypes(types as string[]);
     } catch (error) {
       console.error('Error fetching vendors:', error);
     } finally {
@@ -114,11 +113,10 @@ export default function HomeScreen() {
   const fetchActiveSOSReports = async () => {
     try {
       const API_BASE_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
-      const response = await fetch(`${API_BASE_URL}/api/sos/active`);
-      if (response.ok) {
-        const data = await response.json();
-        setActiveSOSReports(data || []);
-      }
+      const endpoint = `${API_BASE_URL}/api/sos/active`;
+      const response = await fetch(endpoint);
+      const data = await parseJsonResponse<any[]>(response, endpoint);
+      setActiveSOSReports(data || []);
     } catch (error) {
       console.error('Error fetching SOS reports:', error);
     }
@@ -757,7 +755,6 @@ export default function HomeScreen() {
                     <TouchableOpacity 
                       style={[styles.eventDetailSection, styles.locationClickable]}
                       onPress={() => {
-                        console.log('Location clicked:', selectedEvent.location_name);
                         setShowEventDetails(false);
                         router.push({
                           pathname: '/(tabs)/map',

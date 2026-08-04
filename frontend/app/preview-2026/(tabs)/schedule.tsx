@@ -17,6 +17,7 @@ import { useFocusEffect, useRouter } from 'expo-router';
 import colors from '../../../src/theme/colors';
 import { getFavorites, toggleFavorite } from '../../../src/utils/favoritesStorage';
 import { syncStarredEventsWithBackend } from '../../../src/utils/notificationService';
+import { parseJsonResponse } from '../../../src/utils/fetchJson';
 
 // API Event type from Google Sheets
 interface ScheduleEvent {
@@ -40,6 +41,57 @@ interface ScheduleResponse {
 }
 
 const API_BASE_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
+const SCHEDULE_CACHE_KEY = 'walkerton-homecoming-schedule-cache';
+const SCHEDULE_CACHE_TIMESTAMP_KEY = 'walkerton-homecoming-schedule-cache-timestamp';
+
+function getLocalStorage() {
+  if (typeof globalThis === 'undefined' || !('localStorage' in globalThis)) {
+    return null;
+  }
+
+  return globalThis.localStorage;
+}
+
+function loadCachedSchedule(): { data: ScheduleResponse; cachedAt: string | null } | null {
+  const storage = getLocalStorage();
+  if (!storage) return null;
+
+  try {
+    const rawData = storage.getItem(SCHEDULE_CACHE_KEY);
+    if (!rawData) return null;
+
+    const data = JSON.parse(rawData) as ScheduleResponse;
+    const cachedAt = storage.getItem(SCHEDULE_CACHE_TIMESTAMP_KEY);
+    return { data, cachedAt };
+  } catch (error) {
+    console.error('Error reading cached schedule:', error);
+    return null;
+  }
+}
+
+function saveCachedSchedule(data: ScheduleResponse) {
+  const storage = getLocalStorage();
+  if (!storage) return;
+
+  try {
+    storage.setItem(SCHEDULE_CACHE_KEY, JSON.stringify(data));
+    storage.setItem(SCHEDULE_CACHE_TIMESTAMP_KEY, new Date().toISOString());
+  } catch (error) {
+    console.error('Error saving cached schedule:', error);
+  }
+}
+
+function formatCacheTimestamp(timestamp: string | null) {
+  if (!timestamp) return null;
+
+  const date = new Date(timestamp);
+  if (Number.isNaN(date.getTime())) return null;
+
+  return date.toLocaleString('en-US', {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  });
+}
 
 export default function ScheduleScreen() {
   const router = useRouter();
@@ -53,6 +105,7 @@ export default function ScheduleScreen() {
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<ScheduleEvent | null>(null);
   const [showEventModal, setShowEventModal] = useState(false);
+  const [offlineCacheTimestamp, setOfflineCacheTimestamp] = useState<string | null>(null);
 
   // Fetch schedule from API
   const fetchSchedule = async (isRefresh = false) => {
@@ -64,15 +117,30 @@ export default function ScheduleScreen() {
       }
       setError(null);
 
-      const response = await fetch(`${API_BASE_URL}/api/schedule`);
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch schedule');
+      const endpoint = `${API_BASE_URL}/api/schedule`;
+      let response: Response;
+
+      try {
+        response = await fetch(endpoint);
+      } catch (err) {
+        const cachedSchedule = loadCachedSchedule();
+
+        if (cachedSchedule) {
+          setEvents(cachedSchedule.data.events);
+          setLastUpdated(cachedSchedule.data.last_updated);
+          setOfflineCacheTimestamp(cachedSchedule.cachedAt);
+          setError(null);
+          return;
+        }
+
+        throw err;
       }
 
-      const data: ScheduleResponse = await response.json();
+      const data = await parseJsonResponse<ScheduleResponse>(response, endpoint);
       setEvents(data.events);
       setLastUpdated(data.last_updated);
+      setOfflineCacheTimestamp(null);
+      saveCachedSchedule(data);
     } catch (err) {
       console.error('Error fetching schedule:', err);
       setError('Unable to load schedule. Pull down to retry.');
@@ -179,6 +247,7 @@ export default function ScheduleScreen() {
     },
     {} as Record<string, ScheduleEvent[]>
   );
+  const formattedOfflineCacheTimestamp = formatCacheTimestamp(offlineCacheTimestamp);
 
   const handleFilterPress = (value: string | null) => {
     if (value === 'starred') {
@@ -280,6 +349,19 @@ export default function ScheduleScreen() {
           />
         }
       >
+        {offlineCacheTimestamp && (
+          <View style={styles.offlineBanner}>
+            <Text style={styles.offlineBannerText}>
+              Offline — displaying the last downloaded schedule.
+            </Text>
+            {formattedOfflineCacheTimestamp && (
+              <Text style={styles.offlineBannerMeta}>
+                Last updated: {formattedOfflineCacheTimestamp}
+              </Text>
+            )}
+          </View>
+        )}
+
         {/* Last Updated Indicator */}
         {lastUpdated && (
           <View style={styles.lastUpdatedContainer}>
@@ -478,7 +560,6 @@ export default function ScheduleScreen() {
                     <TouchableOpacity 
                       style={[styles.detailSection, styles.locationClickable]}
                       onPress={() => {
-                        console.log('Location clicked:', selectedEvent.location_name);
                         setShowEventModal(false);
                         router.push({
                           pathname: '/(tabs)/map',
@@ -664,6 +745,26 @@ const styles = StyleSheet.create({
   errorText: {
     fontSize: 14,
     color: colors.error,
+  },
+  offlineBanner: {
+    marginTop: 16,
+    marginBottom: 4,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderRadius: 12,
+    backgroundColor: colors.surfaceHighlight,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  offlineBannerText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: colors.textPrimary,
+  },
+  offlineBannerMeta: {
+    fontSize: 12,
+    color: colors.textMuted,
+    marginTop: 4,
   },
   lastUpdatedContainer: {
     flexDirection: 'row',
